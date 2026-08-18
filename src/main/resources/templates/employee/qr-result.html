@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | Attendance</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 25px;
+
+            font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
+            background:
+                    radial-gradient(
+                            circle at 80% 10%,
+                            rgba(37, 99, 235, 0.16),
+                            transparent 30%
+                    ),
+                    radial-gradient(
+                            circle at 10% 90%,
+                            rgba(124, 58, 237, 0.12),
+                            transparent 30%
+                    ),
+                    #f1f5f9;
+
+            color: #0f172a;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+
+            margin: 0 auto 12px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 15px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #2563eb,
+                            #7c3aed
+                    );
+
+            color: white;
+
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .brand h1 {
+            font-size: 23px;
+            margin-bottom: 5px;
+        }
+
+        .brand p {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .card {
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 20px;
+
+            padding: 30px;
+
+            text-align: center;
+
+            box-shadow:
+                    0 15px 40px
+                    rgba(15, 23, 42, 0.08);
+        }
+
+        .result-icon {
+            width: 70px;
+            height: 70px;
+
+            margin: 0 auto 18px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 50%;
+
+            font-size: 30px;
+            font-weight: 900;
+        }
+
+        .success-icon {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .error-icon {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .action {
+            display: inline-block;
+
+            margin-bottom: 8px;
+
+            padding: 7px 13px;
+
+            border-radius: 999px;
+
+            background: #eff6ff;
+            color: #2563eb;
+
+            font-size: 11px;
+            font-weight: 900;
+
+            letter-spacing: 1px;
+        }
+
+        .card h2 {
+            margin-bottom: 8px;
+
+            font-size: 25px;
+        }
+
+        .message {
+            color: #64748b;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 24px;
+        }
+
+        .employee {
+            padding: 18px;
+
+            margin-top: 10px;
+
+            background: #f8fafc;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 14px;
+
+            text-align: left;
+        }
+
+        .employee-row {
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding: 9px 0;
+
+            border-bottom:
+                    1px solid
+                    #e2e8f0;
+        }
+
+        .employee-row:last-child {
+            border-bottom: none;
+        }
+
+        .employee-row span {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .employee-row strong {
+            font-size: 13px;
+            text-align: right;
+        }
+
+        .time-box {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(3, 1fr);
+
+            gap: 10px;
+
+            margin-top: 18px;
+        }
+
+        .time {
+            padding: 13px 8px;
+
+            border-radius: 11px;
+
+            background: #f8fafc;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+        }
+
+        .time span {
+            display: block;
+
+            color: #64748b;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+            margin-bottom: 6px;
+        }
+
+        .time strong {
+            font-size: 13px;
+        }
+
+        .footer {
+            margin-top: 22px;
+
+            color: #94a3b8;
+
+            font-size: 11px;
+
+            text-align: center;
+        }
+
+        @media (max-width: 500px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 23px 18px;
+            }
+
+            .time-box {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="brand">
+
+        <div class="logo">
+            A
+        </div>
+
+        <h1>
+            ASLENIX
+        </h1>
+
+        <p>
+            Attendance Management System
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <!-- SUCCESS -->
+
+        <div th:if="${success}">
+
+            <div class="result-icon success-icon">
+
+                ✓
+
+            </div>
+
+            <div class="action"
+                 th:text="${action}">
+                CHECK-IN
+            </div>
+
+            <h2
+                    th:text="${message}">
+                Check-in successful.
+            </h2>
+
+            <p class="message">
+
+                Your attendance has been recorded successfully.
+
+            </p>
+
+
+            <!-- EMPLOYEE INFORMATION -->
+
+            <div class="employee">
+
+                <div class="employee-row">
+
+                    <span>
+                        Employee
+                    </span>
+
+                    <strong
+                            th:text="${employeeName}">
+                        Employee Name
+                    </strong>
+
+                </div>
+
+
+                <div class="employee-row">
+
+                    <span>
+                        Employee Code
+                    </span>
+
+                    <strong
+                            th:text="${employeeCode}">
+                        ASL-00000
+                    </strong>
+
+                </div>
+
+
+                <div class="employee-row"
+                     th:if="${employee != null}">
+
+                    <span>
+                        Position
+                    </span>
+
+                    <strong
+                            th:text="${employee.position}">
+                        Employee
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- ATTENDANCE TIMES -->
+
+            <div class="time-box">
+
+                <div class="time">
+
+                    <span>
+                        Check-in
+                    </span>
+
+                    <strong
+                            th:text="${checkInTime != null ? #temporals.format(checkInTime, 'hh:mm a') : '--:--'}">
+                        --:--
+                    </strong>
+
+                </div>
+
+
+                <div class="time">
+
+                    <span>
+                        Check-out
+                    </span>
+
+                    <strong
+                            th:text="${checkOutTime != null ? #temporals.format(checkOutTime, 'hh:mm a') : '--:--'}">
+                        --:--
+                    </strong>
+
+                </div>
+
+
+                <div class="time">
+
+                    <span>
+                        Working
+                    </span>
+
+                    <strong
+                            th:text="${workingHours != null ? workingHours : '0h 00m'}">
+                        0h 00m
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div th:unless="${success}">
+
+            <div class="result-icon error-icon">
+
+                !
+
+            </div>
+
+            <h2>
+                Verification Failed
+            </h2>
+
+            <p class="message"
+               th:text="${message}">
+                Invalid employee QR code.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+
+        ASLENIX Attendance System
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

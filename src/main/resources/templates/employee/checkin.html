@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ASLENIX | Attendance</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 80% 10%,
+                    rgba(37, 99, 235, .15),
+                    transparent 30%
+                ),
+                #f1f5f9;
+
+            color: #0f172a;
+        }
+
+        header {
+            min-height: 72px;
+
+            padding: 16px 35px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f172a,
+                    #172554
+                );
+
+            color: white;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .back {
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+        main {
+            width: min(650px, 92%);
+
+            margin: 45px auto;
+        }
+
+        .card {
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 18px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 15px 35px
+                rgba(15, 23, 42, .08);
+        }
+
+        h1 {
+            font-size: 28px;
+
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #64748b;
+
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+        .scanner {
+            width: 100%;
+
+            min-height: 330px;
+
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            background: #0f172a;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+
+            height: 330px;
+
+            object-fit: cover;
+        }
+
+        .status {
+            margin-top: 20px;
+
+            padding: 16px;
+
+            border-radius: 12px;
+
+            background: #f8fafc;
+
+            border: 1px solid #e2e8f0;
+
+            text-align: center;
+
+            color: #475569;
+
+            font-size: 14px;
+        }
+
+        .success {
+            background: #dcfce7;
+
+            border-color: #86efac;
+
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+
+            border-color: #fca5a5;
+
+            color: #991b1b;
+        }
+
+        .location {
+            margin-top: 15px;
+
+            text-align: center;
+
+            font-size: 13px;
+
+            color: #64748b;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="brand">
+        ASLENIX ATTENDANCE
+    </div>
+
+    <a
+        href="/employee/dashboard"
+        class="back">
+        Dashboard
+    </a>
+
+</header>
+
+<main>
+
+    <div class="card">
+
+        <h1>
+            Scan Your ID Card
+        </h1>
+
+        <p class="description">
+            Allow location access and scan the QR code
+            printed on your employee ID card.
+        </p>
+
+        <div class="scanner">
+
+            <video
+                id="camera"
+                autoplay
+                playsinline>
+            </video>
+
+        </div>
+
+        <div
+            id="status"
+            class="status">
+
+            Requesting location permission...
+
+        </div>
+
+        <div
+            id="locationStatus"
+            class="location">
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+const video =
+    document.getElementById("camera");
+
+const statusBox =
+    document.getElementById("status");
+
+const locationStatus =
+    document.getElementById("locationStatus");
+
+let latitude = null;
+let longitude = null;
+
+let processing = false;
+
+
+// =====================================================
+// LOCATION
+// =====================================================
+
+function getLocation() {
+
+    if (!navigator.geolocation) {
+
+        showError(
+            "Your browser does not support GPS location."
+        );
+
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            latitude =
+                position.coords.latitude;
+
+            longitude =
+                position.coords.longitude;
+
+            locationStatus.innerText =
+                "Location detected.";
+
+            statusBox.innerText =
+                "Location verified. Scan your ID card.";
+
+            startScanner();
+
+        },
+
+        function(error) {
+
+            showError(
+                "Location permission is required to check in."
+            );
+
+        },
+
+        {
+            enableHighAccuracy: true,
+
+            timeout: 10000,
+
+            maximumAge: 0
+        }
+    );
+}
+
+
+// =====================================================
+// CAMERA
+// =====================================================
+
+async function startScanner() {
+
+    try {
+
+        const stream =
+            await navigator.mediaDevices
+                .getUserMedia({
+                    video: {
+                        facingMode: {
+                            ideal: "environment"
+                        }
+                    },
+
+                    audio: false
+                });
+
+        video.srcObject = stream;
+
+        statusBox.innerText =
+            "Point your camera at your ID card QR code.";
+
+        scanQR();
+
+    } catch (error) {
+
+        showError(
+            "Camera permission is required to scan the QR code."
+        );
+    }
+}
+
+
+// =====================================================
+// QR SCANNER
+// =====================================================
+
+async function scanQR() {
+
+    if (!("BarcodeDetector" in window)) {
+
+        showError(
+            "QR scanning is not supported by this browser."
+        );
+
+        return;
+    }
+
+    const detector =
+        new BarcodeDetector({
+            formats: ["qr_code"]
+        });
+
+    setInterval(async () => {
+
+        if (processing) {
+            return;
+        }
+
+        try {
+
+            const codes =
+                await detector.detect(video);
+
+            if (!codes.length) {
+                return;
+            }
+
+            const value =
+                codes[0].rawValue;
+
+            if (!value) {
+                return;
+            }
+
+            processing = true;
+
+            await processQR(value);
+
+        } catch (error) {
+
+            console.error(error);
+        }
+
+    }, 500);
+}
+
+
+// =====================================================
+// PROCESS QR
+// =====================================================
+
+async function processQR(qrValue) {
+
+    statusBox.innerText =
+        "QR detected. Verifying employee...";
+
+    let token = extractToken(qrValue);
+
+    if (!token) {
+
+        showError(
+            "Invalid ASLENIX employee QR code."
+        );
+
+        processing = false;
+
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "/employee/attendance/scan",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        token: token,
+
+                        latitude: latitude,
+
+                        longitude: longitude
+
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            showError(
+                data.message ||
+                "Attendance could not be recorded."
+            );
+
+            processing = false;
+
+            return;
+        }
+
+        showSuccess(
+            data.message
+        );
+
+        setTimeout(() => {
+
+            window.location.href =
+                "/employee/dashboard";
+
+        }, 1800);
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(
+            "Unable to connect to the attendance server."
+        );
+
+        processing = false;
+    }
+}
+
+
+// =====================================================
+// EXTRACT QR TOKEN
+// =====================================================
+
+function extractToken(value) {
+
+    try {
+
+        const url =
+            new URL(value);
+
+        const parts =
+            url.pathname
+                .split("/")
+                .filter(Boolean);
+
+        const index =
+            parts.indexOf(
+                "verify-employee"
+            );
+
+        if (
+            index !== -1 &&
+            parts[index + 1]
+        ) {
+
+            return parts[index + 1];
+        }
+
+    } catch (error) {
+
+        // QR may contain only token
+    }
+
+    return value;
+}
+
+
+// =====================================================
+// UI
+// =====================================================
+
+function showError(message) {
+
+    statusBox.innerText =
+        message;
+
+    statusBox.className =
+        "status error";
+}
+
+
+function showSuccess(message) {
+
+    statusBox.innerText =
+        message;
+
+    statusBox.className =
+        "status success";
+}
+
+
+// START
+
+getLocation();
+
+</script>
+
+</body>
+
+</html>

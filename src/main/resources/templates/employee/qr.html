@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | Employee QR</title>
+
+    <!-- QR CODE GENERATOR -->
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
+            background:
+                    radial-gradient(
+                            circle at 80% 10%,
+                            rgba(37, 99, 235, 0.14),
+                            transparent 30%
+                    ),
+                    #f1f5f9;
+
+            color: #0f172a;
+        }
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        header {
+
+            min-height: 74px;
+
+            padding: 16px 35px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #0f172a,
+                            #172554
+                    );
+
+            color: white;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            box-shadow:
+                    0 5px 20px
+                    rgba(15, 23, 42, 0.15);
+        }
+
+        .brand {
+
+            font-size: 22px;
+
+            font-weight: 800;
+        }
+
+        .header-links {
+
+            display: flex;
+
+            gap: 10px;
+
+            align-items: center;
+        }
+
+        .header-link {
+
+            color: white;
+
+            text-decoration: none;
+
+            padding: 9px 15px;
+
+            border-radius: 8px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+        .header-link:hover {
+
+            background:
+                    rgba(255,255,255,0.12);
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        main {
+
+            max-width: 900px;
+
+            margin: 0 auto;
+
+            padding: 40px 20px 60px;
+        }
+
+        .page-header {
+
+            text-align: center;
+
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+
+            font-size: 32px;
+
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+        /* =====================================================
+           QR CARD
+        ===================================================== */
+
+        .qr-card {
+
+            background: white;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 18px;
+
+            padding: 35px;
+
+            box-shadow:
+                    0 10px 30px
+                    rgba(15, 23, 42, 0.08);
+
+            text-align: center;
+        }
+
+        /* =====================================================
+           EMPLOYEE
+        ===================================================== */
+
+        .employee-name {
+
+            font-size: 25px;
+
+            font-weight: 800;
+
+            margin-bottom: 6px;
+        }
+
+        .employee-code {
+
+            color: #2563eb;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            margin-bottom: 25px;
+        }
+
+        /* =====================================================
+           QR
+        ===================================================== */
+
+        .qr-wrapper {
+
+            width: 300px;
+
+            height: 300px;
+
+            margin: 0 auto 25px;
+
+            padding: 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: white;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 15px;
+
+            box-shadow:
+                    0 5px 20px
+                    rgba(15, 23, 42, 0.06);
+        }
+
+        #qrcode {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+        }
+
+        #qrcode img {
+
+            display: block;
+
+            width: 250px;
+
+            height: 250px;
+        }
+
+        /* =====================================================
+           INFORMATION
+        ===================================================== */
+
+        .info {
+
+            max-width: 600px;
+
+            margin: 0 auto;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            background: #f8fafc;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+        }
+
+        .info-label {
+
+            color: #64748b;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+            margin-bottom: 7px;
+        }
+
+        .token {
+
+            word-break: break-all;
+
+            font-family:
+                    Consolas,
+                    monospace;
+
+            font-size: 12px;
+
+            color: #334155;
+        }
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
+        .actions {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            margin-top: 25px;
+        }
+
+        .button {
+
+            border: none;
+
+            border-radius: 9px;
+
+            padding: 12px 20px;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            display: inline-block;
+        }
+
+        .print {
+
+            background: #2563eb;
+
+            color: white;
+        }
+
+        .print:hover {
+
+            background: #1d4ed8;
+        }
+
+        .dashboard {
+
+            background: #e2e8f0;
+
+            color: #0f172a;
+        }
+
+        .dashboard:hover {
+
+            background: #cbd5e1;
+        }
+
+        .regenerate {
+
+            background: #dc2626;
+
+            color: white;
+        }
+
+        .regenerate:hover {
+
+            background: #b91c1c;
+        }
+
+        /* =====================================================
+           PRINT
+        ===================================================== */
+
+        @media print {
+
+            body {
+
+                background: white;
+            }
+
+            header,
+            .page-header,
+            .info,
+            .actions {
+
+                display: none !important;
+            }
+
+            main {
+
+                padding: 0;
+
+                max-width: none;
+            }
+
+            .qr-card {
+
+                border: none;
+
+                box-shadow: none;
+
+                padding: 20px;
+            }
+
+            .qr-wrapper {
+
+                border: none;
+
+                box-shadow: none;
+            }
+
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            header {
+
+                padding: 15px 18px;
+            }
+
+            .brand {
+
+                font-size: 18px;
+            }
+
+            main {
+
+                padding:
+                        28px 14px 45px;
+            }
+
+            .qr-card {
+
+                padding: 25px 15px;
+            }
+
+            .qr-wrapper {
+
+                width: 280px;
+
+                height: 280px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<header>
+
+    <div class="brand">
+        ASLENIX ATTENDANCE
+    </div>
+
+    <div class="header-links">
+
+        <a
+                href="/employee/dashboard"
+                class="header-link">
+
+            Dashboard
+
+        </a>
+
+    </div>
+
+</header>
+
+
+<main>
+
+
+    <div class="page-header">
+
+        <h1>
+            Employee QR Code
+        </h1>
+
+        <p>
+            This QR code is permanently associated
+            with your employee account.
+        </p>
+
+    </div>
+
+
+    <div class="qr-card">
+
+
+        <!-- =================================================
+             EMPLOYEE INFORMATION
+        ================================================== -->
+
+        <div
+                class="employee-name"
+                th:text="${employeeName}">
+
+            Employee Name
+
+        </div>
+
+
+        <div
+                class="employee-code"
+                th:text="${employee.employeeCode}">
+
+            ASL-00000
+
+        </div>
+
+
+        <!-- =================================================
+             QR CODE
+        ================================================== -->
+
+        <div class="qr-wrapper">
+
+            <div id="qrcode"></div>
+
+        </div>
+
+
+        <p style="
+            color:#64748b;
+            font-size:14px;
+            margin-bottom:20px;
+        ">
+
+            Scan this QR code at the ASLENIX office
+            to record your attendance.
+
+        </p>
+
+
+        <!-- =================================================
+             TOKEN
+        ================================================== -->
+
+        <div class="info">
+
+            <div class="info-label">
+
+                QR Token
+
+            </div>
+
+            <div
+                    class="token"
+                    th:text="${qrToken}">
+
+                QR TOKEN
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="actions">
+
+            <button
+                    type="button"
+                    class="button print"
+                    onclick="window.print()">
+
+                🖨 Print QR
+
+            </button>
+
+
+            <a
+                    href="/employee/dashboard"
+                    class="button dashboard">
+
+                ← Dashboard
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+</main>
+
+
+<script th:inline="javascript">
+
+    const qrValue =
+        /*[[${qrUrl}]]*/ "/verify-employee/demo";
+
+
+    // ========================================================
+    // GENERATE QR
+    // ========================================================
+
+    new QRCode(
+        document.getElementById("qrcode"),
+        {
+            text: qrValue,
+
+            width: 250,
+
+            height: 250,
+
+            colorDark: "#0f172a",
+
+            colorLight: "#ffffff",
+
+            correctLevel:
+                QRCode.CorrectLevel.H
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
+

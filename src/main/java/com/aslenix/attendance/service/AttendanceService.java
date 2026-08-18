@@ -11,6 +11,8 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -101,7 +103,8 @@ public class AttendanceService {
         return getCurrentMonthAttendance(employee)
                 .stream()
                 .filter(a ->
-                        "PRESENT".equals(a.getStatus()))
+                        "PRESENT".equalsIgnoreCase(
+                                a.getStatus()))
                 .count();
     }
 
@@ -125,9 +128,6 @@ public class AttendanceService {
 
         /*
          * Leave functionality has not been connected yet.
-         *
-         * This will remain 0 until the Leave module
-         * is connected.
          */
 
         return 0;
@@ -341,7 +341,10 @@ public class AttendanceService {
                     );
 
             totalMinutes +=
-                    Math.max(duration.toMinutes(), 0);
+                    Math.max(
+                            duration.toMinutes(),
+                            0
+                    );
         }
 
         long hours =
@@ -356,6 +359,322 @@ public class AttendanceService {
                         minutes
                 )
                 + "m";
+    }
+
+    // ============================================================
+    // QR CHECK-IN + LOCATION VERIFICATION
+    // ============================================================
+
+    public Attendance checkIn(
+            Employee employee,
+            double latitude,
+            double longitude) {
+
+        // --------------------------------------------------------
+        // Validate employee
+        // --------------------------------------------------------
+
+        if (employee == null) {
+            throw new IllegalArgumentException(
+                    "Employee not found."
+            );
+        }
+
+        if (!employee.isEnabled()) {
+            throw new IllegalStateException(
+                    "Employee account is disabled."
+            );
+        }
+
+        // --------------------------------------------------------
+        // Get office settings
+        // --------------------------------------------------------
+
+        OfficeSettings settings =
+                getOfficeSettings();
+
+        // --------------------------------------------------------
+        // Check whether today is a working day
+        // --------------------------------------------------------
+
+        LocalDate today = LocalDate.now();
+
+        if (!isWorkingDay(
+                settings,
+                today.getDayOfWeek())) {
+
+            throw new IllegalStateException(
+                    "Today is not a working day."
+            );
+        }
+
+        // --------------------------------------------------------
+        // Validate location
+        // --------------------------------------------------------
+
+        double distance =
+                calculateDistanceMeters(
+                        latitude,
+                        longitude,
+                        settings.getLatitude(),
+                        settings.getLongitude()
+                );
+
+        if (distance >
+                settings.getAllowedRadiusMeters()) {
+
+            throw new IllegalStateException(
+                    "You are outside the office attendance radius. "
+                            + "Distance: "
+                            + Math.round(distance)
+                            + " meters. Allowed: "
+                            + Math.round(
+                            settings.getAllowedRadiusMeters())
+                            + " meters."
+            );
+        }
+
+        // --------------------------------------------------------
+        // Check existing attendance
+        // --------------------------------------------------------
+
+        Attendance existing =
+                attendanceRepository
+                        .findByEmployeeAndAttendanceDate(
+                                employee,
+                                today
+                        )
+                        .orElse(null);
+
+        if (existing != null) {
+
+            if (existing.getCheckIn() != null) {
+
+                throw new IllegalStateException(
+                        "You have already checked in today."
+                );
+            }
+
+            return existing;
+        }
+
+        // --------------------------------------------------------
+        // Create attendance
+        // --------------------------------------------------------
+
+        Attendance attendance =
+                new Attendance();
+
+        attendance.setEmployee(employee);
+        attendance.setAttendanceDate(today);
+
+        LocalDateTime now =
+                LocalDateTime.now();
+
+        attendance.setCheckIn(now);
+
+        // --------------------------------------------------------
+        // Determine PRESENT / LATE
+        // --------------------------------------------------------
+
+        LocalTime allowedStart =
+                settings.getWorkStartTime()
+                        .plusMinutes(
+                                settings.getLateGraceMinutes()
+                        );
+
+        if (now.toLocalTime()
+                .isAfter(allowedStart)) {
+
+            attendance.setStatus("PRESENT");
+        } else {
+
+            attendance.setStatus("PRESENT");
+        }
+
+        // --------------------------------------------------------
+        // Save
+        // --------------------------------------------------------
+
+        return attendanceRepository.save(
+                attendance
+        );
+    }
+
+    // ============================================================
+    // QR CHECK-OUT + LOCATION VERIFICATION
+    // ============================================================
+
+    public Attendance checkOut(
+            Employee employee,
+            double latitude,
+            double longitude) {
+
+        // --------------------------------------------------------
+        // Validate employee
+        // --------------------------------------------------------
+
+        if (employee == null) {
+            throw new IllegalArgumentException(
+                    "Employee not found."
+            );
+        }
+
+        if (!employee.isEnabled()) {
+            throw new IllegalStateException(
+                    "Employee account is disabled."
+            );
+        }
+
+        // --------------------------------------------------------
+        // Get office settings
+        // --------------------------------------------------------
+
+        OfficeSettings settings =
+                getOfficeSettings();
+
+        // --------------------------------------------------------
+        // Validate location
+        // --------------------------------------------------------
+
+        double distance =
+                calculateDistanceMeters(
+                        latitude,
+                        longitude,
+                        settings.getLatitude(),
+                        settings.getLongitude()
+                );
+
+        if (distance >
+                settings.getAllowedRadiusMeters()) {
+
+            throw new IllegalStateException(
+                    "You are outside the office attendance radius. "
+                            + "Check-out is only allowed inside the office."
+            );
+        }
+
+        // --------------------------------------------------------
+        // Find today's attendance
+        // --------------------------------------------------------
+
+        LocalDate today =
+                LocalDate.now();
+
+        Attendance attendance =
+                attendanceRepository
+                        .findByEmployeeAndAttendanceDate(
+                                employee,
+                                today
+                        )
+                        .orElse(null);
+
+        if (attendance == null) {
+
+            throw new IllegalStateException(
+                    "You have not checked in today."
+            );
+        }
+
+        // --------------------------------------------------------
+        // Already checked out
+        // --------------------------------------------------------
+
+        if (attendance.getCheckOut() != null) {
+
+            throw new IllegalStateException(
+                    "You have already checked out today."
+            );
+        }
+
+        // --------------------------------------------------------
+        // Save check-out
+        // --------------------------------------------------------
+
+        attendance.setCheckOut(
+                LocalDateTime.now()
+        );
+
+        return attendanceRepository.save(
+                attendance
+        );
+    }
+
+    // ============================================================
+    // OFFICE SETTINGS
+    // ============================================================
+
+    public OfficeSettings getOfficeSettings() {
+
+        return officeSettingsRepository
+                .findFirstByOrderByIdAsc()
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Office settings have not been configured."
+                        )
+                );
+    }
+
+    // ============================================================
+    // LOCATION DISTANCE
+    // ============================================================
+
+    /*
+     * Calculates the distance between:
+     *
+     * Employee GPS location
+     *          and
+     * Office GPS location
+     *
+     * Result is returned in meters.
+     *
+     * Uses the Haversine formula.
+     */
+
+    public double calculateDistanceMeters(
+            double employeeLatitude,
+            double employeeLongitude,
+            double officeLatitude,
+            double officeLongitude) {
+
+        final double EARTH_RADIUS_METERS =
+                6_371_000.0;
+
+        double lat1 =
+                Math.toRadians(employeeLatitude);
+
+        double lat2 =
+                Math.toRadians(officeLatitude);
+
+        double deltaLat =
+                Math.toRadians(
+                        officeLatitude
+                                - employeeLatitude
+                );
+
+        double deltaLon =
+                Math.toRadians(
+                        officeLongitude
+                                - employeeLongitude
+                );
+
+        double a =
+                Math.sin(deltaLat / 2)
+                        * Math.sin(deltaLat / 2)
+                        +
+                        Math.cos(lat1)
+                                * Math.cos(lat2)
+                                *
+                                Math.sin(deltaLon / 2)
+                                * Math.sin(deltaLon / 2);
+
+        double c =
+                2 * Math.atan2(
+                        Math.sqrt(a),
+                        Math.sqrt(1 - a)
+                );
+
+        return EARTH_RADIUS_METERS * c;
     }
 
     // ============================================================
@@ -398,10 +717,12 @@ public class AttendanceService {
     private String formatTime(
             LocalDateTime dateTime) {
 
-        return dateTime.toLocalTime()
+        return dateTime
+                .toLocalTime()
                 .format(
-                        java.time.format.DateTimeFormatter
-                                .ofPattern("hh:mm a")
+                        DateTimeFormatter.ofPattern(
+                                "hh:mm a"
+                        )
                 );
     }
 
@@ -413,7 +734,10 @@ public class AttendanceService {
             Duration duration) {
 
         long totalMinutes =
-                Math.max(duration.toMinutes(), 0);
+                Math.max(
+                        duration.toMinutes(),
+                        0
+                );
 
         long hours =
                 totalMinutes / 60;
@@ -421,7 +745,8 @@ public class AttendanceService {
         long minutes =
                 totalMinutes % 60;
 
-        return hours + "h "
+        return hours
+                + "h "
                 + String.format(
                         "%02d",
                         minutes

@@ -183,4 +183,9 @@ public class OfficeSettings {
     public void setSaturday(boolean saturday) {
         this.saturday = saturday;
     }
+
+    public double getAttendanceRadius() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAttendanceRadius'");
+    }
 }

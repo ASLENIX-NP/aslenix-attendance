@@ -5,11 +5,46 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+public interface EmployeeRepository
+        extends JpaRepository<Employee, Long> {
 
-    Optional<Employee> findByEmployeeCode(String employeeCode);
+    // ============================================================
+    // FIND BY EMPLOYEE CODE
+    // ============================================================
 
-    boolean existsByEmployeeCode(String employeeCode);
+    Optional<Employee> findByEmployeeCode(
+            String employeeCode
+    );
 
-    Optional<Employee> findByUserUsername(String username);
+    // ============================================================
+    // CHECK EMPLOYEE CODE
+    // ============================================================
+
+    boolean existsByEmployeeCode(
+            String employeeCode
+    );
+
+    // ============================================================
+    // FIND EMPLOYEE BY LOGIN USERNAME
+    // ============================================================
+
+    Optional<Employee> findByUserUsername(
+            String username
+    );
+
+    // ============================================================
+    // FIND EMPLOYEE BY QR TOKEN
+    // ============================================================
+
+    Optional<Employee> findByQrToken(
+            String qrToken
+    );
+
+    // ============================================================
+    // CHECK QR TOKEN
+    // ============================================================
+
+    boolean existsByQrToken(
+            String qrToken
+    );
 }
