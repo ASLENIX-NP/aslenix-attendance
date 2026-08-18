@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | Employees</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+            background: #2563eb;
+            padding: 10px 18px;
+            border-radius: 8px;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #0f172a;
+        }
+
+        .add {
+            background: #16a34a;
+            color: white;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 14px;
+            overflow-x: auto;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        td {
+            color: #475569;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .disabled {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .edit {
+            background: #2563eb;
+            color: white;
+            padding: 7px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .action-form {
+            display: inline;
+        }
+
+        .disable {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .enable {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">ASLENIX ADMIN</div>
+
+    <a href="/admin/dashboard" class="back">
+        Dashboard
+    </a>
+</header>
+
+<main>
+
+    <div class="top">
+
+        <h1>Employees</h1>
+
+        <a href="/admin/employees/add" class="add">
+            + Add Employee
+        </a>
+
+    </div>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="employee : ${employees}">
+
+                <td th:text="${employee.employeeCode}"></td>
+
+                <td>
+                    <span th:text="${employee.firstName}"></span>
+                    <span th:text="${employee.lastName}"></span>
+                </td>
+
+                <td th:text="${employee.phone}"></td>
+
+                <td th:text="${employee.position}"></td>
+
+                <td>
+
+                    <span
+                        th:if="${employee.enabled}"
+                        class="status active">
+                        Active
+                    </span>
+
+                    <span
+                        th:unless="${employee.enabled}"
+                        class="status disabled">
+                        Disabled
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <a
+                        th:href="@{/admin/employees/edit/{id}(id=${employee.id})}"
+                        class="edit">
+                        Edit
+                    </a>
+
+                    <form
+                        th:if="${employee.enabled}"
+                        th:action="@{/admin/employees/disable/{id}(id=${employee.id})}"
+                        method="post"
+                        class="action-form">
+
+                        <button class="disable" type="submit">
+                            Disable
+                        </button>
+
+                    </form>
+
+                    <form
+                        th:unless="${employee.enabled}"
+                        th:action="@{/admin/employees/enable/{id}(id=${employee.id})}"
+                        method="post"
+                        class="action-form">
+
+                        <button class="enable" type="submit">
+                            Enable
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(employees)}">
+
+                <td colspan="6" style="text-align:center;">
+                    No employees found.
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+</body>
+</html>

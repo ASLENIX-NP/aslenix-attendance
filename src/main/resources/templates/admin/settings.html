@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | Office Settings</title>
+
+    <style>
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           BODY
+        ===================================================== */
+
+        body {
+            min-height: 100vh;
+
+            font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
+            background:
+                    radial-gradient(
+                            circle at 85% 10%,
+                            rgba(37, 99, 235, 0.12),
+                            transparent 30%
+                    ),
+                    radial-gradient(
+                            circle at 10% 90%,
+                            rgba(124, 58, 237, 0.10),
+                            transparent 30%
+                    ),
+                    #f1f5f9;
+
+            color: #0f172a;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        header {
+            min-height: 76px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #0f172a,
+                            #172554
+                    );
+
+            color: white;
+
+            padding: 18px 40px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            box-shadow:
+                    0 4px 18px
+                    rgba(15, 23, 42, 0.18);
+        }
+
+
+        .brand-area {
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+        }
+
+
+        .logo-box {
+            width: 44px;
+            height: 44px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 12px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #2563eb,
+                            #7c3aed
+                    );
+
+            color: white;
+
+            font-size: 18px;
+
+            font-weight: 800;
+        }
+
+
+        .brand {
+            font-size: 23px;
+
+            font-weight: 800;
+
+            letter-spacing: 0.5px;
+        }
+
+
+        .brand-subtitle {
+            margin-top: 3px;
+
+            color: #bfdbfe;
+
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           DASHBOARD BUTTON
+        ===================================================== */
+
+        .dashboard-btn {
+            display: inline-block;
+
+            padding: 10px 18px;
+
+            border-radius: 9px;
+
+            background: #2563eb;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            transition: 0.2s ease;
+        }
+
+
+        .dashboard-btn:hover {
+            background: #1d4ed8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        main {
+            width: 100%;
+
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding:
+                    40px
+                    30px
+                    60px;
+        }
+
+
+        /* =====================================================
+           PAGE HEADER
+        ===================================================== */
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+
+        .eyebrow {
+            margin-bottom: 8px;
+
+            color: #2563eb;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+        }
+
+
+        .page-header h1 {
+            margin-bottom: 8px;
+
+            color: #0f172a;
+
+            font-size: 36px;
+
+            font-weight: 800;
+        }
+
+
+        .page-header p {
+            color: #64748b;
+
+            font-size: 15px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           SUCCESS MESSAGE
+        ===================================================== */
+
+        .success {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 25px;
+
+            padding: 14px 18px;
+
+            border:
+                    1px solid
+                    #bbf7d0;
+
+            border-radius: 10px;
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+
+        .success-icon {
+            width: 24px;
+            height: 24px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 50%;
+
+            background: #16a34a;
+
+            color: white;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           SETTINGS CARD
+        ===================================================== */
+
+        .settings-card {
+            margin-bottom: 22px;
+
+            padding: 28px;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 16px;
+
+            background: white;
+
+            box-shadow:
+                    0 8px 24px
+                    rgba(15, 23, 42, 0.06);
+        }
+
+
+        .section-title {
+            margin-bottom: 6px;
+
+            color: #0f172a;
+
+            font-size: 20px;
+
+            font-weight: 800;
+        }
+
+
+        .section-description {
+            margin-bottom: 24px;
+
+            color: #64748b;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           FORM GRID
+        ===================================================== */
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(
+                            2,
+                            minmax(0, 1fr)
+                    );
+
+            gap: 20px;
+        }
+
+
+        .form-group {
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+
+        label {
+            margin-bottom: 8px;
+
+            color: #334155;
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+
+        input {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border:
+                    1px solid
+                    #cbd5e1;
+
+            border-radius: 9px;
+
+            outline: none;
+
+            background: white;
+
+            color: #0f172a;
+
+            font-size: 15px;
+
+            transition:
+                    border-color 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+
+        input:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                    0 0 0 3px
+                    rgba(37, 99, 235, 0.12);
+        }
+
+
+        .help {
+            margin-top: 6px;
+
+            color: #94a3b8;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           WORKING HOURS
+        ===================================================== */
+
+        .time-preview {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(
+                            2,
+                            minmax(0, 1fr)
+                    );
+
+            gap: 15px;
+
+            margin-top: 20px;
+        }
+
+
+        .time-box {
+            padding: 16px;
+
+            border:
+                    1px solid
+                    #dbeafe;
+
+            border-radius: 10px;
+
+            background: #eff6ff;
+        }
+
+
+        .time-box-label {
+            margin-bottom: 5px;
+
+            color: #64748b;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+        }
+
+
+        .time-box-value {
+            color: #1d4ed8;
+
+            font-size: 20px;
+
+            font-weight: 800;
+        }
+
+
+        /* =====================================================
+           WORKING DAYS
+           
+           THIS IS THE .day CSS YOU ASKED ABOUT
+        ===================================================== */
+
+        .days-grid {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(
+                            7,
+                            minmax(0, 1fr)
+                    );
+
+            gap: 10px;
+
+            margin-top: 10px;
+        }
+
+
+        /* Individual day container */
+
+        .day {
+            position: relative;
+        }
+
+
+        /*
+         * Hide the real checkbox.
+         * The label becomes the visible button.
+         */
+
+        .day input {
+            position: absolute;
+
+            opacity: 0;
+
+            width: 1px;
+            height: 1px;
+
+            pointer-events: none;
+        }
+
+
+        /*
+         * NORMAL / UNSELECTED DAY
+         */
+
+        .day label {
+            min-height: 58px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 10px;
+
+            border:
+                    2px solid
+                    #cbd5e1;
+
+            border-radius: 10px;
+
+            background: #f8fafc;
+
+            color: #475569;
+
+            text-align: center;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            user-select: none;
+
+            transition:
+                    background 0.2s ease,
+                    color 0.2s ease,
+                    border-color 0.2s ease,
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+
+        /*
+         * HOVER
+         */
+
+        .day label:hover {
+            border-color: #2563eb;
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+
+            transform:
+                    translateY(-1px);
+        }
+
+
+        /*
+         * SELECTED DAY
+         *
+         * This is what makes the selected days highlighted.
+         */
+
+        .day input:checked + label {
+            border-color: #2563eb;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #2563eb,
+                            #1d4ed8
+                    );
+
+            color: white;
+
+            box-shadow:
+                    0 5px 15px
+                    rgba(37, 99, 235, 0.25);
+
+            transform:
+                    translateY(-1px);
+        }
+
+
+        /*
+         * SELECTED DAY HOVER
+         */
+
+        .day input:checked + label:hover {
+            background:
+                    linear-gradient(
+                            135deg,
+                            #1d4ed8,
+                            #1e40af
+                    );
+
+            color: white;
+        }
+
+
+        /*
+         * KEYBOARD ACCESSIBILITY
+         */
+
+        .day input:focus-visible + label {
+            outline:
+                    3px solid
+                    rgba(37, 99, 235, 0.25);
+
+            outline-offset: 2px;
+        }
+
+
+        /* =====================================================
+           GPS NOTE
+        ===================================================== */
+
+        .coordinate-note {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 6px;
+
+            margin-top: 20px;
+
+            padding: 16px;
+
+            border:
+                    1px solid
+                    #bfdbfe;
+
+            border-radius: 10px;
+
+            background: #eff6ff;
+
+            color: #1e40af;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        .coordinate-values {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+        }
+
+
+        .coordinate-value {
+            padding: 7px 10px;
+
+            border-radius: 7px;
+
+            background: white;
+
+            color: #1e40af;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
+        .actions {
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 12px;
+
+            margin-top: 28px;
+        }
+
+
+        .btn {
+            border: none;
+
+            padding: 12px 22px;
+
+            border-radius: 9px;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            transition:
+                    background 0.2s ease,
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+
+        .cancel {
+            background: #e2e8f0;
+
+            color: #334155;
+        }
+
+
+        .cancel:hover {
+            background: #cbd5e1;
+        }
+
+
+        .save {
+            background:
+                    linear-gradient(
+                            135deg,
+                            #16a34a,
+                            #15803d
+                    );
+
+            color: white;
+
+            box-shadow:
+                    0 5px 15px
+                    rgba(22, 163, 74, 0.20);
+        }
+
+
+        .save:hover {
+            transform:
+                    translateY(-1px);
+
+            box-shadow:
+                    0 8px 20px
+                    rgba(22, 163, 74, 0.28);
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .days-grid {
+                grid-template-columns:
+                        repeat(
+                                4,
+                                minmax(0, 1fr)
+                        );
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            header {
+                padding:
+                        15px 20px;
+            }
+
+
+            .brand {
+                font-size: 19px;
+            }
+
+
+            .brand-subtitle {
+                display: none;
+            }
+
+
+            main {
+                padding:
+                        28px 15px 45px;
+            }
+
+
+            .page-header h1 {
+                font-size: 28px;
+            }
+
+
+            .settings-card {
+                padding: 20px;
+            }
+
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+
+            .days-grid {
+                grid-template-columns:
+                        repeat(
+                                2,
+                                minmax(0, 1fr)
+                        );
+            }
+
+
+            .time-preview {
+                grid-template-columns: 1fr;
+            }
+
+
+            .actions {
+                flex-direction: column;
+            }
+
+
+            .btn {
+                width: 100%;
+
+                text-align: center;
+            }
+
+
+            .dashboard-btn {
+                padding:
+                        9px 12px;
+
+                font-size: 12px;
+            }
+
+        }
+
+
+        @media (max-width: 450px) {
+
+            .logo-box {
+                width: 38px;
+                height: 38px;
+            }
+
+
+            .brand {
+                font-size: 17px;
+            }
+
+
+            .dashboard-btn {
+                padding:
+                        8px 10px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header>
+
+    <div class="brand-area">
+
+        <div class="logo-box">
+            A
+        </div>
+
+        <div>
+
+            <div class="brand">
+                ASLENIX ADMIN
+            </div>
+
+            <div class="brand-subtitle">
+                Attendance Management System
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <a
+            th:href="@{/admin/dashboard}"
+            class="dashboard-btn">
+
+        Dashboard
+
+    </a>
+
+</header>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main>
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <p class="eyebrow">
+            SYSTEM CONFIGURATION
+        </p>
+
+        <h1>
+            Office Settings
+        </h1>
+
+        <p>
+            Configure your office location, attendance radius,
+            working hours and employee working days.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUCCESS MESSAGE
+    ====================================================== -->
+
+    <div
+            th:if="${param.saved}"
+            class="success">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <span>
+            Settings saved successfully.
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         SETTINGS FORM
+    ====================================================== -->
+
+    <form
+            th:action="@{/admin/settings}"
+            th:object="${settings}"
+            method="post">
+
+
+        <!-- =================================================
+             OFFICE INFORMATION
+        ================================================== -->
+
+        <div class="settings-card">
+
+            <div class="section-title">
+                Office Information
+            </div>
+
+            <div class="section-description">
+                Basic information about your ASLENIX office.
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <!-- OFFICE NAME -->
+
+                <div class="form-group">
+
+                    <label for="officeName">
+                        Office Name
+                    </label>
+
+                    <input
+                            type="text"
+                            id="officeName"
+                            th:field="*{officeName}"
+                            placeholder="ASLENIX"
+                            required>
+
+                </div>
+
+
+                <!-- OFFICE LOCATION -->
+
+                <div class="form-group">
+
+                    <label for="officeLocation">
+                        Office Location
+                    </label>
+
+                    <input
+                            type="text"
+                            id="officeLocation"
+                            th:field="*{officeLocation}"
+                            placeholder="Kathmandu, Nepal"
+                            required>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             GPS SETTINGS
+        ================================================== -->
+
+        <div class="settings-card">
+
+            <div class="section-title">
+                GPS Attendance Settings
+            </div>
+
+            <div class="section-description">
+                Employees must be within the configured
+                radius of the office location to check in.
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <!-- LATITUDE -->
+
+                <div class="form-group">
+
+                    <label for="latitude">
+                        Office Latitude
+                    </label>
+
+                    <input
+                        type="number"
+                        id="latitude"
+                        th:field="*{latitude}"
+                        step="any"
+                        min="-90"
+                        max="90"
+                        value="27.68777628544264"
+                        required>
+
+                    <div class="help">
+                        Current office latitude:
+                        27.68777628544264
+                    </div>
+
+                </div>
+
+
+                <!-- LONGITUDE -->
+
+                <div class="form-group">
+
+                    <label for="longitude">
+                        Office Longitude
+                    </label>
+
+                    <input
+                    type="number"
+                    id="longitude"
+                    th:field="*{longitude}"
+                    step="any"
+                    min="-180"
+                    max="180"
+                    value="85.3303680512975"
+                    required>
+
+                    <div class="help">
+                        Current office longitude:
+                        85.3303680512975
+                    </div>
+
+                </div>
+
+
+                <!-- RADIUS -->
+
+                <div class="form-group">
+
+                    <label for="allowedRadiusMeters">
+                        Allowed Attendance Radius
+                    </label>
+
+                    <input
+                            type="number"
+                            id="allowedRadiusMeters"
+                            th:field="*{allowedRadiusMeters}"
+                            step="0.1"
+                            min="1"
+                            placeholder="500"
+                            required>
+
+                    <div class="help">
+                        Employees within this distance
+                        can check in.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="coordinate-note">
+
+                <strong>
+                    Office GPS Location
+                </strong>
+
+                <div>
+                    Your current office coordinates are:
+                </div>
+
+                <div class="coordinate-values">
+
+                    <span class="coordinate-value">
+                        Latitude: 27.687500
+                    </span>
+
+                    <span class="coordinate-value">
+                        Longitude: 85.330417
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             WORKING HOURS
+        ================================================== -->
+
+        <div class="settings-card">
+
+            <div class="section-title">
+                Working Hours
+            </div>
+
+            <div class="section-description">
+                Set the normal working hours for employees.
+                These values are loaded from the database when
+                you return to this page.
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <!-- START TIME -->
+
+                <div class="form-group">
+
+                    <label for="workStartTime">
+                        Work Start Time
+                    </label>
+
+                    <input
+                            type="time"
+                            id="workStartTime"
+                            th:field="*{workStartTime}"
+                            required>
+
+                    <div class="help">
+                        Default: 10:00 AM
+                    </div>
+
+                </div>
+
+
+                <!-- END TIME -->
+
+                <div class="form-group">
+
+                    <label for="workEndTime">
+                        Work End Time
+                    </label>
+
+                    <input
+                            type="time"
+                            id="workEndTime"
+                            th:field="*{workEndTime}"
+                            required>
+
+                    <div class="help">
+                        Default: 6:00 PM
+                    </div>
+
+                </div>
+
+
+                <!-- GRACE PERIOD -->
+
+                <div class="form-group">
+
+                    <label for="lateGraceMinutes">
+                        Late Grace Period
+                    </label>
+
+                    <input
+                            type="number"
+                            id="lateGraceMinutes"
+                            th:field="*{lateGraceMinutes}"
+                            min="0"
+                            max="300"
+                            placeholder="15"
+                            required>
+
+                    <div class="help">
+                        Minutes allowed after the start time
+                        before an employee is marked late.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TIME PREVIEW -->
+
+            <div class="time-preview">
+
+                <div class="time-box">
+
+                    <div class="time-box-label">
+                        Work starts
+                    </div>
+
+                    <div
+                            class="time-box-value"
+                            id="startPreview">
+
+                        10:00 AM
+
+                    </div>
+
+                </div>
+
+
+                <div class="time-box">
+
+                    <div class="time-box-label">
+                        Work ends
+                    </div>
+
+                    <div
+                            class="time-box-value"
+                            id="endPreview">
+
+                        06:00 PM
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             WORKING DAYS
+        ================================================== -->
+
+        <div class="settings-card">
+
+            <div class="section-title">
+                Working Days
+            </div>
+
+            <div class="section-description">
+                Select the days employees are required to work.
+                Selected days will remain highlighted after
+                saving and reopening this page.
+            </div>
+
+
+            <div class="days-grid">
+
+
+                <!-- SUNDAY -->
+
+                <div class="day">
+
+                    <input
+                            type="checkbox"
+                            id="sunday"
+                            th:field="*{sunday}">
+
+                    <label for="sunday">
+                        Sunday
+                    </label>
+
+                </div>
+
+
+                <!-- MONDAY -->
+
+                <div class="day">
+
+                    <input
+                            type="checkbox"
+                            id="monday"
+                            th:field="*{monday}">
+
+                    <label for="monday">
+                        Monday
+                    </label>
+
+                </div>
+
+
+                <!-- TUESDAY -->
+
+                <div class="day">
+
+                    <input
+                            type="checkbox"
+                            id="tuesday"
+                            th:field="*{tuesday}">
+
+                    <label for="tuesday">
+                        Tuesday
+                    </label>
+
+                </div>
+
+
+                <!-- WEDNESDAY -->
+
+                <div class="day">
+
+                    <input
+                            type="checkbox"
+                            id="wednesday"
+                            th:field="*{wednesday}">
+
+                    <label for="wednesday">
+                        Wednesday
+                    </label>
+
+                </div>
+
+
+                <!-- THURSDAY -->
+
+                <div class="day">
+
+                    <input
+                            type="checkbox"
+                            id="thursday"
+                            th:field="*{thursday}">
+
+                    <label for="thursday">
+                        Thursday
+                    </label>
+
+                </div>
+
+
+                <!-- FRIDAY -->
+
+                <div class="day">
+
+                    <input
+                            type="checkbox"
+                            id="friday"
+                            th:field="*{friday}">
+
+                    <label for="friday">
+                        Friday
+                    </label>
+
+                </div>
+
+
+                <!-- SATURDAY -->
+
+                <div class="day">
+
+                    <input
+                            type="checkbox"
+                            id="saturday"
+                            th:field="*{saturday}">
+
+                    <label for="saturday">
+                        Saturday
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="actions">
+
+            <a
+                    th:href="@{/admin/dashboard}"
+                    class="btn cancel">
+
+                Cancel
+
+            </a>
+
+
+            <button
+                    type="submit"
+                    class="btn save">
+
+                Save Settings
+
+            </button>
+
+        </div>
+
+
+    </form>
+
+</main>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+    /*
+     * Convert 24-hour time to 12-hour format
+     * for the visual preview.
+     */
+
+    function formatTime(timeValue) {
+
+        if (!timeValue) {
+            return "--:--";
+        }
+
+        const parts = timeValue.split(":");
+
+        let hour = parseInt(parts[0], 10);
+
+        const minute = parts[1];
+
+        const period = hour >= 12
+                ? "PM"
+                : "AM";
+
+        hour = hour % 12;
+
+        if (hour === 0) {
+            hour = 12;
+        }
+
+        return String(hour).padStart(2, "0")
+                + ":"
+                + minute
+                + " "
+                + period;
+    }
+
+
+    /*
+     * Update the visual time preview.
+     */
+
+    function updateTimePreview() {
+
+        const start =
+                document.getElementById(
+                    "workStartTime"
+                );
+
+        const end =
+                document.getElementById(
+                    "workEndTime"
+                );
+
+        const startPreview =
+                document.getElementById(
+                    "startPreview"
+                );
+
+        const endPreview =
+                document.getElementById(
+                    "endPreview"
+                );
+
+
+        if (start && startPreview) {
+
+            startPreview.textContent =
+                    formatTime(start.value);
+
+        }
+
+
+        if (end && endPreview) {
+
+            endPreview.textContent =
+                    formatTime(end.value);
+
+        }
+
+    }
+
+
+    /*
+     * Update preview whenever the user
+     * changes the time.
+     */
+
+    document
+        .getElementById("workStartTime")
+        .addEventListener(
+            "change",
+            updateTimePreview
+        );
+
+
+    document
+        .getElementById("workEndTime")
+        .addEventListener(
+            "change",
+            updateTimePreview
+        );
+
+
+    /*
+     * Initial preview.
+     *
+     * The values come from Thymeleaf/database.
+     * Therefore we do NOT overwrite them here.
+     */
+
+    updateTimePreview();
+
+</script>
+
+
+</body>
+
+</html>

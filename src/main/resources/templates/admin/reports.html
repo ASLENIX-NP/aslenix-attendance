@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | Reports</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            background: #0f172a;
+            color: white;
+
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+
+            background: #2563eb;
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+        }
+
+        .back:hover {
+            background: #1d4ed8;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        main {
+            padding: 40px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        /* =========================
+           SUMMARY CARDS
+        ========================= */
+
+        .summary-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 24px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .card-title {
+            color: #64748b;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 32px;
+
+            font-weight: 800;
+
+            color: #0f172a;
+        }
+
+        .card-description {
+            margin-top: 8px;
+
+            color: #94a3b8;
+
+            font-size: 13px;
+        }
+
+        /* =========================
+           CARD TYPES
+        ========================= */
+
+        .present-card {
+            border-left: 5px solid #16a34a;
+        }
+
+        .late-card {
+            border-left: 5px solid #f59e0b;
+        }
+
+        .early-card {
+            border-left: 5px solid #dc2626;
+        }
+
+        .half-card {
+            border-left: 5px solid #7c3aed;
+        }
+
+        .today-card {
+            border-left: 5px solid #2563eb;
+        }
+
+        .total-card {
+            border-left: 5px solid #0f172a;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-section {
+            background: white;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.07);
+
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 22px 25px;
+
+            border-bottom:
+                1px solid #e2e8f0;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+        .table-header h2 {
+            font-size: 20px;
+        }
+
+        .table-header span {
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1100px;
+        }
+
+        th,
+        td {
+            padding: 15px;
+
+            text-align: left;
+
+            border-bottom:
+                1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+
+            color: #334155;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+        td {
+            color: #475569;
+
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            display: inline-block;
+
+            padding: 6px 10px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        .present {
+            background: #dcfce7;
+
+            color: #15803d;
+        }
+
+        .late {
+            background: #fef3c7;
+
+            color: #b45309;
+        }
+
+        .early {
+            background: #fee2e2;
+
+            color: #b91c1c;
+        }
+
+        .half-day {
+            background: #ede9fe;
+
+            color: #6d28d9;
+        }
+
+        .normal {
+            background: #dbeafe;
+
+            color: #1d4ed8;
+        }
+
+        .yes {
+            color: #dc2626;
+
+            font-weight: 700;
+        }
+
+        .no {
+            color: #64748b;
+        }
+
+        /* =========================
+           EMPTY
+        ========================= */
+
+        .empty {
+            text-align: center;
+
+            padding: 50px;
+
+            color: #64748b;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1000px) {
+
+            .summary-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            header {
+                padding: 15px 20px;
+            }
+
+            .brand {
+                font-size: 19px;
+            }
+
+            main {
+                padding: 25px 15px;
+            }
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header {
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 6px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+    <div class="brand">
+        ASLENIX ADMIN
+    </div>
+
+    <a href="/admin/dashboard"
+       class="back">
+
+        Dashboard
+
+    </a>
+
+</header>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main>
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+        <h1>
+            Attendance Reports
+        </h1>
+
+        <p>
+            Review attendance statistics and employee attendance records.
+        </p>
+
+    </div>
+
+
+    <!-- =========================
+         SUMMARY CARDS
+    ========================= -->
+
+    <div class="summary-grid">
+
+
+        <!-- TOTAL RECORDS -->
+
+        <div class="card total-card">
+
+            <div class="card-title">
+                Total Attendance Records
+            </div>
+
+            <div class="card-value"
+                 th:text="${totalRecords}">
+                0
+            </div>
+
+            <div class="card-description">
+                All attendance records
+            </div>
+
+        </div>
+
+
+        <!-- PRESENT -->
+
+        <div class="card present-card">
+
+            <div class="card-title">
+                Present
+            </div>
+
+            <div class="card-value"
+                 th:text="${presentCount}">
+                0
+            </div>
+
+            <div class="card-description">
+                Normal attendance
+            </div>
+
+        </div>
+
+
+        <!-- LATE -->
+
+        <div class="card late-card">
+
+            <div class="card-title">
+                Late
+            </div>
+
+            <div class="card-value"
+                 th:text="${lateCount}">
+                0
+            </div>
+
+            <div class="card-description">
+                Late arrivals
+            </div>
+
+        </div>
+
+
+        <!-- EARLY LEAVE -->
+
+        <div class="card early-card">
+
+            <div class="card-title">
+                Early Leave
+            </div>
+
+            <div class="card-value"
+                 th:text="${earlyLeaveCount}">
+                0
+            </div>
+
+            <div class="card-description">
+                Employees leaving early
+            </div>
+
+        </div>
+
+
+        <!-- HALF DAY -->
+
+        <div class="card half-card">
+
+            <div class="card-title">
+                Half Day
+            </div>
+
+            <div class="card-value"
+                 th:text="${halfDayCount}">
+                0
+            </div>
+
+            <div class="card-description">
+                Half-day attendance
+            </div>
+
+        </div>
+
+
+        <!-- TODAY -->
+
+        <div class="card today-card">
+
+            <div class="card-title">
+                Today's Records
+            </div>
+
+            <div class="card-value"
+                 th:text="${todayCount}">
+                0
+            </div>
+
+            <div class="card-description">
+                Attendance recorded today
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================
+         ATTENDANCE TABLE
+    ========================= -->
+
+    <div class="table-section">
+
+
+        <div class="table-header">
+
+            <h2>
+                Attendance Records
+            </h2>
+
+            <span>
+                Complete attendance history
+            </span>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+
+                <thead>
+
+                <tr>
+
+                    <th>
+                        Employee Code
+                    </th>
+
+                    <th>
+                        Employee
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Check In
+                    </th>
+
+                    <th>
+                        Check Out
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Late
+                    </th>
+
+                    <th>
+                        Early Leave
+                    </th>
+
+                    <th>
+                        Half Day
+                    </th>
+
+                    <th>
+                        Distance
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                <!-- ATTENDANCE RECORD -->
+
+                <tr th:each="attendance : ${attendanceRecords}">
+
+
+                    <!-- EMPLOYEE CODE -->
+
+                    <td
+                        th:text="${attendance.employee.employeeCode}">
+                        -
+                    </td>
+
+
+                    <!-- EMPLOYEE -->
+
+                    <td>
+
+                        <span
+                            th:text="${attendance.employee.firstName}">
+                        </span>
+
+                        <span
+                            th:text="${attendance.employee.lastName}">
+                        </span>
+
+                    </td>
+
+
+                    <!-- DATE -->
+
+                    <td
+                        th:text="${attendance.attendanceDate}">
+                        -
+                    </td>
+
+
+                    <!-- CHECK IN -->
+
+                    <td>
+
+                        <span
+                            th:if="${attendance.checkIn != null}"
+                            th:text="${#temporals.format(attendance.checkIn, 'HH:mm:ss')}">
+                            --:--
+                        </span>
+
+                        <span
+                            th:unless="${attendance.checkIn != null}">
+                            --:--
+                        </span>
+
+                    </td>
+
+
+                    <!-- CHECK OUT -->
+
+                    <td>
+
+                        <span
+                            th:if="${attendance.checkOut != null}"
+                            th:text="${#temporals.format(attendance.checkOut, 'HH:mm:ss')}">
+                            --:--
+                        </span>
+
+                        <span
+                            th:unless="${attendance.checkOut != null}">
+                            --:--
+                        </span>
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+
+                        <span
+                            th:if="${attendance.status == 'PRESENT'}"
+                            class="status present">
+
+                            Present
+
+                        </span>
+
+
+                        <span
+                            th:if="${attendance.status == 'LATE'}"
+                            class="status late">
+
+                            Late
+
+                        </span>
+
+
+                        <span
+                            th:if="${attendance.status == 'HALF_DAY'}"
+                            class="status half-day">
+
+                            Half Day
+
+                        </span>
+
+
+                        <span
+                            th:if="${attendance.status != 'PRESENT'
+                                   and attendance.status != 'LATE'
+                                   and attendance.status != 'HALF_DAY'}"
+                            class="status normal"
+                            th:text="${attendance.status}">
+
+                            Status
+
+                        </span>
+
+
+                    </td>
+
+
+                    <!-- LATE -->
+
+                    <td>
+
+                        <span
+                            th:if="${attendance.late}"
+                            class="status late">
+
+                            Yes
+
+                        </span>
+
+                        <span
+                            th:unless="${attendance.late}"
+                            class="no">
+
+                            No
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- EARLY LEAVE -->
+
+                    <td>
+
+                        <span
+                            th:if="${attendance.earlyLeave}"
+                            class="status early">
+
+                            Yes
+
+                        </span>
+
+                        <span
+                            th:unless="${attendance.earlyLeave}"
+                            class="no">
+
+                            No
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- HALF DAY -->
+
+                    <td>
+
+                        <span
+                            th:if="${attendance.halfDay}"
+                            class="status half-day">
+
+                            Yes
+
+                        </span>
+
+                        <span
+                            th:unless="${attendance.halfDay}"
+                            class="no">
+
+                            No
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- DISTANCE -->
+
+                    <td>
+
+                        <span
+                            th:if="${attendance.checkInDistanceMeters != null}"
+                            th:text="${#numbers.formatDecimal(attendance.checkInDistanceMeters, 1, 2) + ' m'}">
+
+                            0 m
+
+                        </span>
+
+                        <span
+                            th:unless="${attendance.checkInDistanceMeters != null}">
+
+                            --
+
+                        </span>
+
+                    </td>
+
+
+                </tr>
+
+
+                <!-- EMPTY -->
+
+                <tr
+                    th:if="${attendanceRecords == null
+                            or #lists.isEmpty(attendanceRecords)}">
+
+                    <td
+                        colspan="10"
+                        class="empty">
+
+                        No attendance records found.
+
+                    </td>
+
+                </tr>
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+</main>
+
+
+</body>
+
+</html>

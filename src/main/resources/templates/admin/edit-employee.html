@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | Edit Employee</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            background: #0f172a;
+            color: white;
+
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+
+            background: #2563eb;
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+
+            font-weight: 700;
+        }
+
+        .back:hover {
+            background: #1d4ed8;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        main {
+            max-width: 900px;
+
+            margin: 40px auto;
+
+            padding: 0 20px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #64748b;
+        }
+
+        /* =========================
+           FORM CARD
+        ========================= */
+
+        .form-card {
+            background: white;
+
+            padding: 35px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        /* =========================
+           FORM GRID
+        ========================= */
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+
+            font-weight: 700;
+
+            color: #334155;
+        }
+
+        input,
+        select {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            outline: none;
+
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* =========================
+           READ ONLY
+        ========================= */
+
+        input[readonly] {
+            background: #f8fafc;
+
+            color: #64748b;
+
+            cursor: not-allowed;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .actions {
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 12px;
+
+            margin-top: 30px;
+
+            padding-top: 25px;
+
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .cancel {
+            text-decoration: none;
+
+            background: #e2e8f0;
+
+            color: #334155;
+
+            padding: 12px 20px;
+
+            border-radius: 8px;
+
+            font-weight: 700;
+        }
+
+        .cancel:hover {
+            background: #cbd5e1;
+        }
+
+        .save {
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 12px 22px;
+
+            border-radius: 8px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            font-size: 15px;
+        }
+
+        .save:hover {
+            background: #1d4ed8;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            header {
+                padding: 15px 20px;
+            }
+
+            .brand {
+                font-size: 19px;
+            }
+
+            main {
+                margin: 25px auto;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .cancel,
+            .save {
+                width: 100%;
+
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+    <div class="brand">
+        ASLENIX ADMIN
+    </div>
+
+    <a href="/admin/employees"
+       class="back">
+
+        ← Employees
+
+    </a>
+
+</header>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main>
+
+
+    <div class="page-title">
+
+        <h1>
+            Edit Employee
+        </h1>
+
+        <p>
+            Update the employee's information below.
+        </p>
+
+    </div>
+
+
+    <!-- =========================
+         FORM
+    ========================= -->
+
+    <div class="form-card">
+
+        <form
+                th:action="@{/admin/employees/edit/{id}(id=${employee.id})}"
+                th:object="${employee}"
+                method="post">
+
+
+            <div class="form-grid">
+
+
+                <!-- EMPLOYEE CODE -->
+
+                <div class="form-group">
+
+                    <label for="employeeCode">
+                        Employee Code
+                    </label>
+
+                    <input
+                            type="text"
+                            id="employeeCode"
+                            th:field="*{employeeCode}"
+                            required>
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                            type="email"
+                            id="email"
+                            th:field="*{email}"
+                            required>
+
+                </div>
+
+
+                <!-- FIRST NAME -->
+
+                <div class="form-group">
+
+                    <label for="firstName">
+                        First Name
+                    </label>
+
+                    <input
+                            type="text"
+                            id="firstName"
+                            th:field="*{firstName}"
+                            required>
+
+                </div>
+
+
+                <!-- LAST NAME -->
+
+                <div class="form-group">
+
+                    <label for="lastName">
+                        Last Name
+                    </label>
+
+                    <input
+                            type="text"
+                            id="lastName"
+                            th:field="*{lastName}"
+                            required>
+
+                </div>
+
+
+                <!-- PHONE -->
+
+                <div class="form-group">
+
+                    <label for="phone">
+                        Phone
+                    </label>
+
+                    <input
+                            type="text"
+                            id="phone"
+                            th:field="*{phone}">
+
+                </div>
+
+
+                <!-- POSITION -->
+
+                <div class="form-group">
+
+                    <label for="position">
+                        Position
+                    </label>
+
+                    <input
+                            type="text"
+                            id="position"
+                            th:field="*{position}"
+                            required>
+
+                </div>
+
+
+                <!-- JOINING DATE -->
+
+                <div class="form-group">
+
+                    <label for="joiningDate">
+                        Joining Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="joiningDate"
+                        name="joiningDate"
+                        th:value="${employee.joiningDate}"
+                        required>
+
+                </div>
+
+
+                <!-- DEPARTMENT -->
+
+                <div class="form-group">
+
+                    <label for="departmentId">
+                        Department
+                    </label>
+
+                    <select
+                            id="departmentId"
+                            name="departmentId"
+                            required>
+
+                        <option value="">
+                            Select Department
+                        </option>
+
+                        <option
+                                th:each="department : ${departments}"
+                                th:value="${department.id}"
+                                th:text="${department.name}"
+                                th:selected="${employee.department != null and employee.department.id == department.id}">
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =========================
+                 ACTIONS
+            ========================= -->
+
+            <div class="actions">
+
+                <a href="/admin/employees"
+                   class="cancel">
+
+                    Cancel
+
+                </a>
+
+                <button
+                        type="submit"
+                        class="save">
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+
+</main>
+
+
+</body>
+
+</html>

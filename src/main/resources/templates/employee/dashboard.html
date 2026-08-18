@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ASLENIX | Employee Dashboard</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
+            background:
+                    radial-gradient(
+                            circle at 80% 10%,
+                            rgba(37, 99, 235, 0.14),
+                            transparent 30%
+                    ),
+                    radial-gradient(
+                            circle at 10% 90%,
+                            rgba(124, 58, 237, 0.10),
+                            transparent 30%
+                    ),
+                    #f1f5f9;
+
+            color: #0f172a;
+        }
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        header {
+            min-height: 76px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #0f172a,
+                            #172554
+                    );
+
+            color: white;
+
+            padding: 18px 40px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            box-shadow:
+                    0 4px 18px
+                    rgba(15, 23, 42, 0.18);
+        }
+
+        .brand-area {
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+        }
+
+        .logo-box {
+            width: 44px;
+            height: 44px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 12px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #2563eb,
+                            #7c3aed
+                    );
+
+            color: white;
+
+            font-size: 18px;
+
+            font-weight: 800;
+        }
+
+        .brand {
+            font-size: 23px;
+
+            font-weight: 800;
+
+            letter-spacing: 0.5px;
+        }
+
+        .brand-subtitle {
+            margin-top: 3px;
+
+            color: #bfdbfe;
+
+            font-size: 12px;
+        }
+
+        /* =====================================================
+           LOGOUT
+        ===================================================== */
+
+        .logout-form {
+            margin: 0;
+        }
+
+        .logout {
+            border:
+                    1px solid
+                    rgba(255, 255, 255, 0.18);
+
+            border-radius: 9px;
+
+            background:
+                    rgba(220, 38, 38, 0.95);
+
+            color: white;
+
+            padding: 10px 18px;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition:
+                    background 0.2s ease,
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+        .logout:hover {
+            background: #b91c1c;
+
+            transform:
+                    translateY(-1px);
+
+            box-shadow:
+                    0 7px 18px
+                    rgba(220, 38, 38, 0.25);
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        main {
+            max-width: 1400px;
+
+            margin: 0 auto;
+
+            padding:
+                    38px
+                    40px
+                    60px;
+        }
+
+        /* =====================================================
+           WELCOME
+        ===================================================== */
+
+        .welcome {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            margin-bottom: 8px;
+
+            color: #2563eb;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+        }
+
+        .welcome h1 {
+            margin-bottom: 8px;
+
+            color: #0f172a;
+
+            font-size:
+                    clamp(
+                            30px,
+                            4vw,
+                            44px
+                    );
+
+            line-height: 1.1;
+
+            font-weight: 800;
+        }
+
+        .welcome p {
+            color: #64748b;
+
+            font-size: 15px;
+
+            line-height: 1.7;
+        }
+
+        /* =====================================================
+           MONTHLY ATTENDANCE
+        ===================================================== */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(
+                            5,
+                            minmax(0, 1fr)
+                    );
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: white;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 15px;
+
+            padding: 20px;
+
+            box-shadow:
+                    0 7px 22px
+                    rgba(15, 23, 42, 0.05);
+        }
+
+        .stat-label {
+            color: #64748b;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.7px;
+
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            color: #0f172a;
+
+            font-size: 28px;
+
+            font-weight: 800;
+        }
+
+        /* =====================================================
+           MAIN CARDS
+        ===================================================== */
+
+        .cards {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(
+                            3,
+                            minmax(0, 1fr)
+                    );
+
+            gap: 18px;
+
+            margin-bottom: 22px;
+        }
+
+        .card {
+            background: white;
+
+            padding: 24px;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 15px;
+
+            box-shadow:
+                    0 7px 22px
+                    rgba(15, 23, 42, 0.05);
+
+            transition:
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform:
+                    translateY(-2px);
+
+            box-shadow:
+                    0 12px 28px
+                    rgba(15, 23, 42, 0.08);
+        }
+
+        .card h2 {
+            margin-bottom: 9px;
+
+            color: #0f172a;
+
+            font-size: 18px;
+        }
+
+        .card p {
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.65;
+        }
+
+        .card-link {
+            display: inline-block;
+
+            margin-top: 15px;
+
+            color: #2563eb;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            text-decoration: none;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        /* =====================================================
+           TODAY'S ATTENDANCE
+        ===================================================== */
+
+        .attendance-card {
+            margin-bottom: 22px;
+        }
+
+        .attendance-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .attendance-header h2 {
+            margin-bottom: 4px;
+        }
+
+        .status {
+            padding: 7px 12px;
+
+            border-radius: 999px;
+
+            background: #dcfce7;
+
+            color: #15803d;
+
+            font-size: 11px;
+
+            font-weight: 800;
+        }
+
+        .attendance-grid {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(
+                            3,
+                            minmax(0, 1fr)
+                    );
+
+            gap: 15px;
+        }
+
+        .attendance-item {
+            padding: 17px;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 12px;
+
+            background: #f8fafc;
+        }
+
+        .attendance-item span {
+            display: block;
+
+            color: #64748b;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+            margin-bottom: 7px;
+        }
+
+        .attendance-item strong {
+            color: #0f172a;
+
+            font-size: 18px;
+        }
+
+        /* =====================================================
+           QUICK ACTIONS
+        ===================================================== */
+
+        .section-title {
+            margin-bottom: 15px;
+
+            color: #0f172a;
+
+            font-size: 20px;
+
+            font-weight: 800;
+        }
+
+        .quick-actions {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(
+                            3,
+                            minmax(0, 1fr)
+                    );
+
+            gap: 18px;
+        }
+
+        .action {
+            display: block;
+
+            background: white;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 15px;
+
+            padding: 22px;
+
+            text-decoration: none;
+
+            color: inherit;
+
+            box-shadow:
+                    0 7px 22px
+                    rgba(15, 23, 42, 0.05);
+
+            transition:
+                    transform 0.2s ease,
+                    border-color 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+        .action:hover {
+            transform:
+                    translateY(-2px);
+
+            border-color:
+                    #bfdbfe;
+
+            box-shadow:
+                    0 12px 28px
+                    rgba(37, 99, 235, 0.10);
+        }
+
+        .action-icon {
+            width: 42px;
+            height: 42px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 10px;
+
+            margin-bottom: 13px;
+
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            font-weight: 800;
+        }
+
+        .action h3 {
+            margin-bottom: 7px;
+
+            color: #0f172a;
+
+            font-size: 16px;
+        }
+
+        .action p {
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1100px) {
+
+            .stats {
+                grid-template-columns:
+                        repeat(
+                                3,
+                                1fr
+                        );
+            }
+
+            .cards,
+            .quick-actions {
+                grid-template-columns:
+                        repeat(
+                                2,
+                                1fr
+                        );
+            }
+
+        }
+
+        @media (max-width: 760px) {
+
+            header {
+                padding:
+                        16px 20px;
+            }
+
+            main {
+                padding:
+                        28px 20px 45px;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+
+            .stats,
+            .cards,
+            .quick-actions,
+            .attendance-grid {
+                grid-template-columns:
+                        1fr;
+            }
+
+        }
+
+        @media (max-width: 480px) {
+
+            .brand {
+                font-size: 19px;
+            }
+
+            .logo-box {
+                width: 38px;
+                height: 38px;
+            }
+
+            .logout {
+                padding:
+                        9px 13px;
+
+                font-size: 12px;
+            }
+
+            main {
+                padding:
+                        22px 14px 35px;
+            }
+
+            .card {
+                padding: 19px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="brand-area">
+
+        <div class="logo-box">
+            A
+        </div>
+
+        <div>
+
+            <div class="brand">
+                ASLENIX EMPLOYEE
+            </div>
+
+            <div class="brand-subtitle">
+                Attendance Management System
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <form
+            th:action="@{/logout}"
+            method="post"
+            class="logout-form">
+
+        <input
+                type="hidden"
+                th:name="${_csrf.parameterName}"
+                th:value="${_csrf.token}"
+        >
+
+        <button
+                type="submit"
+                class="logout">
+
+            Logout
+
+        </button>
+
+    </form>
+
+</header>
+
+
+<main>
+
+
+    <!-- =====================================================
+         WELCOME
+    ====================================================== -->
+
+    <section class="welcome">
+
+        <p class="eyebrow">
+            EMPLOYEE PORTAL
+        </p>
+
+        <h1>
+            Welcome,
+            <span th:text="${employeeName}">
+                Employee
+            </span>
+        </h1>
+
+        <p>
+            View your attendance, tasks and employee information
+            from one place.
+        </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         MONTHLY ATTENDANCE
+    ====================================================== -->
+
+    <section class="stats">
+
+
+        <article class="stat">
+
+            <div class="stat-label">
+                Attendance This Month
+            </div>
+
+            <div class="stat-value"
+                 th:text="${attendanceThisMonth ?: 0}">
+                0
+            </div>
+
+        </article>
+
+
+        <article class="stat">
+
+            <div class="stat-label">
+                Present
+            </div>
+
+            <div class="stat-value"
+                 th:text="${presentCount ?: 0}">
+                0
+            </div>
+
+        </article>
+
+
+        <article class="stat">
+
+            <div class="stat-label">
+                Absent
+            </div>
+
+            <div class="stat-value"
+                 th:text="${absentCount ?: 0}">
+                0
+            </div>
+
+        </article>
+
+
+        <article class="stat">
+
+            <div class="stat-label">
+                Late
+            </div>
+
+            <div class="stat-value"
+                 th:text="${lateCount ?: 0}">
+                0
+            </div>
+
+        </article>
+
+
+        <article class="stat">
+
+            <div class="stat-label">
+                Leave
+            </div>
+
+            <div class="stat-value"
+                 th:text="${leaveCount ?: 0}">
+                0
+            </div>
+
+        </article>
+
+
+    </section>
+
+
+    <!-- =====================================================
+         TODAY
+    ====================================================== -->
+
+    <section class="card attendance-card">
+
+        <div class="attendance-header">
+
+            <div>
+
+                <h2>
+                    Today's Attendance
+                </h2>
+
+                <p>
+                    Your attendance status for today.
+                </p>
+
+            </div>
+
+
+            <span class="status">
+
+                <span
+                        th:text="${todayStatus ?: 'Not checked in'}">
+                    Not checked in
+                </span>
+
+            </span>
+
+        </div>
+
+
+        <div class="attendance-grid">
+
+
+            <div class="attendance-item">
+
+                <span>
+                    Check-in
+                </span>
+
+                <strong
+                        th:text="${checkInTime ?: '--:--'}">
+                    --:--
+                </strong>
+
+            </div>
+
+
+            <div class="attendance-item">
+
+                <span>
+                    Check-out
+                </span>
+
+                <strong
+                        th:text="${checkOutTime ?: '--:--'}">
+                    --:--
+                </strong>
+
+            </div>
+
+
+            <div class="attendance-item">
+
+                <span>
+                    Working Hours
+                </span>
+
+                <strong
+                        th:text="${workingHours ?: '0h 00m'}">
+                    0h 00m
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN MODULES
+    ====================================================== -->
+
+    <h2 class="section-title">
+        My Workspace
+    </h2>
+
+
+    <section class="cards">
+
+
+        <article class="card">
+
+            <h2>
+                My Attendance
+            </h2>
+
+            <p>
+                View your attendance history, monthly calendar,
+                check-in times, check-out times and working hours.
+            </p>
+
+            <a
+                    href="/employee/attendance"
+                    class="card-link">
+
+                View Attendance →
+
+            </a>
+
+        </article>
+
+
+        <article class="card">
+
+            <h2>
+                My Tasks
+            </h2>
+
+            <p>
+                View tasks assigned by the administrator and
+                submit completed work for review.
+            </p>
+
+            <a
+                    href="/employee/tasks"
+                    class="card-link">
+
+                View Tasks →
+
+            </a>
+
+        </article>
+
+
+        <article class="card">
+
+            <h2>
+                My Profile
+            </h2>
+
+            <p>
+                View and update your employee profile and
+                account information.
+            </p>
+
+            <a
+                    href="/employee/profile"
+                    class="card-link">
+
+                View Profile →
+
+            </a>
+
+        </article>
+
+
+    </section>
+
+
+    <!-- =====================================================
+         ATTENDANCE ACTION
+    ====================================================== -->
+
+    <section class="card"
+             style="margin-top:22px;">
+
+        <h2>
+            Attendance
+        </h2>
+
+        <p style="margin-top:7px;">
+
+            Attendance check-in and check-out will be available
+            here once the office location and attendance rules
+            are configured.
+
+        </p>
+
+
+        <a
+                href="/employee/attendance"
+                class="card-link">
+
+            Open Attendance →
+
+        </a>
+
+    </section>
+
+
+</main>
+
+
+</body>
+
+</html>
