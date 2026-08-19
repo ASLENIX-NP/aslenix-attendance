@@ -29,6 +29,7 @@
             background: #0f172a;
             color: white;
             padding: 18px 40px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -86,7 +87,7 @@
 
         /* =====================================================
            MESSAGE
-        ====================================================== */
+        ===================================================== */
 
         .message {
             padding: 14px 18px;
@@ -107,7 +108,7 @@
 
         /* =====================================================
            ATTENDANCE ACTION
-        ====================================================== */
+        ===================================================== */
 
         .action-card {
             background: white;
@@ -140,7 +141,6 @@
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: .2s ease;
         }
 
         .check-in {
@@ -151,24 +151,9 @@
             background: #15803d;
         }
 
-        /*
-         * WORKING STATE
-         */
-
         .working {
-            background: #2563eb !important;
-            color: white;
-            cursor: default !important;
-        }
-
-        /*
-         * CHECKED OUT STATE
-         */
-
-        .checked-out {
-            background: #64748b !important;
-            color: white;
-            cursor: default !important;
+            background: #2563eb;
+            cursor: default;
         }
 
         .check-out {
@@ -180,15 +165,8 @@
         }
 
         .action-btn:disabled {
+            background: #94a3b8;
             cursor: not-allowed;
-        }
-
-        .action-btn.working:disabled {
-            opacity: 1;
-        }
-
-        .action-btn.checked-out:disabled {
-            opacity: 1;
         }
 
         .gps-status {
@@ -199,12 +177,13 @@
 
         /* =====================================================
            SUMMARY
-        ====================================================== */
+        ===================================================== */
 
         .summary {
             display: grid;
             grid-template-columns:
                 repeat(auto-fit, minmax(220px, 1fr));
+
             gap: 20px;
             margin-bottom: 25px;
         }
@@ -230,7 +209,7 @@
 
         /* =====================================================
            TODAY
-        ====================================================== */
+        ===================================================== */
 
         .today {
             background: white;
@@ -248,6 +227,7 @@
             display: grid;
             grid-template-columns:
                 repeat(auto-fit, minmax(200px, 1fr));
+
             gap: 20px;
         }
 
@@ -271,7 +251,7 @@
 
         /* =====================================================
            STATUS
-        ====================================================== */
+        ===================================================== */
 
         .status {
             display: inline-block;
@@ -302,13 +282,112 @@
         }
 
         .status-completed {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        /* =====================================================
+           POPUP
+        ===================================================== */
+
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+
+            background: rgba(15, 23, 42, 0.65);
+
+            display: none;
+            align-items: center;
+            justify-content: center;
+
+            z-index: 9999;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+        }
+
+        .popup {
+            width: 90%;
+            max-width: 420px;
+
+            background: white;
+            border-radius: 18px;
+
+            padding: 35px;
+
+            text-align: center;
+
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+
+            animation: popupIn .25s ease;
+        }
+
+        @keyframes popupIn {
+
+            from {
+                opacity: 0;
+                transform: scale(.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+        }
+
+        .popup-icon {
+            width: 70px;
+            height: 70px;
+
+            margin: 0 auto 18px;
+
+            border-radius: 50%;
+
             background: #dcfce7;
-            color: #166534;
+            color: #16a34a;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 38px;
+            font-weight: 800;
+        }
+
+        .popup h2 {
+            margin-bottom: 10px;
+        }
+
+        .popup p {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .popup button {
+            border: none;
+
+            background: #2563eb;
+            color: white;
+
+            padding: 12px 25px;
+
+            border-radius: 9px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background: #1d4ed8;
         }
 
         /* =====================================================
            TABLE
-        ====================================================== */
+        ===================================================== */
 
         .attendance-section {
             background: white;
@@ -348,8 +427,8 @@
         }
 
         /* =====================================================
-           MOBILE
-        ====================================================== */
+           RESPONSIVE
+        ===================================================== */
 
         @media (max-width: 700px) {
 
@@ -381,7 +460,9 @@
 
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -393,8 +474,11 @@
 
         <a href="/employee/dashboard"
            class="dashboard-link">
+
             Dashboard
+
         </a>
+
 
         <form th:action="@{/logout}"
               method="post"
@@ -406,7 +490,9 @@
 
             <button type="submit"
                     class="logout">
+
                 Logout
+
             </button>
 
         </form>
@@ -416,7 +502,9 @@
 </header>
 
 
+
 <main>
+
 
     <div class="page-title">
 
@@ -431,6 +519,7 @@
     </div>
 
 
+
     <!-- =====================================================
          MESSAGES
     ====================================================== -->
@@ -442,12 +531,22 @@
 
     </div>
 
+
     <div th:if="${param.checkedOut}"
          class="message success">
 
         Check-out successful.
 
     </div>
+
+
+    <div th:if="${param.autoCheckedOut}"
+         class="message success">
+
+        You have been automatically checked out at 8:00 PM.
+
+    </div>
+
 
     <div th:if="${param.weekend}"
          class="message error">
@@ -456,12 +555,14 @@
 
     </div>
 
+
     <div th:if="${param.alreadyCheckedIn}"
          class="message error">
 
         You have already checked in today.
 
     </div>
+
 
     <div th:if="${param.alreadyCheckedOut}"
          class="message error">
@@ -470,12 +571,14 @@
 
     </div>
 
+
     <div th:if="${param.notCheckedIn}"
          class="message error">
 
         You must check in before checking out.
 
     </div>
+
 
     <div th:if="${param.outsideOffice}"
          class="message error">
@@ -485,8 +588,9 @@
     </div>
 
 
+
     <!-- =====================================================
-         ACTIONS
+         ATTENDANCE ACTION
     ====================================================== -->
 
     <div class="action-card">
@@ -500,11 +604,12 @@
             you are inside the office attendance area.
         </p>
 
+
         <div class="actions">
 
 
             <!-- =================================================
-                 CHECK IN / WORKING
+                 CHECK IN
             ================================================== -->
 
             <form id="checkInForm"
@@ -515,61 +620,39 @@
                        th:name="${_csrf.parameterName}"
                        th:value="${_csrf.token}">
 
+
                 <input type="hidden"
                        id="latitude"
                        name="latitude">
+
 
                 <input type="hidden"
                        id="longitude"
                        name="longitude">
 
 
-                <!--
-                    If there is no attendance record today,
-                    show CHECK IN.
-
-                    If employee has checked in but has not
-                    checked out, show WORKING.
-
-                    If employee has checked out, show
-                    CHECKED OUT.
-                -->
-
-                <button th:if="${attendance == null}"
-                        type="button"
+                <button type="button"
                         id="checkInButton"
                         class="action-btn check-in"
-                        onclick="checkIn()">
+                        onclick="checkIn()"
+                        th:disabled="${attendance != null}">
 
-                    Check In
+                    <span th:if="${attendance == null}">
+                        Check In
+                    </span>
 
-                </button>
+                    <span th:if="${attendance != null and attendance.checkOut == null}">
+                        Working
+                    </span>
 
-
-                <button th:if="${attendance != null
-                                and attendance.checkOut == null}"
-                        type="button"
-                        id="checkInButton"
-                        class="action-btn working"
-                        disabled>
-
-                    ✓ Working
-
-                </button>
-
-
-                <button th:if="${attendance != null
-                                and attendance.checkOut != null}"
-                        type="button"
-                        id="checkInButton"
-                        class="action-btn checked-out"
-                        disabled>
-
-                    ✓ Checked Out
+                    <span th:if="${attendance != null and attendance.checkOut != null}">
+                        Checked Out
+                    </span>
 
                 </button>
 
             </form>
+
 
 
             <!-- =================================================
@@ -584,72 +667,39 @@
                        th:value="${_csrf.token}">
 
 
-                <button th:if="${attendance != null
-                                and attendance.checkOut == null}"
-                        type="submit"
-                        class="action-btn check-out">
-
-                    Check Out
-
-                </button>
-
-
-                <button th:if="${attendance == null}"
-                        type="button"
+                <button type="submit"
                         class="action-btn check-out"
-                        disabled>
+                        th:disabled="${attendance == null or attendance.checkOut != null}">
 
                     Check Out
-
-                </button>
-
-
-                <button th:if="${attendance != null
-                                and attendance.checkOut != null}"
-                        type="button"
-                        class="action-btn checked-out"
-                        disabled>
-
-                    ✓ Completed
 
                 </button>
 
             </form>
 
+
         </div>
 
-
-        <!-- =====================================================
-             GPS STATUS
-        ====================================================== -->
 
         <div id="gpsStatus"
-             class="gps-status"
-             th:if="${attendance == null}">
+             class="gps-status">
 
-            Location permission is required for check-in.
+            <span th:if="${attendance == null}">
+                Location permission is required for check-in.
+            </span>
 
-        </div>
+            <span th:if="${attendance != null and attendance.checkOut == null}">
+                You are currently working.
+            </span>
 
-
-        <div class="gps-status"
-             th:if="${attendance != null
-                     and attendance.checkOut == null}">
-
-            ✓ You are currently working.
-
-        </div>
-
-
-        <div class="gps-status"
-             th:if="${attendance != null
-                     and attendance.checkOut != null}">
-
-            ✓ Today's attendance has been completed.
+            <span th:if="${attendance != null and attendance.checkOut != null}">
+                Your attendance for today is complete.
+            </span>
 
         </div>
 
     </div>
+
 
 
     <!-- =====================================================
@@ -658,13 +708,18 @@
 
     <div class="summary">
 
+
         <div class="summary-card">
 
-            <h3>Total Days</h3>
+            <h3>
+                Total Days
+            </h3>
 
             <div class="value"
                  th:text="${totalDays}">
+
                 0
+
             </div>
 
         </div>
@@ -672,11 +727,15 @@
 
         <div class="summary-card">
 
-            <h3>Present</h3>
+            <h3>
+                Present
+            </h3>
 
             <div class="value"
                  th:text="${presentDays}">
+
                 0
+
             </div>
 
         </div>
@@ -684,11 +743,15 @@
 
         <div class="summary-card">
 
-            <h3>Absent</h3>
+            <h3>
+                Absent
+            </h3>
 
             <div class="value"
                  th:text="${absentDays}">
+
                 0
+
             </div>
 
         </div>
@@ -696,16 +759,21 @@
 
         <div class="summary-card">
 
-            <h3>Working Hours</h3>
+            <h3>
+                Working Hours
+            </h3>
 
             <div class="value"
                  th:text="${workingHours}">
+
                 0h 0m
+
             </div>
 
         </div>
 
     </div>
+
 
 
     <!-- =====================================================
@@ -717,6 +785,7 @@
         <h2>
             Today's Attendance
         </h2>
+
 
         <div class="today-grid">
 
@@ -767,23 +836,7 @@
                 </span>
 
 
-                <!-- WORKING -->
-
-                <span th:if="${attendance != null
-                              and attendance.checkIn != null
-                              and attendance.checkOut == null}"
-                      class="status status-working">
-
-                    Working
-
-                </span>
-
-
-                <!-- PRESENT -->
-
-                <span th:if="${attendance != null
-                              and attendance.checkOut != null
-                              and todayStatus == 'PRESENT'}"
+                <span th:if="${todayStatus == 'PRESENT'}"
                       class="status status-present">
 
                     Present
@@ -791,11 +844,7 @@
                 </span>
 
 
-                <!-- LATE -->
-
-                <span th:if="${attendance != null
-                              and attendance.checkOut != null
-                              and todayStatus == 'LATE'}"
+                <span th:if="${todayStatus == 'LATE'}"
                       class="status status-late">
 
                     Late
@@ -803,9 +852,23 @@
                 </span>
 
 
-                <!-- NOT CHECKED IN -->
+                <span th:if="${todayStatus == 'WORKING'}"
+                      class="status status-working">
 
-                <span th:if="${attendance == null}"
+                    Working
+
+                </span>
+
+
+                <span th:if="${todayStatus == 'COMPLETED'}"
+                      class="status status-completed">
+
+                    Completed
+
+                </span>
+
+
+                <span th:if="${todayStatus == null}"
                       class="status status-absent">
 
                     Not Checked In
@@ -819,6 +882,7 @@
     </div>
 
 
+
     <!-- =====================================================
          HISTORY
     ====================================================== -->
@@ -829,17 +893,33 @@
             Attendance History
         </h2>
 
+
         <table>
+
 
             <thead>
 
             <tr>
 
-                <th>Date</th>
-                <th>Check In</th>
-                <th>Check Out</th>
-                <th>Working Hours</th>
-                <th>Status</th>
+                <th>
+                    Date
+                </th>
+
+                <th>
+                    Check In
+                </th>
+
+                <th>
+                    Check Out
+                </th>
+
+                <th>
+                    Working Hours
+                </th>
+
+                <th>
+                    Status
+                </th>
 
             </tr>
 
@@ -847,6 +927,7 @@
 
 
             <tbody>
+
 
             <tr th:each="attendance : ${attendanceRecords}">
 
@@ -874,28 +955,26 @@
                 </td>
 
 
+                <!-- =================================================
+                     CORRECTED THYMELEAF WORKING HOURS
+                     ================================================= -->
+
                 <td>
 
-                    <span
-                        th:if="${attendance.checkIn != null
-                                and attendance.checkOut != null}"
-                        th:text="${T(java.time.Duration).between(
-                            attendance.checkIn,
-                            attendance.checkOut
-                        ).toMinutes() / 60}
-                        + 'h '
-                        + ${T(java.time.Duration).between(
-                            attendance.checkIn,
-                            attendance.checkOut
-                        ).toMinutes() % 60}
-                        + 'm'">
+                    <span th:if="${attendance.checkIn != null and attendance.checkOut != null}"
+                          th:with="
+                            totalMinutes=${T(java.time.Duration).between(attendance.checkIn, attendance.checkOut).toMinutes()},
+                            hours=${totalMinutes / 60},
+                            minutes=${totalMinutes % 60}
+                          "
+                          th:text="${hours + 'h ' + minutes + 'm'}">
+
+                        0h 0m
 
                     </span>
 
 
-                    <span
-                        th:unless="${attendance.checkIn != null
-                                    and attendance.checkOut != null}">
+                    <span th:unless="${attendance.checkIn != null and attendance.checkOut != null}">
 
                         In progress
 
@@ -907,21 +986,7 @@
                 <td>
 
 
-                    <!-- WORKING -->
-
-                    <span th:if="${attendance.checkIn != null
-                                  and attendance.checkOut == null}"
-                          class="status status-working">
-
-                        Working
-
-                    </span>
-
-
-                    <!-- PRESENT -->
-
-                    <span th:if="${attendance.checkOut != null
-                                  and attendance.status == 'PRESENT'}"
+                    <span th:if="${attendance.status == 'PRESENT'}"
                           class="status status-present">
 
                         Present
@@ -929,23 +994,31 @@
                     </span>
 
 
-                    <!-- LATE -->
-
-                    <span th:if="${attendance.checkOut != null
-                                  and attendance.status == 'LATE'}"
+                    <span th:if="${attendance.status == 'LATE'}"
                           class="status status-late">
 
                         Late
 
                     </span>
 
+
+                    <span th:if="${attendance.checkIn != null and attendance.checkOut != null and attendance.status != 'LATE' and attendance.status != 'PRESENT'}"
+                          class="status status-completed">
+
+                        Completed
+
+                    </span>
+
+
                 </td>
+
 
             </tr>
 
 
             <tr th:if="${attendanceRecords == null
                         or #lists.isEmpty(attendanceRecords)}">
+
 
                 <td colspan="5"
                     class="empty">
@@ -956,35 +1029,75 @@
 
             </tr>
 
+
             </tbody>
 
         </table>
 
     </div>
 
+
 </main>
+
+
+
+<!-- =========================================================
+     SUCCESS POPUP
+========================================================= -->
+
+<div id="successPopup"
+     class="popup-overlay">
+
+
+    <div class="popup">
+
+
+        <div class="popup-icon">
+            ✓
+        </div>
+
+
+        <h2>
+            Check-In Successful
+        </h2>
+
+
+        <p>
+            Your attendance has been recorded successfully.
+            You are now marked as <strong>Working</strong>.
+        </p>
+
+
+        <button type="button"
+                onclick="closePopup()">
+
+            Continue
+
+        </button>
+
+
+    </div>
+
+</div>
+
 
 
 <script>
 
-    /*
-     * =========================================================
-     * CHECK IN
-     * =========================================================
-     */
+
+    /* =========================================================
+       GPS CHECK-IN
+    ========================================================= */
 
     function checkIn() {
+
 
         const status =
             document.getElementById("gpsStatus");
 
+
         const button =
             document.getElementById("checkInButton");
-
-
-        if (!status || !button) {
-            return;
-        }
 
 
         status.textContent =
@@ -996,16 +1109,21 @@
 
         if (!navigator.geolocation) {
 
+
             status.textContent =
                 "Geolocation is not supported by your browser.";
 
+
             button.disabled = false;
 
+
             return;
+
         }
 
 
         navigator.geolocation.getCurrentPosition(
+
 
             function(position) {
 
@@ -1026,21 +1144,6 @@
                     longitude;
 
 
-                /*
-                 * Change the button immediately so the user
-                 * knows that the check-in request is being
-                 * processed.
-                 */
-
-                button.textContent =
-                    "Checking in...";
-
-
-                button.classList.add(
-                    "working"
-                );
-
-
                 status.textContent =
                     "Location received. Checking in...";
 
@@ -1056,15 +1159,6 @@
 
 
                 button.disabled = false;
-
-
-                button.textContent =
-                    "Check In";
-
-
-                button.classList.remove(
-                    "working"
-                );
 
 
                 switch (error.code) {
@@ -1117,6 +1211,55 @@
         );
 
     }
+
+
+
+    /* =========================================================
+       SUCCESS POPUP
+    ========================================================= */
+
+    function closePopup() {
+
+        document
+            .getElementById("successPopup")
+            .classList.remove("show");
+
+    }
+
+
+
+    /* =========================================================
+       SHOW POPUP AFTER SUCCESSFUL CHECK-IN
+    ========================================================= */
+
+    window.addEventListener("DOMContentLoaded", function () {
+
+
+        const params =
+            new URLSearchParams(window.location.search);
+
+
+        if (params.has("checkedIn")) {
+
+
+            document
+                .getElementById("successPopup")
+                .classList.add("show");
+
+
+            /* Remove query parameter from browser URL */
+
+            window.history.replaceState(
+                {},
+                document.title,
+                window.location.pathname
+            );
+
+        }
+
+
+    });
+
 
 </script>
 
