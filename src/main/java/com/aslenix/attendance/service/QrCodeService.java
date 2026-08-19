@@ -2,9 +2,16 @@ package com.aslenix.attendance.service;
 
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.repository.EmployeeRepository;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.List;
 
@@ -16,13 +23,6 @@ public class QrCodeService {
     private final SecureRandom secureRandom =
             new SecureRandom();
 
-    private static final String CHARACTERS =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    + "abcdefghijklmnopqrstuvwxyz"
-                    + "0123456789";
-
-    private static final int TOKEN_LENGTH = 48;
-
     public QrCodeService(
             EmployeeRepository employeeRepository) {
 
@@ -31,29 +31,38 @@ public class QrCodeService {
     }
 
     // ============================================================
-    // GENERATE RANDOM QR TOKEN
+    // GENERATE QR TOKENS FOR EXISTING EMPLOYEES
     // ============================================================
 
-    public String generateToken() {
+    @PostConstruct
+    public void initializeEmployeeQrTokens() {
 
-        StringBuilder token =
-                new StringBuilder(TOKEN_LENGTH);
+        List<Employee> employees =
+                employeeRepository.findAll();
 
-        for (int i = 0;
-             i < TOKEN_LENGTH;
-             i++) {
+        boolean changed = false;
 
-            int index =
-                    secureRandom.nextInt(
-                            CHARACTERS.length()
-                    );
+        for (Employee employee : employees) {
 
-            token.append(
-                    CHARACTERS.charAt(index)
-            );
+            if (employee.getQrToken() == null
+                    || employee.getQrToken().isBlank()) {
+
+                employee.setQrToken(
+                        generateUniqueToken()
+                );
+
+                employeeRepository.save(employee);
+
+                changed = true;
+            }
         }
 
-        return token.toString();
+        if (changed) {
+
+            System.out.println(
+                    "ASLENIX: Employee QR tokens initialized."
+            );
+        }
     }
 
     // ============================================================
@@ -66,21 +75,92 @@ public class QrCodeService {
 
         do {
 
-            token = generateToken();
+            token = generateRandomToken();
 
         } while (
                 employeeRepository
-                        .existsByQrToken(token)
+                        .findByQrToken(token)
+                        .isPresent()
         );
 
         return token;
     }
 
     // ============================================================
-    // ENSURE EMPLOYEE HAS QR TOKEN
+    // RANDOM TOKEN
     // ============================================================
 
-    @Transactional
+    private String generateRandomToken() {
+
+        byte[] bytes =
+                new byte[32];
+
+        secureRandom.nextBytes(bytes);
+
+        StringBuilder token =
+                new StringBuilder();
+
+        for (byte b : bytes) {
+
+            token.append(
+                    String.format(
+                            "%02x",
+                            b
+                    )
+            );
+        }
+
+        return token.toString();
+    }
+
+    // ============================================================
+    // GENERATE QR IMAGE
+    // ============================================================
+
+    public byte[] generateQrImage(
+            String qrToken,
+            int width,
+            int height) {
+
+        try {
+
+            QRCodeWriter qrCodeWriter =
+                    new QRCodeWriter();
+
+            BitMatrix bitMatrix =
+                    qrCodeWriter.encode(
+                            qrToken,
+                            BarcodeFormat.QR_CODE,
+                            width,
+                            height
+                    );
+
+            ByteArrayOutputStream outputStream =
+                    new ByteArrayOutputStream();
+
+            MatrixToImageWriter.writeToStream(
+                    bitMatrix,
+                    "PNG",
+                    outputStream
+            );
+
+            return outputStream.toByteArray();
+
+        } catch (
+                WriterException |
+                IOException exception) {
+
+            throw new RuntimeException(
+                    "Unable to generate QR code.",
+                    exception
+            );
+        }
+    }
+
+    // ============================================================
+    // ENSURE EMPLOYEE HAS QR
+    // ============================================================
+
     public String ensureQrToken(
             Employee employee) {
 
@@ -96,62 +176,4 @@ public class QrCodeService {
 
         return employee.getQrToken();
     }
-
-    // ============================================================
-    // GENERATE TOKENS FOR EXISTING EMPLOYEES
-    // ============================================================
-
-    @Transactional
-    public void generateMissingTokens() {
-
-        List<Employee> employees =
-                employeeRepository.findAll();
-
-        for (Employee employee : employees) {
-
-            if (employee.getQrToken() == null
-                    || employee.getQrToken().isBlank()) {
-
-                employee.setQrToken(
-                        generateUniqueToken()
-                );
-
-                employeeRepository.save(employee);
-            }
-        }
-    }
-
-    // ============================================================
-    // REGENERATE EMPLOYEE QR TOKEN
-    // ============================================================
-
-    @Transactional
-    public String regenerateToken(
-            Employee employee) {
-
-        String newToken =
-                generateUniqueToken();
-
-        employee.setQrToken(newToken);
-
-        employeeRepository.save(employee);
-
-        return newToken;
-    }
-
-    // ============================================================
-    // BUILD QR URL
-    // ============================================================
-
-    public String buildQrUrl(
-            Employee employee,
-            String baseUrl) {
-
-        ensureQrToken(employee);
-
-        return baseUrl
-                + "/verify-employee/"
-                + employee.getQrToken();
-    }
 }
-

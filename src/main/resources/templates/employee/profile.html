@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | My Profile</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
+            background:
+                    radial-gradient(
+                            circle at 80% 10%,
+                            rgba(37,99,235,.14),
+                            transparent 30%
+                    ),
+                    #f1f5f9;
+
+            color: #0f172a;
+        }
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        header {
+
+            min-height: 76px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #0f172a,
+                            #172554
+                    );
+
+            color: white;
+
+            padding: 18px 40px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+        .brand {
+
+            font-size: 22px;
+
+            font-weight: 800;
+        }
+
+        .back {
+
+            color: white;
+
+            text-decoration: none;
+
+            padding: 10px 16px;
+
+            border-radius: 9px;
+
+            background:
+                    rgba(255,255,255,.10);
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        main {
+
+            max-width: 1100px;
+
+            margin: 0 auto;
+
+            padding: 40px 25px 60px;
+        }
+
+        .heading {
+
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+
+            font-size: 34px;
+
+            margin-bottom: 7px;
+        }
+
+        .heading p {
+
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+        /* =====================================================
+           PROFILE GRID
+        ===================================================== */
+
+        .profile-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                    1fr
+                    380px;
+
+            gap: 22px;
+        }
+
+        .card {
+
+            background: white;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 18px;
+
+            padding: 25px;
+
+            box-shadow:
+                    0 10px 30px
+                    rgba(15,23,42,.07);
+        }
+
+        .card h2 {
+
+            margin-bottom: 20px;
+
+            font-size: 20px;
+        }
+
+        /* =====================================================
+           INFORMATION
+        ===================================================== */
+
+        .info-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                    repeat(2, 1fr);
+
+            gap: 15px;
+        }
+
+        .info {
+
+            padding: 15px;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 11px;
+
+            background: #f8fafc;
+        }
+
+        .info-label {
+
+            display: block;
+
+            color: #64748b;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+
+            color: #0f172a;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            word-break: break-word;
+        }
+
+        /* =====================================================
+           QR CARD
+        ===================================================== */
+
+        .qr-card {
+
+            text-align: center;
+
+            border:
+                    2px solid
+                    #bfdbfe;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #ffffff,
+                            #eff6ff
+                    );
+        }
+
+        .qr-card h2 {
+
+            margin-bottom: 8px;
+        }
+
+        .qr-description {
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            margin-bottom: 18px;
+        }
+
+        .qr-box {
+
+            width: 290px;
+
+            height: 290px;
+
+            margin:
+                    0 auto
+                    20px;
+
+            padding: 15px;
+
+            background: white;
+
+            border-radius: 15px;
+
+            border:
+                    1px solid
+                    #dbeafe;
+
+            box-shadow:
+                    0 8px 25px
+                    rgba(37,99,235,.12);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+        .qr-box img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+        }
+
+        .employee-code {
+
+            display: inline-block;
+
+            padding: 8px 13px;
+
+            border-radius: 999px;
+
+            background: #dbeafe;
+
+            color: #1d4ed8;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            letter-spacing: .5px;
+        }
+
+        .download-button {
+
+            display: inline-block;
+
+            margin-top: 15px;
+
+            padding: 12px 18px;
+
+            border-radius: 9px;
+
+            background: #2563eb;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 800;
+        }
+
+        .download-button:hover {
+
+            background: #1d4ed8;
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 850px) {
+
+            .profile-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            header {
+
+                padding:
+                        15px 18px;
+            }
+
+            .brand {
+
+                font-size: 18px;
+            }
+
+            main {
+
+                padding:
+                        28px 15px 45px;
+            }
+
+            .info-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .qr-box {
+
+                width: 250px;
+
+                height: 250px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<header>
+
+    <div class="brand">
+        ASLENIX EMPLOYEE
+    </div>
+
+    <a
+            href="/employee/dashboard"
+            class="back">
+
+        ← Dashboard
+
+    </a>
+
+</header>
+
+
+<main>
+
+
+    <div class="heading">
+
+        <h1>
+            My Profile
+        </h1>
+
+        <p>
+            View your employee information and personal attendance QR code.
+        </p>
+
+    </div>
+
+
+    <div class="profile-grid">
+
+
+        <!-- =================================================
+             EMPLOYEE INFORMATION
+        ================================================== -->
+
+        <section class="card">
+
+            <h2>
+                Employee Information
+            </h2>
+
+
+            <div class="info-grid">
+
+
+                <div class="info">
+
+                    <span class="info-label">
+                        Employee Code
+                    </span>
+
+                    <span
+                            class="info-value"
+                            th:text="${employee.employeeCode}">
+
+                        EMPLOYEE
+
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <span class="info-label">
+                        First Name
+                    </span>
+
+                    <span
+                            class="info-value"
+                            th:text="${employee.firstName}">
+
+                        Employee
+
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <span class="info-label">
+                        Last Name
+                    </span>
+
+                    <span
+                            class="info-value"
+                            th:text="${employee.lastName}">
+
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <span class="info-label">
+                        Email
+                    </span>
+
+                    <span
+                            class="info-value"
+                            th:text="${employee.email}">
+
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <span class="info-label">
+                        Phone
+                    </span>
+
+                    <span
+                            class="info-value"
+                            th:text="${employee.phone ?: '--'}">
+
+                        --
+
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <span class="info-label">
+                        Position
+                    </span>
+
+                    <span
+                            class="info-value"
+                            th:text="${employee.position}">
+
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <span class="info-label">
+                        Joining Date
+                    </span>
+
+                    <span
+                            class="info-value"
+                            th:text="${employee.joiningDate}">
+
+                    </span>
+
+                </div>
+
+
+                <div class="info">
+
+                    <span class="info-label">
+                        Account Status
+                    </span>
+
+                    <span
+                            class="info-value"
+                            th:text="${employee.enabled ? 'Active' : 'Disabled'}">
+
+                        Active
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PERSONAL QR
+        ================================================== -->
+
+        <section class="card qr-card">
+
+            <h2>
+                My Attendance QR
+            </h2>
+
+            <p class="qr-description">
+
+                This QR code is uniquely assigned to your
+                employee account. Use it to check in or
+                check out at the office.
+
+            </p>
+
+
+            <div class="qr-box">
+
+                <img
+                        th:src="@{/employee/profile/qr}"
+                        alt="Employee Attendance QR Code">
+
+            </div>
+
+
+            <div>
+
+                <span
+                        class="employee-code"
+                        th:text="${employee.employeeCode}">
+
+                    EMPLOYEE CODE
+
+                </span>
+
+            </div>
+
+
+            <a
+                    class="download-button"
+                    th:href="@{/employee/profile/qr}"
+                    th:attr="download=${employee.employeeCode + '-QR.png'}">
+
+                Download QR
+
+            </a>
+
+        </section>
+
+
+    </div>
+
+
+</main>
+
+</body>
+
+</html>

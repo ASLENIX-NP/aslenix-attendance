@@ -3,14 +3,25 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ASLENIX | Attendance Scanner</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <title>ASLENIX | Scan Attendance</title>
+
+    <!-- =====================================================
+         QR SCANNER LIBRARY
+    ====================================================== -->
+
+    <script src="https://unpkg.com/html5-qrcode"
+            type="text/javascript">
+    </script>
+
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -18,523 +29,2104 @@
         }
 
         body {
+
             min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
+
+            font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
             background:
-                radial-gradient(
-                    circle at 80% 10%,
-                    rgba(37, 99, 235, 0.14),
-                    transparent 30%
-                ),
-                #f1f5f9;
+                    radial-gradient(
+                            circle at 80% 10%,
+                            rgba(37, 99, 235, .15),
+                            transparent 30%
+                    ),
+                    #f1f5f9;
+
             color: #0f172a;
         }
 
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
         header {
-            min-height: 72px;
-            padding: 16px 30px;
-            background: linear-gradient(135deg, #0f172a, #172554);
+
+            min-height: 74px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #0f172a,
+                            #172554
+                    );
+
             color: white;
 
+            padding: 16px 35px;
+
             display: flex;
+
             justify-content: space-between;
+
             align-items: center;
         }
 
+
         .brand {
-            font-size: 21px;
+
+            font-size: 22px;
+
             font-weight: 800;
         }
 
-        .back {
+
+        .dashboard {
+
             color: white;
+
             text-decoration: none;
+
             font-size: 14px;
+
             font-weight: 700;
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            background:
+                    rgba(255,255,255,.10);
+
+            transition:
+                    background .2s ease;
         }
+
+
+        .dashboard:hover {
+
+            background:
+                    rgba(255,255,255,.18);
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
 
         main {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 40px 20px;
+
+            width: 100%;
+
+            max-width: 760px;
+
+            margin: auto;
+
+            padding:
+                    40px 20px 60px;
         }
 
-        .scanner-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-        }
 
-        .title {
+        /* =====================================================
+           HEADING
+        ===================================================== */
+
+        .heading {
+
             text-align: center;
-            margin-bottom: 8px;
-            font-size: 26px;
-            font-weight: 800;
-        }
 
-        .subtitle {
-            text-align: center;
-            color: #64748b;
-            font-size: 14px;
             margin-bottom: 25px;
         }
 
-        #reader {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            overflow: hidden;
-            border-radius: 14px;
-        }
 
-        .location {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 12px;
-            background: #f8fafc;
-            text-align: center;
-        }
+        .heading h1 {
 
-        .location-title {
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: #64748b;
-            margin-bottom: 6px;
-        }
+            font-size: 32px;
 
-        #locationStatus {
-            font-weight: 700;
-            color: #2563eb;
-        }
-
-        .result {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 14px;
-            text-align: center;
-        }
-
-        .success {
-            display: block;
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .error {
-            display: block;
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .result h2 {
             margin-bottom: 8px;
         }
 
-        .result p {
-            margin-top: 5px;
+
+        .heading p {
+
+            color: #64748b;
+
+            font-size: 14px;
+
+            line-height: 1.6;
         }
 
-        .distance {
-            margin-top: 10px;
-            font-size: 13px;
-            font-weight: 700;
+
+        /* =====================================================
+           SCANNER CARD
+        ===================================================== */
+
+        .scanner-card {
+
+            background: white;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            border-radius: 18px;
+
+            padding: 25px;
+
+            box-shadow:
+                    0 10px 30px
+                    rgba(15,23,42,.08);
         }
+
+
+        /* =====================================================
+           QR SCANNER
+        ===================================================== */
+
+        #reader {
+
+            width: 100%;
+
+            max-width: 560px;
+
+            margin: auto;
+
+            overflow: hidden;
+
+            border-radius: 15px;
+
+            background: #020617;
+        }
+
+
+        #reader video {
+
+            width: 100% !important;
+
+            height: auto !important;
+
+            border-radius: 15px;
+        }
+
+
+        #reader img {
+
+            max-width: 100%;
+        }
+
+
+        #reader__scan_region {
+
+            background: #020617;
+        }
+
+
+        #reader__dashboard {
+
+            padding: 15px !important;
+
+            background: white;
+        }
+
+
+        #reader__dashboard_section_csr {
+
+            text-align: center;
+        }
+
+
+        #reader__dashboard_section_swaplink {
+
+            color: #2563eb !important;
+
+            font-weight: 700;
+
+            text-decoration: none;
+        }
+
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        .status {
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 11px;
+
+            background: #f8fafc;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            text-align: center;
+
+            color: #475569;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+        }
+
+
+        .status.success {
+
+            background: #dcfce7;
+
+            border-color: #bbf7d0;
+
+            color: #166534;
+        }
+
+
+        .status.error {
+
+            background: #fee2e2;
+
+            border-color: #fecaca;
+
+            color: #991b1b;
+        }
+
+
+        .status.working {
+
+            background: #dbeafe;
+
+            border-color: #bfdbfe;
+
+            color: #1e40af;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
+        .actions {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            margin-top: 20px;
+
+            flex-wrap: wrap;
+        }
+
+
+        button,
+        .back-button {
+
+            border: none;
+
+            border-radius: 9px;
+
+            padding: 12px 20px;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            text-decoration: none;
+        }
+
+
+        .start {
+
+            background: #2563eb;
+
+            color: white;
+        }
+
+
+        .start:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        .stop {
+
+            background: #dc2626;
+
+            color: white;
+        }
+
+
+        .stop:hover {
+
+            background: #b91c1c;
+        }
+
+
+        .back-button {
+
+            background: #e2e8f0;
+
+            color: #0f172a;
+        }
+
+
+        button:disabled {
+
+            opacity: .5;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =====================================================
+           EMPLOYEE INFO
+        ===================================================== */
+
+        .employee-info {
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 11px;
+
+            background: #f8fafc;
+
+            border:
+                    1px solid
+                    #e2e8f0;
+
+            text-align: center;
+        }
+
+
+        .employee-info small {
+
+            display: block;
+
+            color: #64748b;
+
+            margin-bottom: 5px;
+        }
+
+
+        .employee-info strong {
+
+            font-size: 17px;
+        }
+
+
+        /* =====================================================
+           SECURITY INFO
+        ===================================================== */
+
+        .security-info {
+
+            margin-top: 15px;
+
+            padding: 13px 15px;
+
+            border-radius: 10px;
+
+            background: #eff6ff;
+
+            border:
+                    1px solid
+                    #dbeafe;
+
+            color: #1e40af;
+
+            text-align: center;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           SUCCESS POPUP OVERLAY
+        ===================================================== */
+
+        .success-overlay {
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                    rgba(15, 23, 42, .65);
+
+            display: none;
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding: 20px;
+
+            z-index: 9999;
+
+            backdrop-filter: blur(5px);
+        }
+
+
+        .success-overlay.show {
+
+            display: flex;
+
+            animation:
+                    fadeIn .25s ease;
+        }
+
+
+        /* =====================================================
+           SUCCESS POPUP
+        ===================================================== */
+
+        .success-popup {
+
+            width: 100%;
+
+            max-width: 390px;
+
+            background: white;
+
+            border-radius: 22px;
+
+            padding: 35px 25px;
+
+            text-align: center;
+
+            box-shadow:
+                    0 25px 70px
+                    rgba(0,0,0,.25);
+
+            animation:
+                    popupIn .3s ease;
+        }
+
+
+        .success-icon {
+
+            width: 76px;
+
+            height: 76px;
+
+            margin:
+                    0 auto 20px;
+
+            border-radius: 50%;
+
+            background: #dcfce7;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 38px;
+
+            color: #16a34a;
+        }
+
+
+        .success-popup h2 {
+
+            font-size: 25px;
+
+            margin-bottom: 10px;
+
+            color: #0f172a;
+        }
+
+
+        .success-popup p {
+
+            color: #64748b;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 8px;
+        }
+
+
+        .success-time {
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            color: #2563eb;
+
+            margin-top: 10px;
+        }
+
+
+        .popup-note {
+
+            margin-top: 20px;
+
+            font-size: 12px !important;
+
+            color: #94a3b8 !important;
+        }
+
+
+        /* =====================================================
+           ANIMATIONS
+        ===================================================== */
+
+        @keyframes fadeIn {
+
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+
+        @keyframes popupIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                        scale(.88)
+                        translateY(10px);
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                        scale(1)
+                        translateY(0);
+            }
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            header {
+
+                padding:
+                        15px 18px;
+            }
+
+
+            .brand {
+
+                font-size: 18px;
+            }
+
+
+            main {
+
+                padding:
+                        28px 14px 45px;
+            }
+
+
+            .heading h1 {
+
+                font-size: 27px;
+            }
+
+
+            .scanner-card {
+
+                padding: 15px;
+            }
+
+        }
+
     </style>
+
 </head>
 
+
 <body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================== -->
 
 <header>
 
     <div class="brand">
+
         ASLENIX ATTENDANCE
+
     </div>
 
-    <a href="/employee/dashboard" class="back">
-        ← Dashboard
+
+    <a
+            href="/employee/dashboard"
+            class="dashboard">
+
+        Dashboard
+
     </a>
 
 </header>
 
+
+
+<!-- =========================================================
+     MAIN
+========================================================== -->
+
 <main>
+
+
+    <!-- =====================================================
+         HEADING
+    ====================================================== -->
+
+    <div class="heading">
+
+        <h1>
+            Scan Attendance QR
+        </h1>
+
+
+        <p>
+
+            Scan your unique ASLENIX employee QR code
+            to check in or check out.
+
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SCANNER CARD
+    ====================================================== -->
 
     <div class="scanner-card">
 
-        <h1 class="title">
-            Scan Employee ID
-        </h1>
 
-        <p class="subtitle">
-            Scan the QR code on your ASLENIX employee ID card.
-        </p>
+        <!-- =================================================
+             QR SCANNER
+        ================================================== -->
 
         <div id="reader"></div>
 
-        <div class="location">
 
-            <div class="location-title">
-                Office Location
-            </div>
 
-            <div id="locationStatus">
-                Checking your location...
-            </div>
+        <!-- =================================================
+             STATUS
+        ================================================== -->
+
+        <div
+                id="status"
+                class="status">
+
+            Click "Start Scanner" to begin.
 
         </div>
 
-        <div id="result" class="result"></div>
+
+
+        <!-- =================================================
+             LOGGED-IN EMPLOYEE
+        ================================================== -->
+
+        <div class="employee-info">
+
+            <small>
+                Logged in as
+            </small>
+
+
+            <strong
+                    th:text="${employeeName}">
+
+                Employee
+
+            </strong>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SECURITY INFORMATION
+        ================================================== -->
+
+        <div class="security-info">
+
+            🔐 Your QR code is uniquely assigned to your
+            employee account. Another employee's QR code
+            cannot be used to record attendance for you.
+
+        </div>
+
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="actions">
+
+
+            <button
+                    id="startButton"
+                    class="start"
+                    type="button"
+                    onclick="startScanner()">
+
+                Start Scanner
+
+            </button>
+
+
+            <button
+                    id="stopButton"
+                    class="stop"
+                    type="button"
+                    onclick="stopScanner()"
+                    disabled>
+
+                Stop Scanner
+
+            </button>
+
+
+            <a
+                    href="/employee/attendance"
+                    class="back-button">
+
+                Attendance
+
+            </a>
+
+        </div>
 
     </div>
 
 </main>
 
 
+
+<!-- =========================================================
+     SUCCESS POPUP
+========================================================== -->
+
+<div
+        id="successOverlay"
+        class="success-overlay">
+
+
+    <div class="success-popup">
+
+
+        <div class="success-icon">
+
+            ✓
+
+        </div>
+
+
+        <h2 id="successTitle">
+
+            Attendance Successful
+
+        </h2>
+
+
+        <p id="successMessage">
+
+            Your attendance has been recorded successfully.
+
+        </p>
+
+
+        <div
+                id="successTime"
+                class="success-time">
+
+        </div>
+
+
+        <p class="popup-note">
+
+            Redirecting to your attendance page...
+
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     CSRF TOKEN
+========================================================== -->
+
+<input
+        type="hidden"
+        id="csrfToken"
+        th:name="${_csrf.parameterName}"
+        th:value="${_csrf.token}">
+
+
+
 <script>
 
-    let currentLatitude = null;
-    let currentLongitude = null;
-    let scanLocked = false;
+
+    // ========================================================
+    // ELEMENTS
+    // ========================================================
+
+    const statusElement =
+            document.getElementById("status");
 
 
-    // ============================================================
-    // GET EMPLOYEE LOCATION
-    // ============================================================
+    const startButton =
+            document.getElementById("startButton");
 
-    function getLocation() {
 
-        const status =
-            document.getElementById("locationStatus");
+    const stopButton =
+            document.getElementById("stopButton");
+
+
+    const csrfTokenElement =
+            document.getElementById("csrfToken");
+
+
+    const successOverlay =
+            document.getElementById("successOverlay");
+
+
+    const successTitle =
+            document.getElementById("successTitle");
+
+
+    const successMessage =
+            document.getElementById("successMessage");
+
+
+    const successTime =
+            document.getElementById("successTime");
+
+
+
+    // ========================================================
+    // CSRF
+    // ========================================================
+
+    const csrfToken =
+            csrfTokenElement
+                    ? csrfTokenElement.value
+                    : "";
+
+
+
+    // ========================================================
+    // VARIABLES
+    // ========================================================
+
+    let html5QrCode = null;
+
+    let scanning = false;
+
+    let processingQr = false;
+
+
+
+    // ========================================================
+    // STATUS
+    // ========================================================
+
+    function setStatus(
+            message,
+            type = "") {
+
+
+        statusElement.textContent =
+                message;
+
+
+        statusElement.className =
+                "status";
+
+
+        if (type) {
+
+            statusElement.classList.add(
+                    type
+            );
+
+        }
+
+    }
+
+
+
+    // ========================================================
+    // SHOW SUCCESS POPUP
+    // ========================================================
+
+    function showSuccessPopup(
+            action,
+            message,
+            time) {
+
+
+        if (action === "CHECK_IN") {
+
+            successTitle.textContent =
+                    "Check-In Successful";
+
+
+            successMessage.textContent =
+                    message ||
+                    "You have successfully checked in.";
+
+        }
+
+
+        else if (action === "CHECK_OUT") {
+
+            successTitle.textContent =
+                    "Check-Out Successful";
+
+
+            successMessage.textContent =
+                    message ||
+                    "You have successfully checked out.";
+
+        }
+
+
+        else {
+
+            successTitle.textContent =
+                    "Attendance Successful";
+
+
+            successMessage.textContent =
+                    message ||
+                    "Your attendance has been recorded.";
+
+        }
+
+
+        if (time) {
+
+            successTime.textContent =
+                    "Time: " + time;
+
+        }
+
+
+        else {
+
+            successTime.textContent =
+                    "";
+
+        }
+
+
+        successOverlay.classList.add(
+                "show"
+        );
+
+    }
+
+
+
+    // ========================================================
+    // START SCANNER
+    // ========================================================
+
+    async function startScanner() {
+
+
+        if (scanning) {
+
+            return;
+
+        }
+
+
+        if (
+                typeof Html5Qrcode ===
+                "undefined"
+        ) {
+
+            setStatus(
+
+                    "QR scanner library could not be loaded. Please check your internet connection.",
+
+                    "error"
+
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+
+            /*
+             * ------------------------------------------------
+             * CLEAN OLD SCANNER
+             * ------------------------------------------------
+             */
+
+            if (html5QrCode) {
+
+                try {
+
+                    await html5QrCode.stop();
+
+                } catch (error) {
+
+                    console.log(
+                            "Previous scanner was not running."
+                    );
+
+                }
+
+
+                try {
+
+                    html5QrCode.clear();
+
+                } catch (error) {
+
+                    console.log(
+                            "Previous scanner was already clear."
+                    );
+
+                }
+
+
+                html5QrCode = null;
+
+            }
+
+
+            processingQr = false;
+
+
+            /*
+             * ------------------------------------------------
+             * CREATE SCANNER
+             * ------------------------------------------------
+             */
+
+            html5QrCode =
+                    new Html5Qrcode(
+                            "reader"
+                    );
+
+
+            setStatus(
+
+                    "Starting camera...",
+
+                    "working"
+
+            );
+
+
+            /*
+             * ------------------------------------------------
+             * START CAMERA
+             *
+             * IMPORTANT:
+             *
+             * Do NOT use:
+             *
+             * facingMode:
+             * {
+             *     exact: "environment"
+             * }
+             *
+             * because desktop cameras may reject it.
+             * ------------------------------------------------
+             */
+
+            await html5QrCode.start(
+
+                    {
+                        facingMode:
+                                "environment"
+                    },
+
+                    {
+
+                        fps: 10,
+
+                        qrbox: {
+
+                            width: 250,
+
+                            height: 250
+
+                        },
+
+                        aspectRatio: 1.0,
+
+                        disableFlip: false
+
+                    },
+
+                    onQrCodeDetected,
+
+                    onQrCodeScanError
+
+            );
+
+
+            scanning = true;
+
+
+            startButton.disabled =
+                    true;
+
+
+            stopButton.disabled =
+                    false;
+
+
+            setStatus(
+
+                    "Camera started. Point it at your ASLENIX employee QR code.",
+
+                    "working"
+
+            );
+
+
+        }
+
+
+        catch (error) {
+
+
+            console.error(
+                    "Scanner start error:",
+                    error
+            );
+
+
+            let message =
+                    "Unable to access the camera.";
+
+
+            if (
+                    error &&
+                    error.name ===
+                    "NotAllowedError"
+            ) {
+
+                message =
+                        "Camera permission was denied. Please allow camera access for this website and try again.";
+
+            }
+
+
+            else if (
+                    error &&
+                    error.name ===
+                    "NotFoundError"
+            ) {
+
+                message =
+                        "No camera was found on this device.";
+
+            }
+
+
+            else if (
+                    error &&
+                    error.name ===
+                    "NotReadableError"
+            ) {
+
+                message =
+                        "The camera is already being used by another application.";
+
+            }
+
+
+            else if (
+                    error &&
+                    error.name ===
+                    "OverconstrainedError"
+            ) {
+
+                message =
+                        "The requested camera is not available. Please try again.";
+
+            }
+
+
+            else if (
+                    error &&
+                    error.name ===
+                    "SecurityError"
+            ) {
+
+                message =
+                        "The browser blocked camera access for security reasons.";
+
+            }
+
+
+            else if (
+                    error &&
+                    error.message
+            ) {
+
+                message =
+                        "Camera error: "
+                        +
+                        error.message;
+
+            }
+
+
+            setStatus(
+                    message,
+                    "error"
+            );
+
+
+            html5QrCode =
+                    null;
+
+
+            startButton.disabled =
+                    false;
+
+
+            stopButton.disabled =
+                    true;
+
+
+            scanning =
+                    false;
+
+        }
+
+    }
+
+
+
+    // ========================================================
+    // QR DETECTED
+    // ========================================================
+
+    async function onQrCodeDetected(
+
+            decodedText,
+
+            decodedResult
+
+    ) {
+
+
+        if (processingQr) {
+
+            return;
+
+        }
+
+
+        processingQr =
+                true;
+
+
+        console.log(
+
+                "QR detected:",
+
+                decodedText
+
+        );
+
+
+        await handleQrCode(
+                decodedText
+        );
+
+    }
+
+
+
+    // ========================================================
+    // QR SCAN ERROR
+    // ========================================================
+
+    function onQrCodeScanError(
+            errorMessage
+    ) {
+
+        /*
+         * Normal scan failures are ignored.
+         *
+         * html5-qrcode calls this repeatedly
+         * while searching for a QR code.
+         */
+
+    }
+
+
+
+    // ========================================================
+    // STOP SCANNER
+    // ========================================================
+
+    async function stopScanner() {
+
+
+        scanning =
+                false;
+
+
+        if (html5QrCode) {
+
+
+            try {
+
+                await html5QrCode.stop();
+
+            }
+
+            catch (error) {
+
+                console.error(
+
+                        "Scanner stop error:",
+
+                        error
+
+                );
+
+            }
+
+
+            try {
+
+                html5QrCode.clear();
+
+            }
+
+            catch (error) {
+
+                console.error(
+
+                        "Scanner clear error:",
+
+                        error
+
+                );
+
+            }
+
+
+            html5QrCode =
+                    null;
+
+        }
+
+
+        startButton.disabled =
+                false;
+
+
+        stopButton.disabled =
+                true;
+
+
+        processingQr =
+                false;
+
+
+        setStatus(
+                "Scanner stopped."
+        );
+
+    }
+
+
+
+    // ========================================================
+    // EXTRACT QR TOKEN
+    // ========================================================
+
+    function extractQrToken(
+            qrValue
+    ) {
+
+
+        if (!qrValue) {
+
+            return null;
+
+        }
+
+
+        qrValue =
+                String(qrValue)
+                        .trim();
+
+
+        if (!qrValue) {
+
+            return null;
+
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * FORMAT 1
+         *
+         * QR contains only token.
+         * ----------------------------------------------------
+         */
+
+        if (
+
+                /^[A-Za-z0-9]{20,100}$/
+                        .test(qrValue)
+
+        ) {
+
+            return qrValue;
+
+        }
+
+
+
+        /*
+         * ----------------------------------------------------
+         * FORMAT 2
+         *
+         * QR contains URL.
+         * ----------------------------------------------------
+         */
+
+        try {
+
+
+            const url =
+                    new URL(
+
+                            qrValue,
+
+                            window.location.origin
+
+                    );
+
+
+            const parts =
+                    url.pathname
+                            .split("/")
+                            .filter(
+                                    part =>
+                                            part.length > 0
+                            );
+
+
+            const verifyIndex =
+                    parts.indexOf(
+                            "verify-employee"
+                    );
+
+
+            if (
+
+                    verifyIndex !== -1
+                    &&
+                    parts[verifyIndex + 1]
+
+            ) {
+
+
+                const token =
+                        parts[
+                                verifyIndex + 1
+                        ];
+
+
+                if (
+
+                        /^[A-Za-z0-9]{20,100}$/
+                                .test(token)
+
+                ) {
+
+                    return token;
+
+                }
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.log(
+                    "QR is not a URL."
+            );
+
+        }
+
+
+
+        /*
+         * ----------------------------------------------------
+         * FORMAT 3
+         *
+         * QR contains ?token=TOKEN
+         * ----------------------------------------------------
+         */
+
+        try {
+
+
+            const url =
+                    new URL(
+
+                            qrValue,
+
+                            window.location.origin
+
+                    );
+
+
+            const token =
+                    url.searchParams.get(
+                            "token"
+                    );
+
+
+            if (
+
+                    token
+                    &&
+                    /^[A-Za-z0-9]{20,100}$/
+                            .test(token)
+
+            ) {
+
+                return token;
+
+            }
+
+        }
+
+        catch (error) {
+
+            // Not a URL.
+
+        }
+
+
+        return null;
+
+    }
+
+
+
+    // ========================================================
+    // HANDLE QR CODE
+    // ========================================================
+
+    async function handleQrCode(
+            qrValue
+    ) {
+
+
+        setStatus(
+
+                "QR detected. Verifying your employee QR code...",
+
+                "working"
+
+        );
+
+
+        const qrToken =
+                extractQrToken(
+                        qrValue
+                );
+
+
+
+        /*
+         * ----------------------------------------------------
+         * INVALID QR
+         * ----------------------------------------------------
+         */
+
+        if (!qrToken) {
+
+
+            setStatus(
+
+                    "This is not a valid ASLENIX employee QR code.",
+
+                    "error"
+
+            );
+
+
+            processingQr =
+                    false;
+
+
+            return;
+
+        }
+
+
+
+        /*
+         * ----------------------------------------------------
+         * GPS
+         * ----------------------------------------------------
+         */
+
+        setStatus(
+
+                "QR verified. Getting your office location...",
+
+                "working"
+
+        );
+
 
         if (!navigator.geolocation) {
 
-            status.textContent =
-                "Location is not supported by this device.";
+
+            setStatus(
+
+                    "Your browser does not support GPS location.",
+
+                    "error"
+
+            );
+
+
+            processingQr =
+                    false;
+
 
             return;
+
         }
+
+
 
         navigator.geolocation.getCurrentPosition(
 
-            function(position) {
 
-                currentLatitude =
-                    position.coords.latitude;
+                async function(position) {
 
-                currentLongitude =
-                    position.coords.longitude;
 
-                const accuracy =
-                    Math.round(position.coords.accuracy);
+                    const latitude =
+                            position.coords.latitude;
 
-                status.textContent =
-                    "Location detected ✓ (" +
-                    accuracy +
-                    "m accuracy)";
 
-            },
+                    const longitude =
+                            position.coords.longitude;
 
-            function(error) {
 
-                status.textContent =
-                    "Location permission is required.";
+                    await submitAttendance(
 
-                console.error(error);
+                            qrToken,
 
-            },
+                            latitude,
 
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
+                            longitude
+
+                    );
+
+                },
+
+
+                function(error) {
+
+
+                    console.error(
+
+                            "GPS error:",
+
+                            error
+
+                    );
+
+
+                    setStatus(
+
+                            "Location permission is required for attendance.",
+
+                            "error"
+
+                    );
+
+
+                    processingQr =
+                            false;
+
+                },
+
+
+                {
+
+                    enableHighAccuracy:
+                            true,
+
+                    timeout:
+                            10000,
+
+                    maximumAge:
+                            0
+
+                }
+
         );
+
     }
 
 
-    // ============================================================
-    // QR SCANNED
-    // ============================================================
 
-    function onScanSuccess(decodedText) {
+    // ========================================================
+    // SUBMIT ATTENDANCE
+    // ========================================================
 
-        if (scanLocked) {
-            return;
-        }
+    async function submitAttendance(
 
-        scanLocked = true;
+            qrToken,
 
-        console.log("QR:", decodedText);
+            latitude,
 
-        if (
-            currentLatitude === null ||
-            currentLongitude === null
-        ) {
+            longitude
 
-            showError(
-                "Location unavailable. Please allow location access and try again."
-            );
-
-            scanLocked = false;
-
-            getLocation();
-
-            return;
-        }
-
-        let token = extractToken(decodedText);
-
-        if (!token) {
-
-            showError(
-                "Invalid ASLENIX employee QR code."
-            );
-
-            scanLocked = false;
-
-            return;
-        }
-
-        processAttendance(
-            token,
-            currentLatitude,
-            currentLongitude
-        );
-    }
-
-
-    // ============================================================
-    // EXTRACT QR TOKEN
-    // ============================================================
-
-    function extractToken(value) {
-
-        try {
-
-            const url =
-                new URL(value);
-
-            const parts =
-                url.pathname.split("/");
-
-            const index =
-                parts.indexOf("verify-employee");
-
-            if (
-                index !== -1 &&
-                parts[index + 1]
-            ) {
-
-                return parts[index + 1];
-            }
-
-        } catch (error) {
-
-            console.error(error);
-
-        }
-
-        return null;
-    }
-
-
-    // ============================================================
-    // SEND TO SPRING BOOT
-    // ============================================================
-
-    async function processAttendance(
-        token,
-        latitude,
-        longitude
     ) {
 
+
+        setStatus(
+
+                "Recording your attendance...",
+
+                "working"
+
+        );
+
+
         try {
 
+
+            const formData =
+                    new URLSearchParams();
+
+
+            formData.append(
+
+                    "qrToken",
+
+                    qrToken
+
+            );
+
+
+            formData.append(
+
+                    "latitude",
+
+                    latitude
+
+            );
+
+
+            formData.append(
+
+                    "longitude",
+
+                    longitude
+
+            );
+
+
+
+            /*
+             * ------------------------------------------------
+             * SEND REQUEST
+             * ------------------------------------------------
+             */
+
             const response =
-                await fetch(
-                    "/api/attendance/qr",
-                    {
-                        method: "POST",
+                    await fetch(
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+                            "/employee/attendance/qr",
 
-                        body: JSON.stringify({
+                            {
 
-                            qrToken: token,
+                                method:
+                                        "POST",
 
-                            latitude: latitude,
+                                headers: {
 
-                            longitude: longitude
+                                    "Content-Type":
+                                            "application/x-www-form-urlencoded",
 
-                        })
-                    }
-                );
+                                    "X-CSRF-TOKEN":
+                                            csrfToken
 
-            const data =
-                await response.json();
+                                },
+
+                                body:
+                                        formData.toString()
+
+                            }
+
+                    );
+
+
+
+            /*
+             * ------------------------------------------------
+             * SERVER ERROR
+             * ------------------------------------------------
+             */
 
             if (!response.ok) {
 
-                showError(
-                    data.message ||
-                    "Attendance could not be recorded."
+                throw new Error(
+
+                        "Server returned HTTP "
+                        +
+                        response.status
+
                 );
 
-                scanLocked = false;
-
-                return;
             }
 
-            showSuccess(data);
 
-        } catch (error) {
 
-            console.error(error);
+            const data =
+                    await response.json();
 
-            showError(
-                "Unable to connect to the attendance server."
+
+            console.log(
+
+                    "Attendance response:",
+
+                    data
+
             );
 
-            scanLocked = false;
+
+
+            /*
+             * =================================================
+             * SUCCESS
+             * =================================================
+             */
+
+            if (data.success) {
+
+
+                /*
+                 * ---------------------------------------------
+                 * STOP CAMERA
+                 * ---------------------------------------------
+                 */
+
+                await stopScanner();
+
+
+                /*
+                 * ---------------------------------------------
+                 * SHOW SUCCESS STATUS
+                 * ---------------------------------------------
+                 */
+
+                setStatus(
+
+                        data.message
+                        ||
+                        "Attendance recorded successfully.",
+
+                        "success"
+
+                );
+
+
+                /*
+                 * ---------------------------------------------
+                 * SHOW POPUP
+                 * ---------------------------------------------
+                 */
+
+                showSuccessPopup(
+
+                        data.action,
+
+                        data.message,
+
+                        data.time
+
+                );
+
+
+                /*
+                 * ---------------------------------------------
+                 * REDIRECT
+                 * ---------------------------------------------
+                 */
+
+                setTimeout(
+
+                        function() {
+
+                            window.location.href =
+                                    "/employee/attendance";
+
+                        },
+
+                        2200
+
+                );
+
+
+                return;
+
+            }
+
+
+
+            /*
+             * =================================================
+             * SERVER REJECTED
+             * =================================================
+             */
+
+            setStatus(
+
+                    data.message
+                    ||
+                    "Attendance could not be recorded.",
+
+                    "error"
+
+            );
+
+
+            processingQr =
+                    false;
+
         }
+
+
+        catch (error) {
+
+
+            console.error(
+
+                    "Attendance request error:",
+
+                    error
+
+            );
+
+
+            setStatus(
+
+                    "Unable to communicate with the attendance server.",
+
+                    "error"
+
+            );
+
+
+            processingQr =
+                    false;
+
+        }
+
     }
 
 
-    // ============================================================
-    // SUCCESS
-    // ============================================================
 
-    function showSuccess(data) {
+    // ========================================================
+    // CLEANUP
+    // ========================================================
 
-        const result =
-            document.getElementById("result");
+    window.addEventListener(
 
-        result.className =
-            "result success";
+            "beforeunload",
 
-        result.innerHTML = `
-
-            <h2>✓ ${data.action}</h2>
-
-            <p>
-                <strong>${data.employeeName}</strong>
-            </p>
-
-            <p>
-                ${data.employeeCode}
-            </p>
-
-            <p>
-                ${data.time}
-            </p>
-
-            ${
-                data.workingHours
-                    ? `<p>
-                        Working Hours:
-                        <strong>${data.workingHours}</strong>
-                       </p>`
-                    : ""
-            }
-
-            <div class="distance">
-                Location verified ✓
-            </div>
-
-        `;
-
-        setTimeout(
             function() {
 
-                result.style.display =
-                    "none";
 
-                scanLocked = false;
-
-            },
-            5000
-        );
-    }
+                if (html5QrCode) {
 
 
-    // ============================================================
-    // ERROR
-    // ============================================================
+                    html5QrCode
+                            .stop()
+                            .catch(
 
-    function showError(message) {
+                                    function(error) {
 
-        const result =
-            document.getElementById("result");
+                                        console.error(
 
-        result.className =
-            "result error";
+                                                "Scanner cleanup error:",
 
-        result.innerHTML = `
+                                                error
 
-            <h2>✕ Attendance Denied</h2>
+                                        );
 
-            <p>
-                ${message}
-            </p>
+                                    }
 
-        `;
+                            );
 
-        result.style.display =
-            "block";
-    }
+                }
 
-
-    // ============================================================
-    // START LOCATION
-    // ============================================================
-
-    getLocation();
-
-
-    // ============================================================
-    // START QR SCANNER
-    // ============================================================
-
-    const scanner =
-        new Html5Qrcode("reader");
-
-    scanner.start(
-
-        {
-            facingMode: "environment"
-        },
-
-        {
-            fps: 10,
-            qrbox: {
-                width: 250,
-                height: 250
             }
-        },
 
-        onScanSuccess,
-
-        function(errorMessage) {
-            // Ignore normal scanner errors
-        }
-
-    ).catch(function(error) {
-
-        console.error(error);
-
-        showError(
-            "Unable to access the camera. Please allow camera permission."
-        );
-
-    });
+    );
 
 </script>
+
 
 </body>
 

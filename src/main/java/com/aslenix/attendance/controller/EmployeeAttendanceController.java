@@ -470,21 +470,4 @@ public class EmployeeAttendanceController {
     }
 
 
-    // ============================================================
-// QR SCANNER PAGE
-// ============================================================
-
-        @GetMapping("/scanner")
-        public String scanner(
-                Authentication authentication) {
-
-        Employee employee =
-                getLoggedInEmployee(authentication);
-
-        if (employee == null) {
-                return "redirect:/login";
-        }
-
-        return "employee/attendance-scanner";
-        }
 }

@@ -1,105 +1,292 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>com.aslenix</groupId>
-	<artifactId>aslenix-attendance</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
-	<properties>
-		<java.version>25</java.version>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.thymeleaf.extras</groupId>
-			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
-		</dependency>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>com.mysql</groupId>
-			<artifactId>mysql-connector-j</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <modelVersion>4.0.0</modelVersion>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    <!-- =========================================================
+         SPRING BOOT
+    ========================================================== -->
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.0</version>
+        <relativePath/>
+    </parent>
+
+
+    <!-- =========================================================
+         PROJECT INFORMATION
+    ========================================================== -->
+
+    <groupId>com.aslenix</groupId>
+
+    <artifactId>aslenix-attendance</artifactId>
+
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>aslenix-attendance</name>
+
+    <description>ASLENIX Attendance Management System</description>
+
+
+    <!-- =========================================================
+         JAVA
+    ========================================================== -->
+
+    <properties>
+
+        <java.version>25</java.version>
+
+    </properties>
+
+
+    <!-- =========================================================
+         DEPENDENCIES
+    ========================================================== -->
+
+    <dependencies>
+
+
+        <!-- =====================================================
+             SPRING DATA JPA
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             SPRING SECURITY
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-security</artifactId>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             THYMELEAF
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             VALIDATION
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-validation</artifactId>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             SPRING WEB MVC
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             THYMELEAF SPRING SECURITY
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.thymeleaf.extras</groupId>
+
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             DEVTOOLS
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-devtools</artifactId>
+
+            <scope>runtime</scope>
+
+            <optional>true</optional>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             MYSQL
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>com.mysql</groupId>
+
+            <artifactId>mysql-connector-j</artifactId>
+
+            <scope>runtime</scope>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             QR CODE GENERATION - ZXING CORE
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>com.google.zxing</groupId>
+
+            <artifactId>core</artifactId>
+
+            <version>3.5.3</version>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             QR CODE GENERATION - ZXING JAVASE
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>com.google.zxing</groupId>
+
+            <artifactId>javase</artifactId>
+
+            <version>3.5.3</version>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             TEST - JPA
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+
+            <scope>test</scope>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             TEST - SECURITY
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-security-test</artifactId>
+
+            <scope>test</scope>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             TEST - THYMELEAF
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-thymeleaf-test</artifactId>
+
+            <scope>test</scope>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             TEST - VALIDATION
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-validation-test</artifactId>
+
+            <scope>test</scope>
+
+        </dependency>
+
+
+        <!-- =====================================================
+             TEST - WEB MVC
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.springframework.boot</groupId>
+
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+
+            <scope>test</scope>
+
+        </dependency>
+
+
+    </dependencies>
+
+
+    <!-- =========================================================
+         BUILD
+    ========================================================== -->
+
+    <build>
+
+        <plugins>
+
+            <plugin>
+
+                <groupId>org.springframework.boot</groupId>
+
+                <artifactId>spring-boot-maven-plugin</artifactId>
+
+            </plugin>
+
+        </plugins>
+
+    </build>
+
 
 </project>

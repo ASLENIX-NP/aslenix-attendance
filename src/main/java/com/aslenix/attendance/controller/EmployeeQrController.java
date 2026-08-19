@@ -3,18 +3,20 @@ package com.aslenix.attendance.controller;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.service.QrCodeService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/employee")
 public class EmployeeQrController {
 
     private final EmployeeRepository employeeRepository;
-
     private final QrCodeService qrCodeService;
 
     public EmployeeQrController(
@@ -29,13 +31,18 @@ public class EmployeeQrController {
     }
 
     // ============================================================
-    // EMPLOYEE QR PAGE
+    // MY PROFILE
     // ============================================================
 
-    @GetMapping("/employee/qr")
-    public String employeeQr(
+    @GetMapping("/profile")
+    public String profile(
             Authentication authentication,
             Model model) {
+
+        if (authentication == null) {
+
+            return "redirect:/login";
+        }
 
         Employee employee =
                 getLoggedInEmployee(authentication);
@@ -45,18 +52,8 @@ public class EmployeeQrController {
             return "redirect:/login";
         }
 
-        // Make sure the employee has a QR token
-
+        // Make sure employee has a QR token.
         qrCodeService.ensureQrToken(employee);
-
-        String fullName =
-                employee.getFirstName()
-                        + " "
-                        + employee.getLastName();
-
-        String qrUrl =
-                "/verify-employee/"
-                        + employee.getQrToken();
 
         model.addAttribute(
                 "employee",
@@ -65,121 +62,76 @@ public class EmployeeQrController {
 
         model.addAttribute(
                 "employeeName",
-                fullName
-        );
-
-        model.addAttribute(
-                "qrToken",
-                employee.getQrToken()
-        );
-
-        model.addAttribute(
-                "qrUrl",
-                qrUrl
-        );
-
-        return "employee/qr";
-    }
-
-    // ============================================================
-    // ADMIN VIEW EMPLOYEE QR
-    // ============================================================
-
-    @GetMapping("/admin/employee-qr/{id}")
-    public String adminEmployeeQr(
-            @PathVariable Long id,
-            Model model) {
-
-        Optional<Employee> result =
-                employeeRepository.findById(id);
-
-        if (result.isEmpty()) {
-
-            return "redirect:/admin/employees";
-        }
-
-        Employee employee =
-                result.get();
-
-        qrCodeService.ensureQrToken(employee);
-
-        String fullName =
                 employee.getFirstName()
                         + " "
-                        + employee.getLastName();
-
-        String qrUrl =
-                "/verify-employee/"
-                        + employee.getQrToken();
-
-        model.addAttribute(
-                "employee",
-                employee
+                        + employee.getLastName()
         );
 
-        model.addAttribute(
-                "employeeName",
-                fullName
-        );
-
-        model.addAttribute(
-                "qrToken",
-                employee.getQrToken()
-        );
-
-        model.addAttribute(
-                "qrUrl",
-                qrUrl
-        );
-
-        return "employee/qr";
+        return "employee/profile";
     }
 
     // ============================================================
-    // REGENERATE QR
+    // MY QR IMAGE
     // ============================================================
 
-    @PostMapping("/admin/employee-qr/{id}/regenerate")
-    public String regenerateQr(
-            @PathVariable Long id) {
+    @GetMapping("/profile/qr")
+    public ResponseEntity<byte[]> qrImage(
+            Authentication authentication) {
 
-        Optional<Employee> result =
-                employeeRepository.findById(id);
+        if (authentication == null) {
 
-        if (result.isEmpty()) {
-
-            return "redirect:/admin/employees";
+            return ResponseEntity
+                    .status(401)
+                    .build();
         }
 
         Employee employee =
-                result.get();
+                getLoggedInEmployee(authentication);
 
-        qrCodeService.regenerateToken(
-                employee
-        );
+        if (employee == null) {
 
-        return "redirect:/admin/employee-qr/"
-                + id;
+            return ResponseEntity
+                    .status(404)
+                    .build();
+        }
+
+        String qrToken =
+                qrCodeService.ensureQrToken(
+                        employee
+                );
+
+        byte[] qrImage =
+                qrCodeService.generateQrImage(
+                        qrToken,
+                        500,
+                        500
+                );
+
+        return ResponseEntity
+                .ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\""
+                                + employee.getEmployeeCode()
+                                + "-QR.png\""
+                )
+                .contentType(
+                        MediaType.IMAGE_PNG
+                )
+                .body(qrImage);
     }
 
     // ============================================================
-    // FIND LOGGED-IN EMPLOYEE
+    // LOGGED-IN EMPLOYEE
     // ============================================================
 
     private Employee getLoggedInEmployee(
             Authentication authentication) {
 
-        if (authentication == null) {
-
-            return null;
-        }
-
-        String username =
-                authentication.getName();
-
         return employeeRepository
-                .findByUserUsername(username)
+                .findByUserUsername(
+                        authentication.getName()
+                )
                 .orElse(null);
     }
 }
-
