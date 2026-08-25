@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org">
 
@@ -22,6 +23,7 @@
         }
 
         body {
+
             min-height: 100vh;
 
             font-family:
@@ -30,29 +32,35 @@
                     sans-serif;
 
             background:
+
                     radial-gradient(
                             circle at 80% 10%,
                             rgba(37, 99, 235, 0.16),
                             transparent 30%
                     ),
+
                     radial-gradient(
                             circle at 10% 90%,
                             rgba(124, 58, 237, 0.12),
                             transparent 30%
                     ),
+
                     #f1f5f9;
 
             color: #0f172a;
         }
+
 
         /* =====================================================
            HEADER
         ===================================================== */
 
         header {
+
             min-height: 76px;
 
             background:
+
                     linear-gradient(
                             135deg,
                             #0f172a,
@@ -72,11 +80,14 @@
             gap: 20px;
 
             box-shadow:
+
                     0 4px 18px
                     rgba(15, 23, 42, 0.18);
         }
 
+
         .brand-area {
+
             display: flex;
 
             align-items: center;
@@ -84,7 +95,9 @@
             gap: 14px;
         }
 
+
         .logo-box {
+
             width: 44px;
             height: 44px;
 
@@ -95,6 +108,7 @@
             border-radius: 12px;
 
             background:
+
                     linear-gradient(
                             135deg,
                             #2563eb,
@@ -108,7 +122,9 @@
             font-weight: 800;
         }
 
+
         .brand {
+
             font-size: 23px;
 
             font-weight: 800;
@@ -116,7 +132,9 @@
             letter-spacing: 0.5px;
         }
 
+
         .brand-subtitle {
+
             margin-top: 3px;
 
             color: #bfdbfe;
@@ -124,15 +142,19 @@
             font-size: 12px;
         }
 
+
         /* =====================================================
            LOGOUT
         ===================================================== */
 
         .logout-form {
+
             margin: 0;
         }
 
+
         .logout {
+
             border:
                     1px solid
                     rgba(255, 255, 255, 0.18);
@@ -158,22 +180,27 @@
                     box-shadow 0.2s ease;
         }
 
+
         .logout:hover {
+
             background: #b91c1c;
 
             transform:
                     translateY(-1px);
 
             box-shadow:
+
                     0 7px 18px
                     rgba(220, 38, 38, 0.25);
         }
+
 
         /* =====================================================
            MAIN
         ===================================================== */
 
         main {
+
             max-width: 1400px;
 
             margin: 0 auto;
@@ -184,11 +211,13 @@
                     60px;
         }
 
+
         /* =====================================================
            PAGE HEADER
         ===================================================== */
 
         .page-header {
+
             display: flex;
 
             justify-content: space-between;
@@ -200,7 +229,9 @@
             margin-bottom: 28px;
         }
 
+
         .eyebrow {
+
             margin-bottom: 8px;
 
             color: #2563eb;
@@ -214,7 +245,9 @@
             text-transform: uppercase;
         }
 
+
         h1 {
+
             margin-bottom: 8px;
 
             color: #0f172a;
@@ -230,7 +263,9 @@
             font-weight: 800;
         }
 
+
         .subtitle {
+
             max-width: 700px;
 
             color: #64748b;
@@ -240,7 +275,9 @@
             line-height: 1.7;
         }
 
+
         .date-box {
+
             padding: 14px 18px;
 
             border:
@@ -258,15 +295,18 @@
             font-weight: 600;
 
             box-shadow:
+
                     0 5px 18px
                     rgba(15, 23, 42, 0.06);
         }
+
 
         /* =====================================================
            STATISTICS
         ===================================================== */
 
         .stats-grid {
+
             display: grid;
 
             grid-template-columns:
@@ -280,7 +320,9 @@
             margin-bottom: 26px;
         }
 
+
         .stat-card {
+
             position: relative;
 
             overflow: hidden;
@@ -296,6 +338,7 @@
             padding: 23px;
 
             box-shadow:
+
                     0 8px 24px
                     rgba(15, 23, 42, 0.06);
 
@@ -304,7 +347,9 @@
                     box-shadow 0.2s ease;
         }
 
+
         .stat-card::after {
+
             content: "";
 
             position: absolute;
@@ -318,19 +363,25 @@
             border-radius: 50%;
 
             background:
+
                     rgba(37, 99, 235, 0.08);
         }
 
+
         .stat-card:hover {
+
             transform:
                     translateY(-3px);
 
             box-shadow:
+
                     0 12px 28px
                     rgba(15, 23, 42, 0.09);
         }
 
+
         .stat-label {
+
             color: #64748b;
 
             font-size: 12px;
@@ -344,7 +395,9 @@
             margin-bottom: 10px;
         }
 
+
         .stat-number {
+
             color: #0f172a;
 
             font-size: 32px;
@@ -354,7 +407,9 @@
             line-height: 1;
         }
 
+
         .stat-description {
+
             margin-top: 10px;
 
             color: #94a3b8;
@@ -362,11 +417,13 @@
             font-size: 12px;
         }
 
+
         /* =====================================================
            QUICK ACTIONS
         ===================================================== */
 
         .section-title {
+
             margin-bottom: 16px;
 
             color: #0f172a;
@@ -376,12 +433,14 @@
             font-weight: 800;
         }
 
+
         .quick-actions {
+
             display: grid;
 
             grid-template-columns:
                     repeat(
-                            4,
+                            5,
                             minmax(0, 1fr)
                     );
 
@@ -390,7 +449,9 @@
             margin-bottom: 28px;
         }
 
+
         .action-card {
+
             display: block;
 
             padding: 21px;
@@ -408,6 +469,7 @@
             color: inherit;
 
             box-shadow:
+
                     0 7px 20px
                     rgba(15, 23, 42, 0.05);
 
@@ -417,7 +479,9 @@
                     border-color 0.2s ease;
         }
 
+
         .action-card:hover {
+
             transform:
                     translateY(-3px);
 
@@ -425,11 +489,14 @@
                     #bfdbfe;
 
             box-shadow:
+
                     0 12px 28px
                     rgba(37, 99, 235, 0.12);
         }
 
+
         .action-icon {
+
             width: 42px;
             height: 42px;
 
@@ -451,7 +518,9 @@
             font-weight: 800;
         }
 
+
         .action-card h3 {
+
             margin-bottom: 7px;
 
             color: #0f172a;
@@ -459,7 +528,9 @@
             font-size: 16px;
         }
 
+
         .action-card p {
+
             color: #64748b;
 
             font-size: 13px;
@@ -467,11 +538,13 @@
             line-height: 1.6;
         }
 
+
         /* =====================================================
            CONTENT GRID
         ===================================================== */
 
         .content-grid {
+
             display: grid;
 
             grid-template-columns:
@@ -481,7 +554,9 @@
             gap: 20px;
         }
 
+
         .panel {
+
             background: white;
 
             border:
@@ -493,11 +568,14 @@
             padding: 24px;
 
             box-shadow:
+
                     0 8px 24px
                     rgba(15, 23, 42, 0.05);
         }
 
+
         .panel-header {
+
             display: flex;
 
             justify-content: space-between;
@@ -509,23 +587,29 @@
             margin-bottom: 20px;
         }
 
+
         .panel-header h2 {
+
             color: #0f172a;
 
             font-size: 18px;
         }
 
+
         .panel-header span {
+
             color: #64748b;
 
             font-size: 12px;
         }
+
 
         /* =====================================================
            ATTENDANCE SNAPSHOT
         ===================================================== */
 
         .attendance-row {
+
             display: flex;
 
             justify-content: space-between;
@@ -539,11 +623,15 @@
                     #eef2f7;
         }
 
+
         .attendance-row:last-child {
+
             border-bottom: none;
         }
 
+
         .employee-info {
+
             display: flex;
 
             align-items: center;
@@ -551,7 +639,9 @@
             gap: 12px;
         }
 
+
         .avatar {
+
             width: 38px;
             height: 38px;
 
@@ -562,6 +652,7 @@
             border-radius: 50%;
 
             background:
+
                     linear-gradient(
                             135deg,
                             #dbeafe,
@@ -575,7 +666,9 @@
             font-weight: 800;
         }
 
+
         .employee-name {
+
             color: #0f172a;
 
             font-size: 14px;
@@ -583,7 +676,9 @@
             font-weight: 700;
         }
 
+
         .employee-code {
+
             margin-top: 3px;
 
             color: #94a3b8;
@@ -591,7 +686,9 @@
             font-size: 11px;
         }
 
+
         .attendance-status {
+
             padding: 6px 10px;
 
             border-radius: 999px;
@@ -605,17 +702,21 @@
             font-weight: 800;
         }
 
+
         /* =====================================================
            SYSTEM INFORMATION
         ===================================================== */
 
         .info-list {
+
             display: grid;
 
             gap: 13px;
         }
 
+
         .info-item {
+
             display: flex;
 
             justify-content: space-between;
@@ -631,19 +732,25 @@
                     #eef2f7;
         }
 
+
         .info-item:last-child {
+
             padding-bottom: 0;
 
             border-bottom: none;
         }
 
+
         .info-item span:first-child {
+
             color: #64748b;
 
             font-size: 13px;
         }
 
+
         .info-item span:last-child {
+
             color: #0f172a;
 
             font-size: 13px;
@@ -653,7 +760,9 @@
             text-align: right;
         }
 
+
         .online {
+
             display: inline-flex;
 
             align-items: center;
@@ -663,7 +772,9 @@
             color: #15803d !important;
         }
 
+
         .online::before {
+
             content: "";
 
             width: 8px;
@@ -674,15 +785,18 @@
             background: #22c55e;
 
             box-shadow:
+
                     0 0 0 4px
                     rgba(34, 197, 94, 0.12);
         }
+
 
         /* =====================================================
            WORKING DAYS
         ===================================================== */
 
         .working-days {
+
             display: flex;
 
             flex-wrap: wrap;
@@ -692,7 +806,9 @@
             gap: 5px;
         }
 
+
         .working-day {
+
             display: inline-block;
 
             padding: 4px 7px;
@@ -708,90 +824,134 @@
             font-weight: 800;
         }
 
+
         .no-days {
+
             color: #94a3b8 !important;
 
             font-weight: 600 !important;
         }
 
+
         /* =====================================================
            RESPONSIVE
         ===================================================== */
 
+        @media (max-width: 1200px) {
+
+            .quick-actions {
+
+                grid-template-columns:
+                        repeat(
+                                3,
+                                minmax(0, 1fr)
+                        );
+            }
+        }
+
+
         @media (max-width: 1100px) {
 
-            .stats-grid,
-            .quick-actions {
+            .stats-grid {
+
                 grid-template-columns:
                         repeat(2, 1fr);
             }
 
-            .content-grid {
-                grid-template-columns: 1fr;
+
+            .quick-actions {
+
+                grid-template-columns:
+                        repeat(2, 1fr);
             }
 
+
+            .content-grid {
+
+                grid-template-columns: 1fr;
+            }
         }
+
 
         @media (max-width: 720px) {
 
             header {
+
                 padding:
                         16px 20px;
             }
 
+
             .brand-subtitle {
+
                 display: none;
             }
 
+
             main {
+
                 padding:
                         28px 20px 45px;
             }
 
+
             .page-header {
+
                 align-items: flex-start;
 
                 flex-direction: column;
             }
 
+
             .date-box {
+
                 width: 100%;
             }
 
+
             .stats-grid,
             .quick-actions {
+
                 grid-template-columns: 1fr;
             }
-
         }
+
 
         @media (max-width: 480px) {
 
             .brand {
+
                 font-size: 19px;
             }
 
+
             .logo-box {
+
                 width: 38px;
                 height: 38px;
             }
 
+
             .logout {
+
                 padding:
                         9px 13px;
 
                 font-size: 12px;
             }
 
+
             main {
+
                 padding:
                         22px 14px 35px;
             }
 
+
             .panel {
+
                 padding: 18px;
             }
-
         }
 
     </style>
@@ -873,17 +1033,17 @@
             </h1>
 
             <p class="subtitle">
-                Manage employees, attendance, reports and
-                office operations from one place.
+
+                Manage employees, attendance, tasks, reports
+                and office operations from one place.
+
             </p>
 
         </div>
 
 
         <div class="date-box">
-
             System administrator
-
         </div>
 
     </section>
@@ -1008,7 +1168,7 @@
             <!-- EMPLOYEES -->
 
             <a
-                    href="/admin/employees"
+                    th:href="@{/admin/employees}"
                     class="action-card">
 
                 <div class="action-icon">
@@ -1030,7 +1190,7 @@
             <!-- ATTENDANCE -->
 
             <a
-                    href="/admin/attendance"
+                    th:href="@{/admin/attendance}"
                     class="action-card">
 
                 <div class="action-icon">
@@ -1048,10 +1208,32 @@
             </a>
 
 
+            <!-- ASSIGN TASKS -->
+
+            <a
+                    th:href="@{/admin/tasks}"
+                    class="action-card">
+
+                <div class="action-icon">
+                    T
+                </div>
+
+                <h3>
+                    Assign Tasks
+                </h3>
+
+                <p>
+                    Assign tasks to employees, set deadlines
+                    and manage task progress.
+                </p>
+
+            </a>
+
+
             <!-- REPORTS -->
 
             <a
-                    href="/admin/reports"
+                    th:href="@{/admin/reports}"
                     class="action-card">
 
                 <div class="action-icon">
@@ -1072,7 +1254,7 @@
             <!-- SETTINGS -->
 
             <a
-                    href="/admin/settings"
+                    th:href="@{/admin/settings}"
                     class="action-card">
 
                 <div class="action-icon">
@@ -1158,6 +1340,7 @@
                         <span
                                 th:if="${employee.firstName != null
                                     and !employee.firstName.isEmpty()}"
+
                                 th:text="${#strings.substring(
                                     employee.firstName,
                                     0,
@@ -1167,6 +1350,7 @@
                             E
 
                         </span>
+
 
                         <span
                                 th:unless="${employee.firstName != null
@@ -1181,16 +1365,18 @@
 
                     <div>
 
-
                         <div class="employee-name">
 
                             <span
                                     th:text="${employee.firstName}">
+
                                 Employee
+
                             </span>
 
                             <span
                                     th:text="${employee.lastName}">
+
                             </span>
 
                         </div>
@@ -1200,11 +1386,12 @@
 
                             <span
                                     th:text="${employee.employeeCode}">
+
                                 ASL-0000
+
                             </span>
 
                         </div>
-
 
                     </div>
 
@@ -1213,9 +1400,7 @@
 
 
                 <span class="attendance-status">
-
                     Present
-
                 </span>
 
 
@@ -1252,9 +1437,7 @@
             <div class="info-list">
 
 
-                <!-- =========================================
-                     OFFICE
-                ========================================== -->
+                <!-- OFFICE -->
 
                 <div class="info-item">
 
@@ -1274,9 +1457,7 @@
                 </div>
 
 
-                <!-- =========================================
-                     OFFICE LOCATION
-                ========================================== -->
+                <!-- OFFICE LOCATION -->
 
                 <div class="info-item">
 
@@ -1296,9 +1477,7 @@
                 </div>
 
 
-                <!-- =========================================
-                     WORKING HOURS
-                ========================================== -->
+                <!-- WORKING HOURS -->
 
                 <div class="info-item">
 
@@ -1311,6 +1490,7 @@
                             th:if="${settings != null
                                 and settings.workStartTime != null
                                 and settings.workEndTime != null}"
+
                             th:text="${#temporals.format(
                                 settings.workStartTime,
                                 'hh:mm a'
@@ -1337,9 +1517,7 @@
                 </div>
 
 
-                <!-- =========================================
-                     LATE AFTER
-                ========================================== -->
+                <!-- LATE AFTER -->
 
                 <div class="info-item">
 
@@ -1351,6 +1529,7 @@
                     <span
                             th:if="${settings != null
                                 and settings.workStartTime != null}"
+
                             th:text="${#temporals.format(
                                 settings.workStartTime.plusMinutes(
                                     settings.lateGraceMinutes
@@ -1374,9 +1553,7 @@
                 </div>
 
 
-                <!-- =========================================
-                     WORKING DAYS
-                ========================================== -->
+                <!-- WORKING DAYS -->
 
                 <div class="info-item">
 
@@ -1498,9 +1675,7 @@
                 </div>
 
 
-                <!-- =========================================
-                     ATTENDANCE RADIUS
-                ========================================== -->
+                <!-- ATTENDANCE RADIUS -->
 
                 <div class="info-item">
 
@@ -1528,9 +1703,7 @@
                 </div>
 
 
-                <!-- =========================================
-                     ADMIN DEVICE LIMIT
-                ========================================== -->
+                <!-- ADMIN DEVICE LIMIT -->
 
                 <div class="info-item">
 
@@ -1545,9 +1718,7 @@
                 </div>
 
 
-                <!-- =========================================
-                     SYSTEM STATUS
-                ========================================== -->
+                <!-- SYSTEM STATUS -->
 
                 <div class="info-item">
 

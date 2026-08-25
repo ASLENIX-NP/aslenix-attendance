@@ -6,6 +6,8 @@ import com.aslenix.attendance.entity.OfficeSettings;
 import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.repository.OfficeSettingsRepository;
+import com.aslenix.attendance.service.AttendanceService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -23,15 +25,18 @@ public class AttendanceController {
     private final AttendanceRepository attendanceRepository;
     private final EmployeeRepository employeeRepository;
     private final OfficeSettingsRepository officeSettingsRepository;
+    private final AttendanceService attendanceService;
 
     public AttendanceController(
             AttendanceRepository attendanceRepository,
             EmployeeRepository employeeRepository,
-            OfficeSettingsRepository officeSettingsRepository) {
+            OfficeSettingsRepository officeSettingsRepository,
+            AttendanceService attendanceService) {
 
         this.attendanceRepository = attendanceRepository;
         this.employeeRepository = employeeRepository;
         this.officeSettingsRepository = officeSettingsRepository;
+        this.attendanceService = attendanceService;
     }
 
     // ============================================================
@@ -45,176 +50,73 @@ public class AttendanceController {
 
         try {
 
-            // ----------------------------------------------------
-            // Get logged-in username
-            // ----------------------------------------------------
+            String username =
+                    authentication.getName();
 
-            String username = authentication.getName();
-
-            Employee employee = employeeRepository
-                    .findByUserUsername(username)
-                    .orElse(null);
-
-            if (employee == null) {
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "success", false,
-                                "message", "Employee account not found."
-                        )
-                );
-            }
-
-            // ----------------------------------------------------
-            // Get GPS coordinates sent by browser
-            // ----------------------------------------------------
-
-            Double latitude = location.get("latitude");
-            Double longitude = location.get("longitude");
-
-            if (latitude == null || longitude == null) {
-
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "success", false,
-                                "message", "GPS location was not provided."
-                        )
-                );
-            }
-
-            // ----------------------------------------------------
-            // Get office settings
-            // ----------------------------------------------------
-
-            OfficeSettings settings =
-                    officeSettingsRepository.findFirstByOrderByIdAsc()
+            Employee employee =
+                    employeeRepository
+                            .findByUserUsername(username)
                             .orElse(null);
 
-            if (settings == null) {
-
-                return ResponseEntity.internalServerError().body(
-                        Map.of(
-                                "success", false,
-                                "message", "Office settings have not been configured."
-                        )
-                );
-            }
-
-            // ----------------------------------------------------
-            // Check working day
-            // ----------------------------------------------------
-
-            LocalDate today = LocalDate.now();
-
-            if (!isWorkingDay(settings, today.getDayOfWeek())) {
-
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "success", false,
-                                "message", "Today is not a working day."
-                        )
-                );
-            }
-
-            // ----------------------------------------------------
-            // Check whether employee already checked in
-            // ----------------------------------------------------
-
-            if (attendanceRepository
-                    .findByEmployeeAndAttendanceDate(employee, today)
-                    .isPresent()) {
-
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "success", false,
-                                "message", "You have already checked in today."
-                        )
-                );
-            }
-
-            // ----------------------------------------------------
-            // Calculate distance from office
-            // ----------------------------------------------------
-
-            double distance = calculateDistance(
-                    latitude,
-                    longitude,
-                    settings.getLatitude(),
-                    settings.getLongitude()
-            );
-
-            // ----------------------------------------------------
-            // Check GPS radius
-            // ----------------------------------------------------
-
-            if (distance > settings.getAllowedRadiusMeters()) {
+            if (employee == null) {
 
                 return ResponseEntity.badRequest().body(
                         Map.of(
                                 "success", false,
                                 "message",
-                                "You are outside the office attendance area.",
-                                "distance",
-                                Math.round(distance * 100.0) / 100.0,
-                                "allowedRadius",
-                                settings.getAllowedRadiusMeters()
+                                "Employee account not found."
                         )
                 );
             }
 
-            // ----------------------------------------------------
-            // Create attendance record
-            // ----------------------------------------------------
+            Double latitude =
+                    location.get("latitude");
 
-            LocalDateTime now = LocalDateTime.now();
+            Double longitude =
+                    location.get("longitude");
 
-            Attendance attendance = new Attendance();
+            if (latitude == null
+                    || longitude == null) {
 
-            attendance.setEmployee(employee);
-            attendance.setAttendanceDate(today);
-            attendance.setCheckIn(now);
-
-            attendance.setCheckInLatitude(latitude);
-            attendance.setCheckInLongitude(longitude);
-            attendance.setCheckInDistanceMeters(distance);
-
-            // ----------------------------------------------------
-            // Determine late status
-            // ----------------------------------------------------
-
-            LocalTime lateTime =
-                    settings.getWorkStartTime()
-                            .plusMinutes(settings.getLateGraceMinutes());
-
-            boolean late = now.toLocalTime().isAfter(lateTime);
-
-            attendance.setLate(late);
-
-            if (late) {
-                attendance.setStatus("LATE");
-            } else {
-                attendance.setStatus("PRESENT");
+                return ResponseEntity.badRequest().body(
+                        Map.of(
+                                "success", false,
+                                "message",
+                                "GPS location was not provided."
+                        )
+                );
             }
 
-            attendance.setEarlyLeave(false);
-            attendance.setHalfDay(false);
-
-            attendanceRepository.save(attendance);
-
-            // ----------------------------------------------------
-            // Successful response
-            // ----------------------------------------------------
+            Attendance attendance =
+                    attendanceService.checkIn(
+                            employee,
+                            latitude,
+                            longitude
+                    );
 
             return ResponseEntity.ok(
                     Map.of(
                             "success", true,
-                            "message", late
+                            "message",
+                            attendance.isLate()
                                     ? "Check-in successful. You are late."
                                     : "Check-in successful.",
-                            "checkInTime", now.toString(),
-                            "distance",
-                            Math.round(distance * 100.0) / 100.0,
+                            "checkInTime",
+                            attendance.getCheckIn().toString(),
                             "status",
-                            attendance.getStatus()
+                            attendance.getStatus(),
+                            "late",
+                            attendance.isLate()
+                    )
+            );
+
+        } catch (IllegalStateException
+                 | IllegalArgumentException e) {
+
+            return ResponseEntity.badRequest().body(
+                    Map.of(
+                            "success", false,
+                            "message", e.getMessage()
                     )
             );
 
@@ -225,7 +127,8 @@ public class AttendanceController {
             return ResponseEntity.internalServerError().body(
                     Map.of(
                             "success", false,
-                            "message", "Unable to process check-in."
+                            "message",
+                            "Unable to process check-in."
                     )
             );
         }
@@ -237,107 +140,150 @@ public class AttendanceController {
 
     @PostMapping("/check-out")
     public ResponseEntity<?> checkOut(
+            @RequestBody(required = false)
+            Map<String, Double> location,
             Authentication authentication) {
 
         try {
 
-            // ----------------------------------------------------
-            // Get logged-in employee
-            // ----------------------------------------------------
+            String username =
+                    authentication.getName();
 
-            String username = authentication.getName();
-
-            Employee employee = employeeRepository
-                    .findByUserUsername(username)
-                    .orElse(null);
+            Employee employee =
+                    employeeRepository
+                            .findByUserUsername(username)
+                            .orElse(null);
 
             if (employee == null) {
 
                 return ResponseEntity.badRequest().body(
                         Map.of(
                                 "success", false,
-                                "message", "Employee account not found."
+                                "message",
+                                "Employee account not found."
                         )
                 );
             }
 
-            // ----------------------------------------------------
-            // Find today's attendance
-            // ----------------------------------------------------
+            /*
+             * If scanner sends GPS coordinates,
+             * use them.
+             */
+            double latitude = 0;
+            double longitude = 0;
 
-            LocalDate today = LocalDate.now();
+            if (location != null) {
+
+                if (location.get("latitude") != null) {
+                    latitude =
+                            location.get("latitude");
+                }
+
+                if (location.get("longitude") != null) {
+                    longitude =
+                            location.get("longitude");
+                }
+            }
+
+            /*
+             * If no GPS was provided, use the
+             * normal service validation only when
+             * coordinates are available.
+             */
+            if (latitude == 0 && longitude == 0) {
+
+                Attendance attendance =
+                        attendanceRepository
+                                .findByEmployeeAndAttendanceDate(
+                                        employee,
+                                        LocalDate.now()
+                                )
+                                .orElse(null);
+
+                if (attendance == null) {
+
+                    return ResponseEntity.badRequest().body(
+                            Map.of(
+                                    "success", false,
+                                    "message",
+                                    "You have not checked in today."
+                            )
+                    );
+                }
+
+                if (attendance.getCheckOut() != null) {
+
+                    return ResponseEntity.badRequest().body(
+                            Map.of(
+                                    "success", false,
+                                    "message",
+                                    "You have already checked out today."
+                            )
+                    );
+
+                }
+
+                LocalDateTime now =
+                        LocalDateTime.now();
+
+                attendance.setCheckOut(now);
+
+                OfficeSettings settings =
+                        officeSettingsRepository
+                                .findFirstByOrderByIdAsc()
+                                .orElse(null);
+
+                if (settings != null) {
+
+                    boolean early =
+                            settings.getWorkEndTime() != null
+                                    && now.toLocalTime()
+                                    .isBefore(
+                                            settings.getWorkEndTime()
+                                    );
+
+                    attendance.setEarlyLeave(early);
+                }
+
+                attendanceRepository.save(attendance);
+
+                return ResponseEntity.ok(
+                        Map.of(
+                                "success", true,
+                                "message",
+                                "Check-out successful.",
+                                "checkOutTime",
+                                now.toString()
+                        )
+                );
+            }
 
             Attendance attendance =
-                    attendanceRepository
-                            .findByEmployeeAndAttendanceDate(
-                                    employee,
-                                    today
-                            )
-                            .orElse(null);
-
-            if (attendance == null) {
-
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "success", false,
-                                "message",
-                                "You have not checked in today."
-                        )
-                );
-            }
-
-            // ----------------------------------------------------
-            // Prevent duplicate checkout
-            // ----------------------------------------------------
-
-            if (attendance.getCheckOut() != null) {
-
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "success", false,
-                                "message",
-                                "You have already checked out today."
-                        )
-                );
-            }
-
-            // ----------------------------------------------------
-            // Save checkout
-            // ----------------------------------------------------
-
-            LocalDateTime now = LocalDateTime.now();
-
-            attendance.setCheckOut(now);
-
-            // ----------------------------------------------------
-            // Determine early leave
-            // ----------------------------------------------------
-
-            OfficeSettings settings =
-                    officeSettingsRepository
-                            .findFirstByOrderByIdAsc()
-                            .orElse(null);
-
-            if (settings != null) {
-
-                boolean early =
-                        now.toLocalTime()
-                                .isBefore(settings.getWorkEndTime());
-
-                attendance.setEarlyLeave(early);
-            }
-
-            attendanceRepository.save(attendance);
-
-            // ----------------------------------------------------
-            // Successful response
-            // ----------------------------------------------------
+                    attendanceService.checkOut(
+                            employee,
+                            latitude,
+                            longitude
+                    );
 
             return ResponseEntity.ok(
                     Map.of(
                             "success", true,
-                            "message", "Check-out successful.",
-                            "checkOutTime", now.toString()
+                            "message",
+                            "Check-out successful.",
+                            "checkOutTime",
+                            attendance
+                                    .getCheckOut()
+                                    .toString()
+                    )
+            );
+
+        } catch (IllegalStateException
+                 | IllegalArgumentException e) {
+
+            return ResponseEntity.badRequest().body(
+                    Map.of(
+                            "success", false,
+                            "message", e.getMessage()
                     )
             );
 
@@ -348,14 +294,15 @@ public class AttendanceController {
             return ResponseEntity.internalServerError().body(
                     Map.of(
                             "success", false,
-                            "message", "Unable to process check-out."
+                            "message",
+                            "Unable to process check-out."
                     )
             );
         }
     }
 
     // ============================================================
-    // TODAY'S ATTENDANCE
+    // TODAY
     // ============================================================
 
     @GetMapping("/today")
@@ -364,31 +311,28 @@ public class AttendanceController {
 
         try {
 
-            String username = authentication.getName();
+            String username =
+                    authentication.getName();
 
-            Employee employee = employeeRepository
-                    .findByUserUsername(username)
-                    .orElse(null);
+            Employee employee =
+                    employeeRepository
+                            .findByUserUsername(username)
+                            .orElse(null);
 
             if (employee == null) {
 
                 return ResponseEntity.badRequest().body(
                         Map.of(
                                 "success", false,
-                                "message", "Employee account not found."
+                                "message",
+                                "Employee account not found."
                         )
                 );
             }
 
-            LocalDate today = LocalDate.now();
-
             Attendance attendance =
-                    attendanceRepository
-                            .findByEmployeeAndAttendanceDate(
-                                    employee,
-                                    today
-                            )
-                            .orElse(null);
+                    attendanceService
+                            .getTodayAttendance(employee);
 
             if (attendance == null) {
 
@@ -396,7 +340,15 @@ public class AttendanceController {
                         Map.of(
                                 "success", true,
                                 "checkedIn", false,
-                                "checkedOut", false
+                                "checkedOut", false,
+                                "status",
+                                "NOT CHECKED IN",
+                                "checkIn",
+                                "",
+                                "checkOut",
+                                "",
+                                "workingHours",
+                                "0h 00m"
                         )
                 );
             }
@@ -404,26 +356,36 @@ public class AttendanceController {
             return ResponseEntity.ok(
                     Map.of(
                             "success", true,
-                            "checkedIn", attendance.getCheckIn() != null,
-                            "checkedOut", attendance.getCheckOut() != null,
+
+                            "checkedIn",
+                            attendance.getCheckIn() != null,
+
+                            "checkedOut",
+                            attendance.getCheckOut() != null,
+
                             "checkIn",
                             attendance.getCheckIn() != null
                                     ? attendance.getCheckIn().toString()
                                     : "",
+
                             "checkOut",
                             attendance.getCheckOut() != null
                                     ? attendance.getCheckOut().toString()
                                     : "",
+
                             "status",
-                            attendance.getStatus(),
+                            attendanceService
+                                    .getTodayStatus(employee),
+
                             "late",
                             attendance.isLate(),
+
                             "earlyLeave",
                             attendance.isEarlyLeave(),
-                            "distance",
-                            attendance.getCheckInDistanceMeters() != null
-                                    ? attendance.getCheckInDistanceMeters()
-                                    : 0
+
+                            "workingHours",
+                            attendanceService
+                                    .getTodayWorkingHours(employee)
                     )
             );
 
@@ -434,14 +396,127 @@ public class AttendanceController {
             return ResponseEntity.internalServerError().body(
                     Map.of(
                             "success", false,
-                            "message", "Unable to load today's attendance."
+                            "message",
+                            "Unable to load today's attendance."
                     )
             );
         }
     }
 
     // ============================================================
-    // WORKING DAY CHECK
+    // DASHBOARD DATA
+    // ============================================================
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> dashboard(
+            Authentication authentication) {
+
+        try {
+
+            String username =
+                    authentication.getName();
+
+            Employee employee =
+                    employeeRepository
+                            .findByUserUsername(username)
+                            .orElse(null);
+
+            if (employee == null) {
+
+                return ResponseEntity.badRequest().body(
+                        Map.of(
+                                "success", false,
+                                "message",
+                                "Employee account not found."
+                        )
+                );
+            }
+
+            long attendanceThisMonth =
+                    attendanceService
+                            .getAttendanceThisMonth(employee);
+
+            long presentCount =
+                    attendanceService
+                            .getPresentCount(employee);
+
+            long absentCount =
+                    attendanceService
+                            .getAbsentCount(employee);
+
+            long lateCount =
+                    attendanceService
+                            .getLateCount(employee);
+
+            long leaveCount =
+                    attendanceService
+                            .getLeaveCount(employee);
+
+            String todayStatus =
+                    attendanceService
+                            .getTodayStatus(employee);
+
+            String checkInTime =
+                    attendanceService
+                            .getTodayCheckInTime(employee);
+
+            String checkOutTime =
+                    attendanceService
+                            .getTodayCheckOutTime(employee);
+
+            String workingHours =
+                    attendanceService
+                            .getTodayWorkingHours(employee);
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "success", true,
+
+                            "attendanceThisMonth",
+                            attendanceThisMonth,
+
+                            "presentCount",
+                            presentCount,
+
+                            "absentCount",
+                            absentCount,
+
+                            "lateCount",
+                            lateCount,
+
+                            "leaveCount",
+                            leaveCount,
+
+                            "todayStatus",
+                            todayStatus,
+
+                            "checkInTime",
+                            checkInTime,
+
+                            "checkOutTime",
+                            checkOutTime,
+
+                            "workingHours",
+                            workingHours
+                    )
+            );
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return ResponseEntity.internalServerError().body(
+                    Map.of(
+                            "success", false,
+                            "message",
+                            "Unable to load dashboard data."
+                    )
+            );
+        }
+    }
+
+    // ============================================================
+    // WORKING DAY
     // ============================================================
 
     private boolean isWorkingDay(
@@ -450,24 +525,31 @@ public class AttendanceController {
 
         return switch (day) {
 
-            case SUNDAY -> settings.isSunday();
+            case SUNDAY ->
+                    settings.isSunday();
 
-            case MONDAY -> settings.isMonday();
+            case MONDAY ->
+                    settings.isMonday();
 
-            case TUESDAY -> settings.isTuesday();
+            case TUESDAY ->
+                    settings.isTuesday();
 
-            case WEDNESDAY -> settings.isWednesday();
+            case WEDNESDAY ->
+                    settings.isWednesday();
 
-            case THURSDAY -> settings.isThursday();
+            case THURSDAY ->
+                    settings.isThursday();
 
-            case FRIDAY -> settings.isFriday();
+            case FRIDAY ->
+                    settings.isFriday();
 
-            case SATURDAY -> settings.isSaturday();
+            case SATURDAY ->
+                    settings.isSaturday();
         };
     }
 
     // ============================================================
-    // DISTANCE CALCULATION
+    // DISTANCE
     // ============================================================
 
     private double calculateDistance(
@@ -476,19 +558,25 @@ public class AttendanceController {
             double officeLatitude,
             double officeLongitude) {
 
-        final double EARTH_RADIUS_METERS = 6371000;
+        final double EARTH_RADIUS_METERS =
+                6371000;
 
-        double lat1 = Math.toRadians(employeeLatitude);
-        double lat2 = Math.toRadians(officeLatitude);
+        double lat1 =
+                Math.toRadians(employeeLatitude);
+
+        double lat2 =
+                Math.toRadians(officeLatitude);
 
         double deltaLat =
                 Math.toRadians(
-                        officeLatitude - employeeLatitude
+                        officeLatitude
+                                - employeeLatitude
                 );
 
         double deltaLon =
                 Math.toRadians(
-                        officeLongitude - employeeLongitude
+                        officeLongitude
+                                - employeeLongitude
                 );
 
         double a =
@@ -497,7 +585,8 @@ public class AttendanceController {
                         +
                         Math.cos(lat1)
                                 * Math.cos(lat2)
-                                * Math.sin(deltaLon / 2)
+                                *
+                                Math.sin(deltaLon / 2)
                                 * Math.sin(deltaLon / 2);
 
         double c =

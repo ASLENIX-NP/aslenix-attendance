@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | Task Management</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        header {
+            min-height: 76px;
+            padding: 18px 40px;
+            background:
+                    linear-gradient(
+                            135deg,
+                            #0f172a,
+                            #172554
+                    );
+            color: white;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            margin-top: 4px;
+            color: #bfdbfe;
+            font-size: 12px;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #2563eb;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        main {
+            max-width: 1300px;
+            margin: auto;
+            padding: 40px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading small {
+            color: #2563eb;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .heading h1 {
+            margin-top: 7px;
+            font-size: 36px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 22px;
+            box-shadow:
+                    0 7px 22px
+                    rgba(15, 23, 42, 0.05);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns:
+                    repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #475569;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            background: white;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .create {
+            margin-top: 18px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .task-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .task {
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .task-title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .description {
+            margin-top: 12px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .review {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .review textarea {
+            margin-top: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .approve,
+        .reject,
+        .delete {
+            padding: 9px 14px;
+            border: none;
+            border-radius: 7px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .approve {
+            background: #16a34a;
+        }
+
+        .reject {
+            background: #dc2626;
+        }
+
+        .delete {
+            background: #475569;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px;
+            color: #64748b;
+        }
+
+        @media (max-width: 800px) {
+
+            header {
+                padding: 16px 20px;
+            }
+
+            main {
+                padding: 25px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div>
+
+        <div class="brand">
+            ASLENIX ADMIN
+        </div>
+
+        <div class="subtitle">
+            Task Management
+        </div>
+
+    </div>
+
+    <a href="/admin/dashboard"
+       class="back">
+        ← Dashboard
+    </a>
+
+</header>
+
+<main>
+
+    <section class="heading">
+
+        <small>
+            ADMINISTRATION
+        </small>
+
+        <h1>
+            Task Management
+        </h1>
+
+    </section>
+
+    <!-- CREATE TASK -->
+
+    <section class="card">
+
+        <h2>
+            Assign New Task
+        </h2>
+
+        <form
+                th:action="@{/admin/tasks/create}"
+                method="post">
+
+            <div class="form-grid">
+
+                <div class="field">
+
+                    <label>
+                        Task Title
+                    </label>
+
+                    <input
+                            type="text"
+                            name="title"
+                            placeholder="Enter task title"
+                            required>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Employee
+                    </label>
+
+                    <select
+                            name="employeeId"
+                            required>
+
+                        <option value="">
+                            Select Employee
+                        </option>
+
+                        <option
+                                th:each="employee : ${employees}"
+                                th:value="${employee.id}"
+                                th:text="${employee.firstName + ' ' + employee.lastName + ' (' + employee.employeeCode + ')'}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Priority
+                    </label>
+
+                    <select name="priority">
+
+                        <option value="LOW">
+                            Low
+                        </option>
+
+                        <option value="MEDIUM"
+                                selected>
+                            Medium
+                        </option>
+
+                        <option value="HIGH">
+                            High
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Due Date
+                    </label>
+
+                    <input
+                            type="date"
+                            name="dueDate">
+
+                </div>
+
+                <div class="field full">
+
+                    <label>
+                        Description
+                    </label>
+
+                    <textarea
+                            name="description"
+                            placeholder="Describe the task..."></textarea>
+
+                </div>
+
+            </div>
+
+            <button
+                    type="submit"
+                    class="create">
+
+                + Assign Task
+
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- ALL TASKS -->
+
+    <section class="card">
+
+        <h2>
+            Assigned Tasks
+        </h2>
+
+        <div
+                class="task-list"
+                th:if="${!#lists.isEmpty(tasks)}">
+
+            <article
+                    class="task"
+                    th:each="task : ${tasks}">
+
+                <div class="task-header">
+
+                    <div class="task-title"
+                         th:text="${task.title}">
+                        Task
+                    </div>
+
+                    <span
+                            class="badge"
+                            th:text="${task.status}">
+                        ASSIGNED
+                    </span>
+
+                </div>
+
+                <p
+                        class="description"
+                        th:text="${task.description}">
+                    Description
+                </p>
+
+                <div class="details">
+
+                    <span class="badge">
+
+                        Employee:
+
+                        <span
+                                th:text="${task.employee.firstName + ' ' + task.employee.lastName}">
+                        </span>
+
+                    </span>
+
+                    <span
+                            class="badge"
+                            th:text="'Priority: ' + ${task.priority}">
+                    </span>
+
+                    <span
+                            class="badge"
+                            th:if="${task.dueDate != null}"
+                            th:text="'Due: ' + ${task.dueDate}">
+                    </span>
+
+                </div>
+
+                <div
+                        class="review"
+                        th:if="${task.status == 'COMPLETED'}">
+
+                    <strong>
+                        Employee submission
+                    </strong>
+
+                    <p
+                            style="margin-top: 10px; color: #64748b;"
+                            th:text="${task.completionNote}">
+                    </p>
+
+                    <form
+                            th:action="@{/admin/tasks/{id}/approve(id=${task.id})}"
+                            method="post">
+
+                        <textarea
+                                name="reviewNote"
+                                placeholder="Optional review note..."></textarea>
+
+                        <div class="buttons">
+
+                            <button
+                                    type="submit"
+                                    class="approve">
+                                Approve
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <form
+                            th:action="@{/admin/tasks/{id}/reject(id=${task.id})}"
+                            method="post">
+
+                        <textarea
+                                name="reviewNote"
+                                placeholder="Reason for rejection..."></textarea>
+
+                        <div class="buttons">
+
+                            <button
+                                    type="submit"
+                                    class="reject">
+                                Reject
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div
+                        class="review"
+                        th:if="${task.status == 'APPROVED' || task.status == 'REJECTED'}">
+
+                    <strong>
+                        Admin Review
+                    </strong>
+
+                    <p
+                            style="margin-top: 8px; color: #64748b;"
+                            th:text="${task.reviewNote}">
+                    </p>
+
+                </div>
+
+                <form
+                        th:action="@{/admin/tasks/{id}/delete(id=${task.id})}"
+                        method="post"
+                        style="margin-top: 15px;">
+
+                    <button
+                            type="submit"
+                            class="delete">
+
+                        Delete Task
+
+                    </button>
+
+                </form>
+
+            </article>
+
+        </div>
+
+        <div
+                class="empty"
+                th:if="${#lists.isEmpty(tasks)}">
+
+            No tasks have been assigned yet.
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+
+</html>

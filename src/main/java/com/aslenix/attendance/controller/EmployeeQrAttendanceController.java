@@ -7,6 +7,7 @@ import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.repository.OfficeSettingsRepository;
 import com.aslenix.attendance.util.GeoUtils;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -51,8 +52,7 @@ public class EmployeeQrAttendanceController {
             return "redirect:/login";
         }
 
-        Employee employee =
-                getLoggedInEmployee(authentication);
+        Employee employee = getLoggedInEmployee(authentication);
 
         if (employee == null) {
             return "redirect:/login";
@@ -62,29 +62,17 @@ public class EmployeeQrAttendanceController {
             return "redirect:/login";
         }
 
-        /*
-         * Make sure the employee has a QR token.
-         *
-         * If the token is missing, send the employee
-         * to the correct profile page where the QR
-         * is generated.
-         */
         if (employee.getQrToken() == null
                 || employee.getQrToken().isBlank()) {
 
             return "redirect:/employee/profile";
         }
 
-        model.addAttribute(
-                "employee",
-                employee
-        );
+        model.addAttribute("employee", employee);
 
         model.addAttribute(
                 "employeeName",
-                employee.getFirstName()
-                        + " "
-                        + employee.getLastName()
+                employee.getFirstName() + " " + employee.getLastName()
         );
 
         return "employee/attendance-scanner";
@@ -102,12 +90,9 @@ public class EmployeeQrAttendanceController {
             @RequestParam double latitude,
             @RequestParam double longitude) {
 
-        Map<String, Object> response =
-                new HashMap<>();
-
-        // ========================================================
-        // AUTHENTICATION
-        // ========================================================
+        // --------------------------------------------------------
+        // Authentication
+        // --------------------------------------------------------
 
         if (authentication == null) {
 
@@ -139,12 +124,11 @@ public class EmployeeQrAttendanceController {
             );
         }
 
-        // ========================================================
-        // QR TOKEN VALIDATION
-        // ========================================================
+        // --------------------------------------------------------
+        // Validate QR
+        // --------------------------------------------------------
 
-        if (qrToken == null
-                || qrToken.isBlank()) {
+        if (qrToken == null || qrToken.isBlank()) {
 
             return response(
                     false,
@@ -155,9 +139,9 @@ public class EmployeeQrAttendanceController {
 
         qrToken = qrToken.trim();
 
-        // ========================================================
-        // FIND EMPLOYEE FROM QR TOKEN
-        // ========================================================
+        // --------------------------------------------------------
+        // Find employee from QR token
+        // --------------------------------------------------------
 
         Employee qrEmployee =
                 employeeRepository
@@ -173,9 +157,9 @@ public class EmployeeQrAttendanceController {
             );
         }
 
-        // ========================================================
-        // CHECK QR EMPLOYEE ACCOUNT
-        // ========================================================
+        // --------------------------------------------------------
+        // QR employee enabled
+        // --------------------------------------------------------
 
         if (!qrEmployee.isEnabled()) {
 
@@ -186,12 +170,11 @@ public class EmployeeQrAttendanceController {
             );
         }
 
-        // ========================================================
-        // PREVENT PROXY ATTENDANCE
-        // ========================================================
+        // --------------------------------------------------------
+        // Prevent proxy attendance
+        // --------------------------------------------------------
 
-        if (!loggedInEmployee
-                .getId()
+        if (!loggedInEmployee.getId()
                 .equals(qrEmployee.getId())) {
 
             return response(
@@ -201,9 +184,9 @@ public class EmployeeQrAttendanceController {
             );
         }
 
-        // ========================================================
-        // OFFICE SETTINGS
-        // ========================================================
+        // --------------------------------------------------------
+        // Office settings
+        // --------------------------------------------------------
 
         OfficeSettings settings;
 
@@ -211,7 +194,7 @@ public class EmployeeQrAttendanceController {
 
             settings = getOfficeSettings();
 
-        } catch (Exception exception) {
+        } catch (Exception e) {
 
             return response(
                     false,
@@ -220,21 +203,17 @@ public class EmployeeQrAttendanceController {
             );
         }
 
-        // ========================================================
-        // TODAY
-        // ========================================================
+        // --------------------------------------------------------
+        // Today
+        // --------------------------------------------------------
 
-        LocalDate today =
-                LocalDate.now();
+        LocalDate today = LocalDate.now();
 
-        // ========================================================
-        // WORKING DAY
-        // ========================================================
+        // --------------------------------------------------------
+        // Working day
+        // --------------------------------------------------------
 
-        if (!isWorkingDay(
-                today,
-                settings
-        )) {
+        if (!isWorkingDay(today, settings)) {
 
             return response(
                     false,
@@ -243,9 +222,9 @@ public class EmployeeQrAttendanceController {
             );
         }
 
-        // ========================================================
-        // GPS VALIDATION
-        // ========================================================
+        // --------------------------------------------------------
+        // GPS
+        // --------------------------------------------------------
 
         double distance;
 
@@ -259,7 +238,7 @@ public class EmployeeQrAttendanceController {
                             settings.getLongitude()
                     );
 
-        } catch (Exception exception) {
+        } catch (Exception e) {
 
             return response(
                     false,
@@ -268,12 +247,11 @@ public class EmployeeQrAttendanceController {
             );
         }
 
-        // ========================================================
-        // OFFICE RADIUS
-        // ========================================================
+        // --------------------------------------------------------
+        // Office radius
+        // --------------------------------------------------------
 
-        if (distance >
-                settings.getAllowedRadiusMeters()) {
+        if (distance > settings.getAllowedRadiusMeters()) {
 
             return response(
                     false,
@@ -282,9 +260,9 @@ public class EmployeeQrAttendanceController {
             );
         }
 
-        // ========================================================
-        // TODAY'S ATTENDANCE
-        // ========================================================
+        // --------------------------------------------------------
+        // Today's attendance
+        // --------------------------------------------------------
 
         Attendance attendance =
                 attendanceRepository
@@ -300,79 +278,46 @@ public class EmployeeQrAttendanceController {
 
         if (attendance == null) {
 
-            LocalDateTime now =
-                    LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now();
 
             LocalTime lateTime =
-                    settings
-                            .getWorkStartTime()
+                    settings.getWorkStartTime()
                             .plusMinutes(
-                                    settings
-                                            .getLateGraceMinutes()
+                                    settings.getLateGraceMinutes()
                             );
 
             boolean late =
-                    now.toLocalTime()
-                            .isAfter(lateTime);
+                    now.toLocalTime().isAfter(lateTime);
 
-            attendance =
-                    new Attendance();
+            attendance = new Attendance();
 
-            attendance.setEmployee(
-                    loggedInEmployee
-            );
+            attendance.setEmployee(loggedInEmployee);
+            attendance.setAttendanceDate(today);
+            attendance.setCheckIn(now);
 
-            attendance.setAttendanceDate(
-                    today
-            );
+            attendance.setCheckInLatitude(latitude);
+            attendance.setCheckInLongitude(longitude);
+            attendance.setCheckInDistanceMeters(distance);
 
-            attendance.setCheckIn(
-                    now
-            );
-
-            attendance.setCheckInLatitude(
-                    latitude
-            );
-
-            attendance.setCheckInLongitude(
-                    longitude
-            );
-
-            attendance.setCheckInDistanceMeters(
-                    distance
-            );
-
-            attendance.setLate(
-                    late
-            );
-
-            attendance.setEarlyLeave(
-                    false
-            );
-
-            attendance.setHalfDay(
-                    false
-            );
+            attendance.setLate(late);
+            attendance.setEarlyLeave(false);
+            attendance.setHalfDay(false);
 
             attendance.setStatus(
-                    late
-                            ? "LATE"
-                            : "PRESENT"
+                    late ? "LATE" : "PRESENT"
             );
 
-            attendanceRepository.save(
-                    attendance
-            );
+            attendance =
+                    attendanceRepository.save(attendance);
 
-            response.put(
-                    "success",
-                    true
-            );
+            // ----------------------------------------------------
+            // Return UPDATED attendance
+            // ----------------------------------------------------
 
-            response.put(
-                    "action",
-                    "CHECK_IN"
-            );
+            Map<String, Object> response = new HashMap<>();
+
+            response.put("success", true);
+            response.put("action", "CHECK_IN");
 
             response.put(
                     "message",
@@ -383,10 +328,29 @@ public class EmployeeQrAttendanceController {
 
             response.put(
                     "time",
-                    now.toLocalTime()
-                            .withSecond(0)
-                            .withNano(0)
-                            .toString()
+                    formatTime(now)
+            );
+
+            response.put(
+                    "date",
+                    today.toString()
+            );
+
+            response.put(
+                    "status",
+                    attendance.getStatus()
+            );
+
+            response.put(
+                    "employeeName",
+                    loggedInEmployee.getFirstName()
+                            + " "
+                            + loggedInEmployee.getLastName()
+            );
+
+            response.put(
+                    "employeeCode",
+                    loggedInEmployee.getEmployeeCode()
             );
 
             response.put(
@@ -394,9 +358,12 @@ public class EmployeeQrAttendanceController {
                     Math.round(distance)
             );
 
-            return ResponseEntity.ok(
-                    response
+            response.put(
+                    "dashboardUrl",
+                    "/employee/dashboard"
             );
+
+            return ResponseEntity.ok(response);
         }
 
         // ========================================================
@@ -416,8 +383,7 @@ public class EmployeeQrAttendanceController {
         // CHECK OUT
         // ========================================================
 
-        LocalDateTime now =
-                LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
         boolean earlyLeave =
                 now.toLocalTime()
@@ -425,27 +391,20 @@ public class EmployeeQrAttendanceController {
                                 settings.getWorkEndTime()
                         );
 
-        attendance.setCheckOut(
-                now
-        );
+        attendance.setCheckOut(now);
+        attendance.setEarlyLeave(earlyLeave);
 
-        attendance.setEarlyLeave(
-                earlyLeave
-        );
+        attendance =
+                attendanceRepository.save(attendance);
 
-        attendanceRepository.save(
-                attendance
-        );
+        // --------------------------------------------------------
+        // Return UPDATED attendance
+        // --------------------------------------------------------
 
-        response.put(
-                "success",
-                true
-        );
+        Map<String, Object> response = new HashMap<>();
 
-        response.put(
-                "action",
-                "CHECK_OUT"
-        );
+        response.put("success", true);
+        response.put("action", "CHECK_OUT");
 
         response.put(
                 "message",
@@ -456,10 +415,29 @@ public class EmployeeQrAttendanceController {
 
         response.put(
                 "time",
-                now.toLocalTime()
-                        .withSecond(0)
-                        .withNano(0)
-                        .toString()
+                formatTime(now)
+        );
+
+        response.put(
+                "date",
+                today.toString()
+        );
+
+        response.put(
+                "status",
+                attendance.getStatus()
+        );
+
+        response.put(
+                "employeeName",
+                loggedInEmployee.getFirstName()
+                        + " "
+                        + loggedInEmployee.getLastName()
+        );
+
+        response.put(
+                "employeeCode",
+                loggedInEmployee.getEmployeeCode()
         );
 
         response.put(
@@ -467,9 +445,12 @@ public class EmployeeQrAttendanceController {
                 Math.round(distance)
         );
 
-        return ResponseEntity.ok(
-                response
+        response.put(
+                "dashboardUrl",
+                "/employee/dashboard"
         );
+
+        return ResponseEntity.ok(response);
     }
 
     // ============================================================
@@ -484,28 +465,28 @@ public class EmployeeQrAttendanceController {
         Map<String, Object> response =
                 new HashMap<>();
 
-        response.put(
-                "success",
-                success
-        );
+        response.put("success", success);
+        response.put("message", message);
+        response.put("errorCode", errorCode);
 
-        response.put(
-                "message",
-                message
-        );
-
-        response.put(
-                "errorCode",
-                errorCode
-        );
-
-        return ResponseEntity.ok(
-                response
-        );
+        return ResponseEntity.ok(response);
     }
 
     // ============================================================
-    // GET OFFICE SETTINGS
+    // FORMAT TIME
+    // ============================================================
+
+    private String formatTime(LocalDateTime dateTime) {
+
+        return dateTime
+                .toLocalTime()
+                .withSecond(0)
+                .withNano(0)
+                .toString();
+    }
+
+    // ============================================================
+    // OFFICE SETTINGS
     // ============================================================
 
     private OfficeSettings getOfficeSettings() {
@@ -513,10 +494,9 @@ public class EmployeeQrAttendanceController {
         return officeSettingsRepository
                 .findFirstByOrderByIdAsc()
                 .orElseThrow(
-                        () ->
-                                new IllegalStateException(
-                                        "Office settings not configured."
-                                )
+                        () -> new IllegalStateException(
+                                "Office settings not configured."
+                        )
                 );
     }
 
@@ -528,31 +508,17 @@ public class EmployeeQrAttendanceController {
             LocalDate date,
             OfficeSettings settings) {
 
-        DayOfWeek day =
-                date.getDayOfWeek();
+        DayOfWeek day = date.getDayOfWeek();
 
         return switch (day) {
 
-            case SUNDAY ->
-                    settings.isSunday();
-
-            case MONDAY ->
-                    settings.isMonday();
-
-            case TUESDAY ->
-                    settings.isTuesday();
-
-            case WEDNESDAY ->
-                    settings.isWednesday();
-
-            case THURSDAY ->
-                    settings.isThursday();
-
-            case FRIDAY ->
-                    settings.isFriday();
-
-            case SATURDAY ->
-                    settings.isSaturday();
+            case SUNDAY -> settings.isSunday();
+            case MONDAY -> settings.isMonday();
+            case TUESDAY -> settings.isTuesday();
+            case WEDNESDAY -> settings.isWednesday();
+            case THURSDAY -> settings.isThursday();
+            case FRIDAY -> settings.isFriday();
+            case SATURDAY -> settings.isSaturday();
         };
     }
 
@@ -568,9 +534,7 @@ public class EmployeeQrAttendanceController {
         }
 
         return employeeRepository
-                .findByUserUsername(
-                        authentication.getName()
-                )
+                .findByUserUsername(authentication.getName())
                 .orElse(null);
     }
 }

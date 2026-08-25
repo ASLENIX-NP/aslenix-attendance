@@ -30,7 +30,7 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // GET ALL ATTENDANCE RECORDS FOR EMPLOYEE
+    // ALL EMPLOYEE ATTENDANCE
     // ============================================================
 
     public List<Attendance> getEmployeeAttendance(Employee employee) {
@@ -40,6 +40,8 @@ public class AttendanceService {
                 .stream()
                 .filter(a ->
                         a.getEmployee() != null
+                                && a.getEmployee().getId() != null
+                                && employee.getId() != null
                                 && a.getEmployee().getId()
                                 .equals(employee.getId()))
                 .sorted((a, b) ->
@@ -54,18 +56,16 @@ public class AttendanceService {
 
     public Attendance getTodayAttendance(Employee employee) {
 
-        LocalDate today = LocalDate.now();
-
         return attendanceRepository
                 .findByEmployeeAndAttendanceDate(
                         employee,
-                        today
+                        LocalDate.now()
                 )
                 .orElse(null);
     }
 
     // ============================================================
-    // MONTHLY ATTENDANCE
+    // CURRENT MONTH ATTENDANCE
     // ============================================================
 
     public List<Attendance> getCurrentMonthAttendance(
@@ -85,6 +85,10 @@ public class AttendanceService {
                 .stream()
                 .filter(a -> {
 
+                    if (a.getAttendanceDate() == null) {
+                        return false;
+                    }
+
                     LocalDate date =
                             a.getAttendanceDate();
 
@@ -95,41 +99,61 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // PRESENT COUNT
+    // ATTENDANCE THIS MONTH
     // ============================================================
 
-    public long getPresentCount(Employee employee) {
+    public long getAttendanceThisMonth(
+            Employee employee) {
+
+        return getCurrentMonthAttendance(employee)
+                .size();
+    }
+
+    // ============================================================
+    // PRESENT
+    // ============================================================
+
+    public long getPresentCount(
+            Employee employee) {
 
         return getCurrentMonthAttendance(employee)
                 .stream()
                 .filter(a ->
-                        "PRESENT".equalsIgnoreCase(
-                                a.getStatus()))
+                        a.getStatus() != null
+                                && a.getStatus()
+                                .equalsIgnoreCase("PRESENT"))
                 .count();
     }
 
     // ============================================================
-    // LATE COUNT
+    // LATE
     // ============================================================
 
-    public long getLateCount(Employee employee) {
+    public long getLateCount(
+            Employee employee) {
 
         return getCurrentMonthAttendance(employee)
                 .stream()
-                .filter(Attendance::isLate)
+                .filter(a ->
+                        a.isLate()
+                                || (
+                                a.getStatus() != null
+                                        && a.getStatus()
+                                        .equalsIgnoreCase("LATE")
+                        ))
                 .count();
     }
 
     // ============================================================
-    // LEAVE COUNT
+    // LEAVE
     // ============================================================
 
-    public long getLeaveCount(Employee employee) {
+    public long getLeaveCount(
+            Employee employee) {
 
         /*
-         * Leave functionality has not been connected yet.
+         * Leave functionality is not connected yet.
          */
-
         return 0;
     }
 
@@ -155,9 +179,11 @@ public class AttendanceService {
 
         long count = 0;
 
-        for (LocalDate date = firstDay;
-             !date.isAfter(today);
-             date = date.plusDays(1)) {
+        for (
+                LocalDate date = firstDay;
+                !date.isAfter(today);
+                date = date.plusDays(1)
+        ) {
 
             if (isWorkingDay(
                     settings,
@@ -171,10 +197,11 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // ABSENT COUNT
+    // ABSENT
     // ============================================================
 
-    public long getAbsentCount(Employee employee) {
+    public long getAbsentCount(
+            Employee employee) {
 
         long workingDays =
                 getWorkingDaysThisMonth();
@@ -184,8 +211,13 @@ public class AttendanceService {
                         .stream()
                         .filter(a ->
                                 a.getStatus() != null
-                                        && !a.getStatus()
-                                        .equalsIgnoreCase("ABSENT"))
+                                        && (
+                                        a.getStatus()
+                                                .equalsIgnoreCase("PRESENT")
+                                                ||
+                                        a.getStatus()
+                                                .equalsIgnoreCase("LATE")
+                                ))
                         .count();
 
         long leaveDays =
@@ -200,29 +232,29 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // TOTAL ATTENDANCE THIS MONTH
-    // ============================================================
-
-    public long getAttendanceThisMonth(Employee employee) {
-
-        return getCurrentMonthAttendance(employee)
-                .size();
-    }
-
-    // ============================================================
     // TODAY STATUS
     // ============================================================
 
-    public String getTodayStatus(Employee employee) {
+    public String getTodayStatus(
+            Employee employee) {
 
         Attendance attendance =
                 getTodayAttendance(employee);
 
         if (attendance == null) {
-            return null;
+            return "NOT CHECKED IN";
+        }
+
+        if (attendance.getCheckIn() == null) {
+            return "NOT CHECKED IN";
         }
 
         if (attendance.getCheckOut() == null) {
+
+            if (attendance.isLate()) {
+                return "LATE / WORKING";
+            }
+
             return "WORKING";
         }
 
@@ -234,18 +266,19 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // TODAY CHECK-IN TIME
+    // TODAY CHECK-IN
     // ============================================================
 
-    public String getTodayCheckInTime(Employee employee) {
+    public String getTodayCheckInTime(
+            Employee employee) {
 
         Attendance attendance =
                 getTodayAttendance(employee);
 
-        if (attendance == null ||
-                attendance.getCheckIn() == null) {
+        if (attendance == null
+                || attendance.getCheckIn() == null) {
 
-            return null;
+            return "--:--";
         }
 
         return formatTime(
@@ -254,18 +287,19 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // TODAY CHECK-OUT TIME
+    // TODAY CHECK-OUT
     // ============================================================
 
-    public String getTodayCheckOutTime(Employee employee) {
+    public String getTodayCheckOutTime(
+            Employee employee) {
 
         Attendance attendance =
                 getTodayAttendance(employee);
 
-        if (attendance == null ||
-                attendance.getCheckOut() == null) {
+        if (attendance == null
+                || attendance.getCheckOut() == null) {
 
-            return null;
+            return "--:--";
         }
 
         return formatTime(
@@ -277,13 +311,14 @@ public class AttendanceService {
     // TODAY WORKING HOURS
     // ============================================================
 
-    public String getTodayWorkingHours(Employee employee) {
+    public String getTodayWorkingHours(
+            Employee employee) {
 
         Attendance attendance =
                 getTodayAttendance(employee);
 
-        if (attendance == null ||
-                attendance.getCheckIn() == null) {
+        if (attendance == null
+                || attendance.getCheckIn() == null) {
 
             return "0h 00m";
         }
@@ -294,6 +329,10 @@ public class AttendanceService {
         LocalDateTime checkOut =
                 attendance.getCheckOut();
 
+        /*
+         * If employee is still working,
+         * calculate until current time.
+         */
         if (checkOut == null) {
             checkOut = LocalDateTime.now();
         }
@@ -311,7 +350,8 @@ public class AttendanceService {
     // TOTAL WORKING HOURS
     // ============================================================
 
-    public String getTotalWorkingHours(Employee employee) {
+    public String getTotalWorkingHours(
+            Employee employee) {
 
         List<Attendance> records =
                 getCurrentMonthAttendance(employee);
@@ -353,7 +393,8 @@ public class AttendanceService {
         long minutes =
                 totalMinutes % 60;
 
-        return hours + "h "
+        return hours
+                + "h "
                 + String.format(
                         "%02d",
                         minutes
@@ -362,7 +403,7 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // QR CHECK-IN + LOCATION VERIFICATION
+    // QR CHECK-IN
     // ============================================================
 
     public Attendance checkIn(
@@ -370,34 +411,25 @@ public class AttendanceService {
             double latitude,
             double longitude) {
 
-        // --------------------------------------------------------
-        // Validate employee
-        // --------------------------------------------------------
-
         if (employee == null) {
+
             throw new IllegalArgumentException(
                     "Employee not found."
             );
         }
 
         if (!employee.isEnabled()) {
+
             throw new IllegalStateException(
                     "Employee account is disabled."
             );
         }
 
-        // --------------------------------------------------------
-        // Get office settings
-        // --------------------------------------------------------
-
         OfficeSettings settings =
                 getOfficeSettings();
 
-        // --------------------------------------------------------
-        // Check whether today is a working day
-        // --------------------------------------------------------
-
-        LocalDate today = LocalDate.now();
+        LocalDate today =
+                LocalDate.now();
 
         if (!isWorkingDay(
                 settings,
@@ -407,10 +439,6 @@ public class AttendanceService {
                     "Today is not a working day."
             );
         }
-
-        // --------------------------------------------------------
-        // Validate location
-        // --------------------------------------------------------
 
         double distance =
                 calculateDistanceMeters(
@@ -434,10 +462,6 @@ public class AttendanceService {
             );
         }
 
-        // --------------------------------------------------------
-        // Check existing attendance
-        // --------------------------------------------------------
-
         Attendance existing =
                 attendanceRepository
                         .findByEmployeeAndAttendanceDate(
@@ -446,24 +470,18 @@ public class AttendanceService {
                         )
                         .orElse(null);
 
-        if (existing != null) {
+        if (existing != null
+                && existing.getCheckIn() != null) {
 
-            if (existing.getCheckIn() != null) {
-
-                throw new IllegalStateException(
-                        "You have already checked in today."
-                );
-            }
-
-            return existing;
+            throw new IllegalStateException(
+                    "You have already checked in today."
+            );
         }
 
-        // --------------------------------------------------------
-        // Create attendance
-        // --------------------------------------------------------
-
         Attendance attendance =
-                new Attendance();
+                existing != null
+                        ? existing
+                        : new Attendance();
 
         attendance.setEmployee(employee);
         attendance.setAttendanceDate(today);
@@ -473,28 +491,36 @@ public class AttendanceService {
 
         attendance.setCheckIn(now);
 
-        // --------------------------------------------------------
-        // Determine PRESENT / LATE
-        // --------------------------------------------------------
-
+        /*
+         * Determine late status.
+         */
         LocalTime allowedStart =
                 settings.getWorkStartTime()
                         .plusMinutes(
                                 settings.getLateGraceMinutes()
                         );
 
-        if (now.toLocalTime()
-                .isAfter(allowedStart)) {
+        boolean late =
+                now.toLocalTime()
+                        .isAfter(allowedStart);
 
-            attendance.setStatus("PRESENT");
-        } else {
+        attendance.setLate(late);
 
-            attendance.setStatus("PRESENT");
-        }
+        attendance.setStatus(
+                late
+                        ? "LATE"
+                        : "PRESENT"
+        );
 
-        // --------------------------------------------------------
-        // Save
-        // --------------------------------------------------------
+        attendance.setEarlyLeave(false);
+        attendance.setHalfDay(false);
+
+        /*
+         * GPS information.
+         */
+        attendance.setCheckInLatitude(latitude);
+        attendance.setCheckInLongitude(longitude);
+        attendance.setCheckInDistanceMeters(distance);
 
         return attendanceRepository.save(
                 attendance
@@ -502,7 +528,7 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // QR CHECK-OUT + LOCATION VERIFICATION
+    // QR CHECK-OUT
     // ============================================================
 
     public Attendance checkOut(
@@ -510,32 +536,22 @@ public class AttendanceService {
             double latitude,
             double longitude) {
 
-        // --------------------------------------------------------
-        // Validate employee
-        // --------------------------------------------------------
-
         if (employee == null) {
+
             throw new IllegalArgumentException(
                     "Employee not found."
             );
         }
 
         if (!employee.isEnabled()) {
+
             throw new IllegalStateException(
                     "Employee account is disabled."
             );
         }
 
-        // --------------------------------------------------------
-        // Get office settings
-        // --------------------------------------------------------
-
         OfficeSettings settings =
                 getOfficeSettings();
-
-        // --------------------------------------------------------
-        // Validate location
-        // --------------------------------------------------------
 
         double distance =
                 calculateDistanceMeters(
@@ -549,14 +565,9 @@ public class AttendanceService {
                 settings.getAllowedRadiusMeters()) {
 
             throw new IllegalStateException(
-                    "You are outside the office attendance radius. "
-                            + "Check-out is only allowed inside the office."
+                    "You are outside the office attendance radius."
             );
         }
-
-        // --------------------------------------------------------
-        // Find today's attendance
-        // --------------------------------------------------------
 
         LocalDate today =
                 LocalDate.now();
@@ -576,10 +587,6 @@ public class AttendanceService {
             );
         }
 
-        // --------------------------------------------------------
-        // Already checked out
-        // --------------------------------------------------------
-
         if (attendance.getCheckOut() != null) {
 
             throw new IllegalStateException(
@@ -587,13 +594,19 @@ public class AttendanceService {
             );
         }
 
-        // --------------------------------------------------------
-        // Save check-out
-        // --------------------------------------------------------
+        LocalDateTime now =
+                LocalDateTime.now();
 
-        attendance.setCheckOut(
-                LocalDateTime.now()
-        );
+        attendance.setCheckOut(now);
+
+        boolean early =
+                settings.getWorkEndTime() != null
+                        && now.toLocalTime()
+                        .isBefore(
+                                settings.getWorkEndTime()
+                        );
+
+        attendance.setEarlyLeave(early);
 
         return attendanceRepository.save(
                 attendance
@@ -616,20 +629,8 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // LOCATION DISTANCE
+    // DISTANCE
     // ============================================================
-
-    /*
-     * Calculates the distance between:
-     *
-     * Employee GPS location
-     *          and
-     * Office GPS location
-     *
-     * Result is returned in meters.
-     *
-     * Uses the Haversine formula.
-     */
 
     public double calculateDistanceMeters(
             double employeeLatitude,
@@ -678,7 +679,7 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // CHECK WORKING DAY
+    // WORKING DAY
     // ============================================================
 
     private boolean isWorkingDay(

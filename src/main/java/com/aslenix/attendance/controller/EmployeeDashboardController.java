@@ -4,12 +4,14 @@ import com.aslenix.attendance.entity.Attendance;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.service.AttendanceService;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -36,16 +38,8 @@ public class EmployeeDashboardController {
             Authentication authentication,
             Model model) {
 
-        // --------------------------------------------------------
-        // Get logged-in username
-        // --------------------------------------------------------
-
         String username =
                 authentication.getName();
-
-        // --------------------------------------------------------
-        // Find employee
-        // --------------------------------------------------------
 
         Employee employee =
                 employeeRepository
@@ -57,61 +51,9 @@ public class EmployeeDashboardController {
             return "redirect:/login?employeeNotFound=true";
         }
 
-        // --------------------------------------------------------
-        // Attendance records
-        // --------------------------------------------------------
-
-        List<Attendance> attendanceRecords =
-                attendanceService
-                        .getEmployeeAttendance(employee);
-
-        // --------------------------------------------------------
-        // Current month statistics
-        // --------------------------------------------------------
-
-        long attendanceThisMonth =
-                attendanceService
-                        .getAttendanceThisMonth(employee);
-
-        long presentCount =
-                attendanceService
-                        .getPresentCount(employee);
-
-        long absentCount =
-                attendanceService
-                        .getAbsentCount(employee);
-
-        long lateCount =
-                attendanceService
-                        .getLateCount(employee);
-
-        long leaveCount =
-                attendanceService
-                        .getLeaveCount(employee);
-
-        // --------------------------------------------------------
-        // Today's attendance
-        // --------------------------------------------------------
-
-        String todayStatus =
-                attendanceService
-                        .getTodayStatus(employee);
-
-        String checkInTime =
-                attendanceService
-                        .getTodayCheckInTime(employee);
-
-        String checkOutTime =
-                attendanceService
-                        .getTodayCheckOutTime(employee);
-
-        String workingHours =
-                attendanceService
-                        .getTodayWorkingHours(employee);
-
-        // --------------------------------------------------------
-        // Employee information
-        // --------------------------------------------------------
+        // ========================================================
+        // EMPLOYEE INFORMATION
+        // ========================================================
 
         model.addAttribute(
                 "employee",
@@ -135,75 +77,88 @@ public class EmployeeDashboardController {
                 employee.getDepartment()
         );
 
-        // --------------------------------------------------------
-        // Dashboard statistics
-        // --------------------------------------------------------
+        // ========================================================
+        // ATTENDANCE
+        // ========================================================
 
-        model.addAttribute(
-                "attendanceThisMonth",
-                attendanceThisMonth
-        );
-
-        model.addAttribute(
-                "presentCount",
-                presentCount
-        );
-
-        model.addAttribute(
-                "absentCount",
-                absentCount
-        );
-
-        model.addAttribute(
-                "lateCount",
-                lateCount
-        );
-
-        model.addAttribute(
-                "leaveCount",
-                leaveCount
-        );
-
-        // --------------------------------------------------------
-        // Today's information
-        // --------------------------------------------------------
-
-        model.addAttribute(
-                "todayStatus",
-                todayStatus
-        );
-
-        model.addAttribute(
-                "checkInTime",
-                checkInTime
-        );
-
-        model.addAttribute(
-                "checkOutTime",
-                checkOutTime
-        );
-
-        model.addAttribute(
-                "workingHours",
-                workingHours
-        );
-
-        // --------------------------------------------------------
-        // Attendance history
-        // --------------------------------------------------------
+        List<Attendance> attendanceRecords =
+                attendanceService
+                        .getEmployeeAttendance(employee);
 
         model.addAttribute(
                 "attendanceRecords",
                 attendanceRecords
         );
 
-        // --------------------------------------------------------
-        // Today's date
-        // --------------------------------------------------------
+        // ========================================================
+        // MONTHLY STATISTICS
+        // ========================================================
+
+        model.addAttribute(
+                "attendanceThisMonth",
+                attendanceService
+                        .getAttendanceThisMonth(employee)
+        );
+
+        model.addAttribute(
+                "presentCount",
+                attendanceService
+                        .getPresentCount(employee)
+        );
+
+        model.addAttribute(
+                "absentCount",
+                attendanceService
+                        .getAbsentCount(employee)
+        );
+
+        model.addAttribute(
+                "lateCount",
+                attendanceService
+                        .getLateCount(employee)
+        );
+
+        model.addAttribute(
+                "leaveCount",
+                attendanceService
+                        .getLeaveCount(employee)
+        );
+
+        // ========================================================
+        // TODAY
+        // ========================================================
+
+        model.addAttribute(
+                "todayStatus",
+                attendanceService
+                        .getTodayStatus(employee)
+        );
+
+        model.addAttribute(
+                "checkInTime",
+                attendanceService
+                        .getTodayCheckInTime(employee)
+        );
+
+        model.addAttribute(
+                "checkOutTime",
+                attendanceService
+                        .getTodayCheckOutTime(employee)
+        );
+
+        model.addAttribute(
+                "workingHours",
+                attendanceService
+                        .getTodayWorkingHours(employee)
+        );
+
+        // ========================================================
+        // DATE
+        // ========================================================
 
         model.addAttribute(
                 "todayDate",
-                java.time.LocalDate.now()
+                LocalDate.now()
         );
 
         return "employee/dashboard";

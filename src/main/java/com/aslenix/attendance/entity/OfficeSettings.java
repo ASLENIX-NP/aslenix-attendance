@@ -104,6 +104,16 @@ public class OfficeSettings {
         this.allowedRadiusMeters = allowedRadiusMeters;
     }
 
+    /*
+     * Compatibility method.
+     *
+     * Some older code may use getAttendanceRadius().
+     * Keep it mapped to the same database value.
+     */
+    public double getAttendanceRadius() {
+        return allowedRadiusMeters;
+    }
+
     public LocalTime getWorkStartTime() {
         return workStartTime;
     }
@@ -182,10 +192,5 @@ public class OfficeSettings {
 
     public void setSaturday(boolean saturday) {
         this.saturday = saturday;
-    }
-
-    public double getAttendanceRadius() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAttendanceRadius'");
     }
 }
