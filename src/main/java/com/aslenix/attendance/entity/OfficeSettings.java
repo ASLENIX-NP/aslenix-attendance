@@ -1,7 +1,6 @@
 package com.aslenix.attendance.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalTime;
 
 @Entity
@@ -27,15 +26,31 @@ public class OfficeSettings {
     @Column(nullable = false)
     private double allowedRadiusMeters;
 
+    /*
+     * Working hours
+     *
+     * These values are stored permanently in the
+     * office_settings table.
+     *
+     * Defaults are provided so that a new settings
+     * record is never created with blank working hours.
+     */
     @Column(nullable = false)
-    private LocalTime workStartTime;
+    private LocalTime workStartTime = LocalTime.of(10, 0);
 
     @Column(nullable = false)
-    private LocalTime workEndTime;
+    private LocalTime workEndTime = LocalTime.of(18, 0);
 
+    /*
+     * Number of minutes after the normal start time
+     * before an employee is considered late.
+     */
     @Column(nullable = false)
-    private int lateGraceMinutes;
+    private int lateGraceMinutes = 15;
 
+    /*
+     * Working days
+     */
     @Column(nullable = false)
     private boolean sunday = true;
 
@@ -57,12 +72,41 @@ public class OfficeSettings {
     @Column(nullable = false)
     private boolean saturday = false;
 
+
+    /*
+     * =========================================================
+     * CONSTRUCTOR
+     * =========================================================
+     */
+
     public OfficeSettings() {
+        /*
+         * Defaults are intentionally kept here as well.
+         * This protects newly created Java objects from
+         * having null working hours.
+         */
+        this.workStartTime = LocalTime.of(10, 0);
+        this.workEndTime = LocalTime.of(18, 0);
+        this.lateGraceMinutes = 15;
     }
+
+
+    /*
+     * =========================================================
+     * ID
+     * =========================================================
+     */
 
     public Long getId() {
         return id;
     }
+
+
+    /*
+     * =========================================================
+     * OFFICE NAME
+     * =========================================================
+     */
 
     public String getOfficeName() {
         return officeName;
@@ -72,6 +116,13 @@ public class OfficeSettings {
         this.officeName = officeName;
     }
 
+
+    /*
+     * =========================================================
+     * OFFICE LOCATION
+     * =========================================================
+     */
+
     public String getOfficeLocation() {
         return officeLocation;
     }
@@ -79,6 +130,13 @@ public class OfficeSettings {
     public void setOfficeLocation(String officeLocation) {
         this.officeLocation = officeLocation;
     }
+
+
+    /*
+     * =========================================================
+     * LATITUDE
+     * =========================================================
+     */
 
     public double getLatitude() {
         return latitude;
@@ -88,6 +146,13 @@ public class OfficeSettings {
         this.latitude = latitude;
     }
 
+
+    /*
+     * =========================================================
+     * LONGITUDE
+     * =========================================================
+     */
+
     public double getLongitude() {
         return longitude;
     }
@@ -95,6 +160,13 @@ public class OfficeSettings {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+
+    /*
+     * =========================================================
+     * ATTENDANCE RADIUS
+     * =========================================================
+     */
 
     public double getAllowedRadiusMeters() {
         return allowedRadiusMeters;
@@ -107,36 +179,88 @@ public class OfficeSettings {
     /*
      * Compatibility method.
      *
-     * Some older code may use getAttendanceRadius().
-     * Keep it mapped to the same database value.
+     * Older code may use getAttendanceRadius().
+     * It returns the same value as allowedRadiusMeters.
      */
     public double getAttendanceRadius() {
         return allowedRadiusMeters;
     }
+
+
+    /*
+     * =========================================================
+     * WORK START TIME
+     * =========================================================
+     */
 
     public LocalTime getWorkStartTime() {
         return workStartTime;
     }
 
     public void setWorkStartTime(LocalTime workStartTime) {
-        this.workStartTime = workStartTime;
+
+        /*
+         * Never allow the working start time to become null.
+         */
+        if (workStartTime == null) {
+            this.workStartTime = LocalTime.of(10, 0);
+        } else {
+            this.workStartTime = workStartTime;
+        }
     }
+
+
+    /*
+     * =========================================================
+     * WORK END TIME
+     * =========================================================
+     */
 
     public LocalTime getWorkEndTime() {
         return workEndTime;
     }
 
     public void setWorkEndTime(LocalTime workEndTime) {
-        this.workEndTime = workEndTime;
+
+        /*
+         * Never allow the working end time to become null.
+         */
+        if (workEndTime == null) {
+            this.workEndTime = LocalTime.of(18, 0);
+        } else {
+            this.workEndTime = workEndTime;
+        }
     }
+
+
+    /*
+     * =========================================================
+     * LATE GRACE MINUTES
+     * =========================================================
+     */
 
     public int getLateGraceMinutes() {
         return lateGraceMinutes;
     }
 
     public void setLateGraceMinutes(int lateGraceMinutes) {
-        this.lateGraceMinutes = lateGraceMinutes;
+
+        /*
+         * Prevent negative grace periods.
+         */
+        if (lateGraceMinutes < 0) {
+            this.lateGraceMinutes = 0;
+        } else {
+            this.lateGraceMinutes = lateGraceMinutes;
+        }
     }
+
+
+    /*
+     * =========================================================
+     * SUNDAY
+     * =========================================================
+     */
 
     public boolean isSunday() {
         return sunday;
@@ -146,6 +270,13 @@ public class OfficeSettings {
         this.sunday = sunday;
     }
 
+
+    /*
+     * =========================================================
+     * MONDAY
+     * =========================================================
+     */
+
     public boolean isMonday() {
         return monday;
     }
@@ -153,6 +284,13 @@ public class OfficeSettings {
     public void setMonday(boolean monday) {
         this.monday = monday;
     }
+
+
+    /*
+     * =========================================================
+     * TUESDAY
+     * =========================================================
+     */
 
     public boolean isTuesday() {
         return tuesday;
@@ -162,6 +300,13 @@ public class OfficeSettings {
         this.tuesday = tuesday;
     }
 
+
+    /*
+     * =========================================================
+     * WEDNESDAY
+     * =========================================================
+     */
+
     public boolean isWednesday() {
         return wednesday;
     }
@@ -169,6 +314,13 @@ public class OfficeSettings {
     public void setWednesday(boolean wednesday) {
         this.wednesday = wednesday;
     }
+
+
+    /*
+     * =========================================================
+     * THURSDAY
+     * =========================================================
+     */
 
     public boolean isThursday() {
         return thursday;
@@ -178,6 +330,13 @@ public class OfficeSettings {
         this.thursday = thursday;
     }
 
+
+    /*
+     * =========================================================
+     * FRIDAY
+     * =========================================================
+     */
+
     public boolean isFriday() {
         return friday;
     }
@@ -185,6 +344,13 @@ public class OfficeSettings {
     public void setFriday(boolean friday) {
         this.friday = friday;
     }
+
+
+    /*
+     * =========================================================
+     * SATURDAY
+     * =========================================================
+     */
 
     public boolean isSaturday() {
         return saturday;

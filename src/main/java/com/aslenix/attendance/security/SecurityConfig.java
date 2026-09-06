@@ -10,53 +10,98 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    // ============================================================
+    // PASSWORD ENCODER
+    // ============================================================
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // ============================================================
+    // SECURITY FILTER CHAIN
+    // ============================================================
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
         http
+
+            // ====================================================
+            // AUTHORIZATION
+            // ====================================================
+
             .authorizeHttpRequests(auth -> auth
 
-                // Public pages and resources
+                // ------------------------------------------------
+                // PUBLIC
+                // ------------------------------------------------
+
                 .requestMatchers(
-                    "/login",
-                    "/css/**",
-                    "/js/**",
-                    "/images/**"
+                        "/login",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**"
                 ).permitAll()
 
-                // Admin pages
+                // ------------------------------------------------
+                // ADMIN
+                // ------------------------------------------------
+
                 .requestMatchers("/admin/**")
                 .hasRole("ADMIN")
 
-                // Employee pages
+                // ------------------------------------------------
+                // EMPLOYEE
+                // ------------------------------------------------
+
                 .requestMatchers("/employee/**")
                 .hasRole("EMPLOYEE")
 
-                // Home page requires login
+                // ------------------------------------------------
+                // ROOT
+                // ------------------------------------------------
+
                 .requestMatchers("/")
                 .authenticated()
 
-                // Everything else requires authentication
+                // ------------------------------------------------
+                // EVERYTHING ELSE
+                // ------------------------------------------------
+
                 .anyRequest()
                 .authenticated()
             )
 
-            // Login configuration
+            // ====================================================
+            // FORM LOGIN
+            // ====================================================
+
             .formLogin(form -> form
+
                 .loginPage("/login")
+
+                /*
+                 * Send every successfully authenticated user to /
+                 *
+                 * LoginController then decides whether the user
+                 * is ADMIN or EMPLOYEE.
+                 */
                 .defaultSuccessUrl("/", true)
+
                 .permitAll()
             )
 
-            // Logout configuration
+            // ====================================================
+            // LOGOUT
+            // ====================================================
+
             .logout(logout -> logout
+
                 .logoutSuccessUrl("/login?logout")
+
                 .permitAll()
             );
 

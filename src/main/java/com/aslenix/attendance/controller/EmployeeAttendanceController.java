@@ -5,8 +5,7 @@ import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.entity.OfficeSettings;
 import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
-import com.aslenix.attendance.repository.OfficeSettingsRepository;
-import com.aslenix.attendance.util.GeoUtils;
+import com.aslenix.attendance.service.AttendanceService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,9 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.DayOfWeek;
 import java.util.List;
 
 @Controller
@@ -25,16 +21,16 @@ public class EmployeeAttendanceController {
 
     private final EmployeeRepository employeeRepository;
     private final AttendanceRepository attendanceRepository;
-    private final OfficeSettingsRepository officeSettingsRepository;
+    private final AttendanceService attendanceService;
 
     public EmployeeAttendanceController(
             EmployeeRepository employeeRepository,
             AttendanceRepository attendanceRepository,
-            OfficeSettingsRepository officeSettingsRepository) {
+            AttendanceService attendanceService) {
 
         this.employeeRepository = employeeRepository;
         this.attendanceRepository = attendanceRepository;
-        this.officeSettingsRepository = officeSettingsRepository;
+        this.attendanceService = attendanceService;
     }
 
     // ============================================================
@@ -46,7 +42,8 @@ public class EmployeeAttendanceController {
             Authentication authentication,
             Model model) {
 
-        Employee employee = getLoggedInEmployee(authentication);
+        Employee employee =
+                getLoggedInEmployee(authentication);
 
         if (employee == null) {
             return "redirect:/login";
@@ -69,44 +66,72 @@ public class EmployeeAttendanceController {
                         );
 
         // --------------------------------------------------------
-        // TODAY
+        // TODAY'S ATTENDANCE
         // --------------------------------------------------------
 
-        String todayCheckIn = "--:--";
-        String todayCheckOut = "--:--";
-        String todayStatus = null;
+        String todayCheckIn =
+                attendanceService.getTodayCheckInTime(employee);
 
-        if (todayAttendance != null) {
+        String todayCheckOut =
+                attendanceService.getTodayCheckOutTime(employee);
 
-            if (todayAttendance.getCheckIn() != null) {
+        String todayStatus =
+                attendanceService.getTodayStatus(employee);
 
-                todayCheckIn =
-                        formatTime(todayAttendance.getCheckIn());
+        String todayWorkingHours =
+                attendanceService.getTodayWorkingHours(employee);
 
-            }
+        // --------------------------------------------------------
+        // BUTTON STATES
+        // --------------------------------------------------------
 
-            if (todayAttendance.getCheckOut() != null) {
+        boolean canCheckIn =
+                todayAttendance == null
+                        || todayAttendance.getCheckIn() == null;
 
-                todayCheckOut =
-                        formatTime(todayAttendance.getCheckOut());
+        boolean canCheckOut =
+                todayAttendance != null
+                        && todayAttendance.getCheckIn() != null
+                        && todayAttendance.getCheckOut() == null;
 
-            }
+        boolean checkedIn =
+                todayAttendance != null
+                        && todayAttendance.getCheckIn() != null;
 
-            if (todayAttendance.getCheckOut() != null) {
+        boolean checkedOut =
+                todayAttendance != null
+                        && todayAttendance.getCheckOut() != null;
 
-                todayStatus = "PRESENT";
+        // --------------------------------------------------------
+        // TODAY'S TIMELINE DATA
+        // --------------------------------------------------------
 
-            } else {
+        String checkInDistance = "--";
 
-                todayStatus = "WORKING";
-            }
+        if (todayAttendance != null
+                && todayAttendance.getCheckInDistanceMeters() != null) {
+
+            checkInDistance =
+                    String.format(
+                            "%.1f m",
+                            todayAttendance.getCheckInDistanceMeters()
+                    );
         }
+
+        boolean late =
+                todayAttendance != null
+                        && todayAttendance.isLate();
+
+        boolean earlyLeave =
+                todayAttendance != null
+                        && todayAttendance.isEarlyLeave();
 
         // --------------------------------------------------------
         // SUMMARY
         // --------------------------------------------------------
 
-        int totalDays = attendanceRecords.size();
+        int totalDays =
+                attendanceRecords.size();
 
         int presentDays = 0;
 
@@ -123,7 +148,6 @@ public class EmployeeAttendanceController {
             }
 
             if (attendance.getCheckIn() == null) {
-
                 absentDays++;
             }
 
@@ -143,6 +167,26 @@ public class EmployeeAttendanceController {
 
         String workingHours =
                 formatWorkingHours(totalWorkingMinutes);
+
+        // --------------------------------------------------------
+        // OFFICE SETTINGS
+        // --------------------------------------------------------
+
+        OfficeSettings settings =
+                attendanceService.getOfficeSettings();
+
+        String officeStartTime = "--:--";
+        String officeEndTime = "--:--";
+
+        if (settings.getWorkStartTime() != null) {
+            officeStartTime =
+                    settings.getWorkStartTime().toString();
+        }
+
+        if (settings.getWorkEndTime() != null) {
+            officeEndTime =
+                    settings.getWorkEndTime().toString();
+        }
 
         // --------------------------------------------------------
         // MODEL
@@ -194,8 +238,58 @@ public class EmployeeAttendanceController {
         );
 
         model.addAttribute(
+                "todayWorkingHours",
+                todayWorkingHours
+        );
+
+        model.addAttribute(
                 "todayStatus",
                 todayStatus
+        );
+
+        model.addAttribute(
+                "canCheckIn",
+                canCheckIn
+        );
+
+        model.addAttribute(
+                "canCheckOut",
+                canCheckOut
+        );
+
+        model.addAttribute(
+                "checkedIn",
+                checkedIn
+        );
+
+        model.addAttribute(
+                "checkedOut",
+                checkedOut
+        );
+
+        model.addAttribute(
+                "late",
+                late
+        );
+
+        model.addAttribute(
+                "earlyLeave",
+                earlyLeave
+        );
+
+        model.addAttribute(
+                "checkInDistance",
+                checkInDistance
+        );
+
+        model.addAttribute(
+                "officeStartTime",
+                officeStartTime
+        );
+
+        model.addAttribute(
+                "officeEndTime",
+                officeEndTime
         );
 
         return "employee/attendance";
@@ -218,98 +312,26 @@ public class EmployeeAttendanceController {
             return "redirect:/login";
         }
 
-        OfficeSettings settings =
-                getOfficeSettings();
+        try {
 
-        LocalDate today = LocalDate.now();
+            attendanceService.checkIn(
+                    employee,
+                    latitude,
+                    longitude
+            );
 
-        // --------------------------------------------------------
-        // WORKING DAY
-        // --------------------------------------------------------
+            return "redirect:/employee/attendance?checkedIn";
 
-        if (!isWorkingDay(today, settings)) {
+        } catch (IllegalArgumentException e) {
 
-            return "redirect:/employee/attendance?weekend";
+            return "redirect:/employee/attendance?error="
+                    + encodeMessage(e.getMessage());
+
+        } catch (IllegalStateException e) {
+
+            return "redirect:/employee/attendance?error="
+                    + encodeMessage(e.getMessage());
         }
-
-        // --------------------------------------------------------
-        // ALREADY CHECKED IN
-        // --------------------------------------------------------
-
-        if (attendanceRepository
-                .findByEmployeeAndAttendanceDate(
-                        employee,
-                        today
-                )
-                .isPresent()) {
-
-            return "redirect:/employee/attendance?alreadyCheckedIn";
-        }
-
-        // --------------------------------------------------------
-        // GPS DISTANCE
-        // --------------------------------------------------------
-
-        double distance =
-                GeoUtils.distanceMeters(
-                        latitude,
-                        longitude,
-                        settings.getLatitude(),
-                        settings.getLongitude()
-                );
-
-        if (distance > settings.getAllowedRadiusMeters()) {
-
-            return "redirect:/employee/attendance?outsideOffice";
-        }
-
-        // --------------------------------------------------------
-        // CREATE ATTENDANCE
-        // --------------------------------------------------------
-
-        LocalDateTime now =
-                LocalDateTime.now();
-
-        LocalTime lateTime =
-                settings.getWorkStartTime()
-                        .plusMinutes(
-                                settings.getLateGraceMinutes()
-                        );
-
-        boolean late =
-                now.toLocalTime()
-                        .isAfter(lateTime);
-
-        Attendance attendance =
-                new Attendance();
-
-        attendance.setEmployee(employee);
-
-        attendance.setAttendanceDate(today);
-
-        attendance.setCheckIn(now);
-
-        attendance.setCheckInLatitude(latitude);
-
-        attendance.setCheckInLongitude(longitude);
-
-        attendance.setCheckInDistanceMeters(distance);
-
-        attendance.setLate(late);
-
-        attendance.setEarlyLeave(false);
-
-        attendance.setHalfDay(false);
-
-        attendance.setStatus(
-                late
-                        ? "LATE"
-                        : "PRESENT"
-        );
-
-        attendanceRepository.save(attendance);
-
-        return "redirect:/employee/attendance?checkedIn";
     }
 
     // ============================================================
@@ -318,7 +340,9 @@ public class EmployeeAttendanceController {
 
     @PostMapping("/check-out")
     public String checkOut(
-            Authentication authentication) {
+            Authentication authentication,
+            @RequestParam double latitude,
+            @RequestParam double longitude) {
 
         Employee employee =
                 getLoggedInEmployee(authentication);
@@ -327,97 +351,26 @@ public class EmployeeAttendanceController {
             return "redirect:/login";
         }
 
-        LocalDate today =
-                LocalDate.now();
+        try {
 
-        Attendance attendance =
-                attendanceRepository
-                        .findByEmployeeAndAttendanceDate(
-                                employee,
-                                today
-                        )
-                        .orElse(null);
+            attendanceService.checkOut(
+                    employee,
+                    latitude,
+                    longitude
+            );
 
-        if (attendance == null) {
+            return "redirect:/employee/attendance?checkedOut";
 
-            return "redirect:/employee/attendance?notCheckedIn";
+        } catch (IllegalArgumentException e) {
+
+            return "redirect:/employee/attendance?error="
+                    + encodeMessage(e.getMessage());
+
+        } catch (IllegalStateException e) {
+
+            return "redirect:/employee/attendance?error="
+                    + encodeMessage(e.getMessage());
         }
-
-        if (attendance.getCheckOut() != null) {
-
-            return "redirect:/employee/attendance?alreadyCheckedOut";
-        }
-
-        OfficeSettings settings =
-                getOfficeSettings();
-
-        LocalDateTime now =
-                LocalDateTime.now();
-
-        boolean earlyLeave =
-                now.toLocalTime()
-                        .isBefore(
-                                settings.getWorkEndTime()
-                        );
-
-        attendance.setCheckOut(now);
-
-        attendance.setEarlyLeave(earlyLeave);
-
-        attendanceRepository.save(attendance);
-
-        return "redirect:/employee/attendance?checkedOut";
-    }
-
-    // ============================================================
-    // OFFICE SETTINGS
-    // ============================================================
-
-    private OfficeSettings getOfficeSettings() {
-
-        return officeSettingsRepository
-                .findFirstByOrderByIdAsc()
-                .orElseThrow(() ->
-                        new IllegalStateException(
-                                "Office settings not configured."
-                        )
-                );
-    }
-
-    // ============================================================
-    // WORKING DAY
-    // ============================================================
-
-    private boolean isWorkingDay(
-            LocalDate date,
-            OfficeSettings settings) {
-
-        DayOfWeek day =
-                date.getDayOfWeek();
-
-        return switch (day) {
-
-            case SUNDAY ->
-                    settings.isSunday();
-
-            case MONDAY ->
-                    settings.isMonday();
-
-            case TUESDAY ->
-                    settings.isTuesday();
-
-            case WEDNESDAY ->
-                    settings.isWednesday();
-
-            case THURSDAY ->
-                    settings.isThursday();
-
-            case FRIDAY ->
-                    settings.isFriday();
-
-            case SATURDAY ->
-                    settings.isSaturday();
-        };
     }
 
     // ============================================================
@@ -440,20 +393,6 @@ public class EmployeeAttendanceController {
     }
 
     // ============================================================
-    // FORMAT TIME
-    // ============================================================
-
-    private String formatTime(
-            LocalDateTime dateTime) {
-
-        return dateTime
-                .toLocalTime()
-                .withSecond(0)
-                .withNano(0)
-                .toString();
-    }
-
-    // ============================================================
     // FORMAT WORKING HOURS
     // ============================================================
 
@@ -466,8 +405,26 @@ public class EmployeeAttendanceController {
         long minutes =
                 totalMinutes % 60;
 
-        return hours + "h " + minutes + "m";
+        return hours
+                + "h "
+                + minutes
+                + "m";
     }
 
+    // ============================================================
+    // ERROR MESSAGE
+    // ============================================================
 
+    private String encodeMessage(
+            String message) {
+
+        if (message == null) {
+            return "Attendance operation failed.";
+        }
+
+        return message
+                .replace(" ", "%20")
+                .replace(":", "%3A")
+                .replace(",", "%2C");
+    }
 }

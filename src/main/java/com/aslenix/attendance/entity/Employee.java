@@ -68,26 +68,6 @@ public class Employee {
     // QR CODE
     // ============================================================
 
-    /*
-     * Unique token stored in the employee's QR code.
-     *
-     * Example:
-     *
-     * QR token:
-     *
-     * 8cdbf990445c0e478f65b37436ffb81e9f2daf66d333efc7
-     *
-     * The QR code can contain either:
-     *
-     * https://attendance.aslenix.tech/verify-employee/{token}
-     *
-     * or just:
-     *
-     * {token}
-     *
-     * Only the token is stored in the database.
-     */
-
     @Column(
             name = "qr_token",
             unique = true,
@@ -272,4 +252,3 @@ public class Employee {
         this.enabled = enabled;
     }
 }
-

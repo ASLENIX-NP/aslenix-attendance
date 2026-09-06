@@ -11,6 +11,16 @@
 
     <title>ASLENIX | Add Employee</title>
 
+    <!-- NEPALI DATE PICKER -->
+
+    <link
+            rel="stylesheet"
+            href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
+
+    <script
+            src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js">
+    </script>
+
     <style>
 
         * {
@@ -67,7 +77,7 @@
             border-radius: 14px;
 
             box-shadow:
-                0 5px 20px rgba(0, 0, 0, 0.08);
+                    0 5px 20px rgba(0, 0, 0, 0.08);
         }
 
         h1 {
@@ -417,17 +427,38 @@
                 </div>
 
 
+                <!-- ========================= -->
+                <!-- JOINING DATE - NEPALI BS -->
+                <!-- ========================= -->
+
                 <div class="form-group">
 
-                    <label for="joiningDate">
+                    <label for="joiningDateBs">
                         Joining Date
                     </label>
 
+                    <!--
+                        USER SELECTS NEPALI BS DATE HERE
+                    -->
+
                     <input
-                            type="date"
-                            id="joiningDate"
-                            th:field="*{joiningDate}"
+                            type="text"
+                            id="joiningDateBs"
+                            placeholder="Select Nepali Date"
+                            autocomplete="off"
                             required>
+
+
+                    <!--
+                        THIS HIDDEN INPUT SENDS
+                        THE CONVERTED AD DATE
+                        TO SPRING BOOT
+                    -->
+
+                    <input
+                            type="hidden"
+                            id="joiningDate"
+                            th:field="*{joiningDate}">
 
                 </div>
 
@@ -549,6 +580,510 @@
     </div>
 
 </main>
+
+
+<!-- ========================= -->
+<!-- NEPALI DATE CONVERSION -->
+<!-- ========================= -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const nepaliDateInput =
+            document.getElementById("joiningDateBs");
+
+        const actualDateInput =
+            document.getElementById("joiningDate");
+
+
+        /*
+         * =========================================================
+         * NEPALI BS DATE PICKER
+         * =========================================================
+         *
+         * Calendar remains Bikram Sambat.
+         *
+         * We only change the DISPLAY:
+         *
+         * Nepali:
+         *   भाद्र २०८३
+         *   आइत सोम मंगल बुध बिहि शुक्र शनि
+         *
+         * English:
+         *   Bhadra 2083
+         *   Sun Mon Tue Wed Thu Fri Sat
+         *
+         * The actual selected date is still BS.
+         */
+
+
+        /*
+         * Initialize the Nepali Date Picker.
+         */
+
+        nepaliDateInput.nepaliDatePicker({
+
+            ndpYear: true,
+
+            ndpMonth: true,
+
+            ndpYearCount: 100
+
+        });
+
+
+        /*
+         * =========================================================
+         * NEPALI NUMBER -> ENGLISH NUMBER
+         * =========================================================
+         */
+
+        function convertNepaliNumbersToEnglish(value) {
+
+            if (!value) {
+                return value;
+            }
+
+            const nepaliNumbers =
+                "०१२३४५६७८९";
+
+            const englishNumbers =
+                "0123456789";
+
+            return value.replace(/[०-९]/g, function (character) {
+
+                const index =
+                    nepaliNumbers.indexOf(character);
+
+                return index >= 0
+                    ? englishNumbers[index]
+                    : character;
+
+            });
+
+        }
+
+
+        /*
+         * =========================================================
+         * BS DATE -> AD DATE
+         * =========================================================
+         */
+
+        function convertBsToAd(bsDate) {
+
+            if (!bsDate) {
+
+                actualDateInput.value = "";
+
+                return;
+
+            }
+
+
+            try {
+
+                /*
+                 * Make sure BS date contains English digits.
+                 */
+
+                bsDate =
+                    convertNepaliNumbersToEnglish(bsDate);
+
+
+                /*
+                 * Convert BS -> AD.
+                 */
+
+                const adDate =
+                    NepaliFunctions.BS2AD(bsDate);
+
+
+                if (!adDate) {
+
+                    actualDateInput.value = "";
+
+                    return;
+
+                }
+
+
+                /*
+                 * Format AD as YYYY-MM-DD.
+                 */
+
+                const year =
+                    String(adDate.year);
+
+                const month =
+                    String(adDate.month)
+                        .padStart(2, "0");
+
+                const day =
+                    String(adDate.day)
+                        .padStart(2, "0");
+
+
+                actualDateInput.value =
+                    year
+                    + "-"
+                    + month
+                    + "-"
+                    + day;
+
+
+            } catch (error) {
+
+                console.error(
+                    "BS to AD conversion error:",
+                    error
+                );
+
+                actualDateInput.value = "";
+
+            }
+
+        }
+
+
+        /*
+         * =========================================================
+         * SELECTED DATE
+         * =========================================================
+         */
+
+        nepaliDateInput.addEventListener(
+            "change",
+            function () {
+
+                let bsDate =
+                    nepaliDateInput.value.trim();
+
+
+                if (!bsDate) {
+
+                    actualDateInput.value = "";
+
+                    return;
+
+                }
+
+
+                /*
+                 * Convert displayed Nepali digits
+                 * into English digits.
+                 */
+
+                bsDate =
+                    convertNepaliNumbersToEnglish(bsDate);
+
+
+                /*
+                 * Keep visible field as BS.
+                 *
+                 * Example:
+                 *
+                 * 2083-05-10
+                 */
+
+                nepaliDateInput.value = bsDate;
+
+
+                /*
+                 * Save AD date into hidden field.
+                 */
+
+                convertBsToAd(bsDate);
+
+
+                console.log(
+                    "Selected BS:",
+                    bsDate
+                );
+
+                console.log(
+                    "AD sent to Spring Boot:",
+                    actualDateInput.value
+                );
+
+            }
+        );
+
+
+        /*
+         * =========================================================
+         * TRANSLATE PICKER DISPLAY
+         * =========================================================
+         *
+         * The v5.0.6 library itself does not expose a language
+         * option for the picker UI.
+         *
+         * Therefore we observe the picker DOM and replace the
+         * Nepali labels/numbers with English equivalents.
+         */
+
+
+        const nepaliMonths = {
+
+            "बैशाख": "Baisakh",
+            "जेठ": "Jestha",
+            "असार": "Asar",
+            "श्रावण": "Shrawan",
+            "भाद्र": "Bhadra",
+            "आश्विन": "Ashwin",
+            "कार्तिक": "Kartik",
+            "मंसिर": "Mangsir",
+            "पौष": "Poush",
+            "माघ": "Magh",
+            "फाल्गुण": "Falgun",
+            "चैत्र": "Chaitra",
+
+            /*
+             * Some versions use these spellings.
+             */
+
+            "बैशाख": "Baisakh",
+            "जेठ": "Jestha",
+            "आषाढ": "Asar",
+            "श्रावण": "Shrawan",
+            "भाद्र": "Bhadra",
+            "आश्विन": "Ashwin",
+            "कार्तिक": "Kartik",
+            "मंसिर": "Mangsir",
+            "पौष": "Poush",
+            "माघ": "Magh",
+            "फाल्गुन": "Falgun",
+            "चैत्र": "Chaitra"
+
+        };
+
+
+        const nepaliDays = {
+
+            "आइत": "Sun",
+            "सोम": "Mon",
+            "मंगल": "Tue",
+            "बुध": "Wed",
+            "बिहि": "Thu",
+            "शुक्र": "Fri",
+            "शनि": "Sat",
+
+            "आइतबार": "Sunday",
+            "सोमबार": "Monday",
+            "मंगलबार": "Tuesday",
+            "बुधबार": "Wednesday",
+            "बिहिबार": "Thursday",
+            "बिहीबार": "Thursday",
+            "शुक्रबार": "Friday",
+            "शनिबार": "Saturday"
+
+        };
+
+
+        /*
+         * Replace Nepali text and Nepali numbers
+         * inside the date picker.
+         */
+
+        function translateDatePicker(root) {
+
+            if (!root) {
+                return;
+            }
+
+
+            /*
+             * Walk through all text nodes.
+             */
+
+            const walker =
+                document.createTreeWalker(
+                    root,
+                    NodeFilter.SHOW_TEXT
+                );
+
+
+            const textNodes = [];
+
+            let currentNode;
+
+
+            while (
+                currentNode =
+                walker.nextNode()
+            ) {
+
+                textNodes.push(currentNode);
+
+            }
+
+
+            textNodes.forEach(function (node) {
+
+                let text =
+                    node.nodeValue;
+
+
+                /*
+                 * Translate months.
+                 */
+
+                Object.keys(nepaliMonths).forEach(
+                    function (nepali) {
+
+                        text =
+                            text.replace(
+                                new RegExp(
+                                    nepali,
+                                    "g"
+                                ),
+                                nepaliMonths[nepali]
+                            );
+
+                    }
+                );
+
+
+                /*
+                 * Translate weekdays.
+                 */
+
+                Object.keys(nepaliDays).forEach(
+                    function (nepali) {
+
+                        text =
+                            text.replace(
+                                new RegExp(
+                                    nepali,
+                                    "g"
+                                ),
+                                nepaliDays[nepali]
+                            );
+
+                    }
+                );
+
+
+                /*
+                 * Translate Nepali numerals.
+                 */
+
+                text =
+                    convertNepaliNumbersToEnglish(
+                        text
+                    );
+
+
+                node.nodeValue = text;
+
+            });
+
+        }
+
+
+        /*
+         * =========================================================
+         * OBSERVE DATE PICKER
+         * =========================================================
+         *
+         * The picker is dynamically created when the input is
+         * clicked. MutationObserver catches it immediately.
+         */
+
+        const observer =
+            new MutationObserver(function (mutations) {
+
+                mutations.forEach(function (mutation) {
+
+                    mutation.addedNodes.forEach(
+                        function (node) {
+
+                            if (
+                                node.nodeType ===
+                                Node.ELEMENT_NODE
+                            ) {
+
+                                translateDatePicker(node);
+
+                            }
+
+                        }
+                    );
+
+                });
+
+
+                /*
+                 * Also translate the complete document
+                 * after picker changes.
+                 */
+
+                translateDatePicker(document.body);
+
+            });
+
+
+        observer.observe(
+            document.body,
+            {
+                childList: true,
+                subtree: true
+            }
+        );
+
+
+        /*
+         * Also translate when the input is clicked.
+         */
+
+        nepaliDateInput.addEventListener(
+            "click",
+            function () {
+
+                setTimeout(function () {
+
+                    translateDatePicker(
+                        document.body
+                    );
+
+                }, 10);
+
+
+                setTimeout(function () {
+
+                    translateDatePicker(
+                        document.body
+                    );
+
+                }, 100);
+
+            }
+        );
+
+
+        /*
+         * Also translate when the input receives focus.
+         */
+
+        nepaliDateInput.addEventListener(
+            "focus",
+            function () {
+
+                setTimeout(function () {
+
+                    translateDatePicker(
+                        document.body
+                    );
+
+                }, 50);
+
+            }
+        );
+
+    });
+
+</script>
 
 </body>
 

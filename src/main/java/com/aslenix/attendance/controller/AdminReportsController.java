@@ -27,49 +27,86 @@ public class AdminReportsController {
 
         LocalDate today = LocalDate.now();
 
-        // Get all attendance records
+        /*
+         * =========================================================
+         * GET ALL ATTENDANCE RECORDS
+         * =========================================================
+         */
         List<Attendance> attendanceRecords =
                 attendanceRepository.findAll();
 
-        // Total attendance records
+        /*
+         * =========================================================
+         * TOTAL RECORDS
+         * =========================================================
+         */
         long totalRecords =
                 attendanceRecords.size();
 
-        // Present
+        /*
+         * =========================================================
+         * PRESENT
+         *
+         * A normal present record has status PRESENT.
+         * =========================================================
+         */
         long presentCount =
                 attendanceRecords.stream()
                         .filter(a ->
-                                "PRESENT".equals(a.getStatus()))
+                                "PRESENT".equalsIgnoreCase(
+                                        a.getStatus()
+                                ))
                         .count();
 
-        // Late
+        /*
+         * =========================================================
+         * LATE
+         * =========================================================
+         */
         long lateCount =
                 attendanceRecords.stream()
                         .filter(Attendance::isLate)
                         .count();
 
-        // Early leave
+        /*
+         * =========================================================
+         * EARLY LEAVE
+         * =========================================================
+         */
         long earlyLeaveCount =
                 attendanceRecords.stream()
                         .filter(Attendance::isEarlyLeave)
                         .count();
 
-        // Half day
+        /*
+         * =========================================================
+         * HALF DAY
+         * =========================================================
+         */
         long halfDayCount =
                 attendanceRecords.stream()
                         .filter(Attendance::isHalfDay)
                         .count();
 
-        // Today's attendance records
+        /*
+         * =========================================================
+         * TODAY'S RECORDS
+         * =========================================================
+         */
         long todayCount =
                 attendanceRecords.stream()
                         .filter(a ->
-                                today.equals(
+                                a.getAttendanceDate() != null
+                                        && today.equals(
                                         a.getAttendanceDate()
                                 ))
                         .count();
 
-        // Send data to Thymeleaf
+        /*
+         * =========================================================
+         * SEND DATA TO THYMELEAF
+         * =========================================================
+         */
         model.addAttribute(
                 "attendanceRecords",
                 attendanceRecords

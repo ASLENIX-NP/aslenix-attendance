@@ -25,4 +25,20 @@ public interface AttendanceRepository
             LocalDate startDate,
             LocalDate endDate
     );
+
+    // ============================================================
+    // ADMIN DASHBOARD / ADMIN ATTENDANCE
+    // ============================================================
+
+    List<Attendance> findByAttendanceDate(
+            LocalDate attendanceDate
+    );
+
+    long countByAttendanceDate(
+            LocalDate attendanceDate
+    );
+
+    long countByAttendanceDateAndLateTrue(
+            LocalDate attendanceDate
+    );
 }
