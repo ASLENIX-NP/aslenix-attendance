@@ -67,28 +67,180 @@ public class EmployeeTaskController {
     // ============================================================
     // UPDATE PROGRESS
     // ============================================================
+    //
+    // FIXED: this used to return a view name / redirect
+    // ("redirect:/employee/tasks"), which sends back an HTML
+    // redirect response instead of JSON.
+    //
+    // tasks.html calls this via fetch() and then does
+    // `await response.json()` — parsing HTML as JSON throws,
+    // which is why the UI showed "Unable to save task progress"
+    // even though the database write itself was succeeding.
+    //
+    // Now mirrors the /move endpoint: @ResponseBody + JSON,
+    // with the same try/catch + status-code pattern.
+    // ============================================================
 
     @PostMapping("/{id}/progress")
-    public String updateProgress(
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateProgress(
             @PathVariable Long id,
             @RequestParam Integer progress,
             Authentication authentication) {
 
-        Employee employee =
-                getCurrentEmployee(authentication);
+        Map<String, Object> response =
+                new HashMap<>();
 
-        if (employee == null) {
+        try {
 
-            return "redirect:/login?employeeNotFound=true";
+            // ----------------------------------------------------
+            // GET CURRENT EMPLOYEE
+            // ----------------------------------------------------
+
+            Employee employee =
+                    getCurrentEmployee(authentication);
+
+            if (employee == null) {
+
+                response.put(
+                        "success",
+                        false
+                );
+
+                response.put(
+                        "message",
+                        "Employee not found."
+                );
+
+                return ResponseEntity
+                        .status(401)
+                        .body(response);
+            }
+
+
+            // ----------------------------------------------------
+            // VALIDATE RANGE
+            // ----------------------------------------------------
+
+            if (progress == null
+                    || progress < 0
+                    || progress > 100) {
+
+                response.put(
+                        "success",
+                        false
+                );
+
+                response.put(
+                        "message",
+                        "Progress must be between 0 and 100."
+                );
+
+                return ResponseEntity
+                        .badRequest()
+                        .body(response);
+            }
+
+
+            // ----------------------------------------------------
+            // SAVE PROGRESS
+            // ----------------------------------------------------
+            //
+            // NOTE: this assumes taskService.updateProgress(...)
+            // returns the updated Task, mirroring how
+            // taskService.moveTask(...) works below. If your
+            // TaskService method currently returns void, change it
+            // to `return taskRepository.save(task);` at the end,
+            // or tell me and I'll adjust this controller to match.
+
+            Task task =
+                    taskService.updateProgress(
+                            id,
+                            employee,
+                            progress
+                    );
+
+
+            // ----------------------------------------------------
+            // SUCCESS RESPONSE
+            // ----------------------------------------------------
+
+            response.put(
+                    "success",
+                    true
+            );
+
+            response.put(
+                    "message",
+                    "Progress saved."
+            );
+
+            response.put(
+                    "progress",
+                    task.getProgress()
+            );
+
+            response.put(
+                    "status",
+                    task.getStatus()
+            );
+
+            return ResponseEntity
+                    .ok(response);
+
+
+        } catch (SecurityException e) {
+
+            response.put(
+                    "success",
+                    false
+            );
+
+            response.put(
+                    "message",
+                    e.getMessage()
+            );
+
+            return ResponseEntity
+                    .status(403)
+                    .body(response);
+
+
+        } catch (
+                IllegalArgumentException |
+                IllegalStateException e) {
+
+            response.put(
+                    "success",
+                    false
+            );
+
+            response.put(
+                    "message",
+                    e.getMessage()
+            );
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(response);
+
+
+        } catch (Exception e) {
+
+            response.put(
+                    "success",
+                    false
+            );
+
+            response.put(
+                    "message",
+                    "Unable to save task progress."
+            );
+
+            return ResponseEntity
+                    .status(500)
+                    .body(response);
         }
-
-        taskService.updateProgress(
-                id,
-                employee,
-                progress
-        );
-
-        return "redirect:/employee/tasks";
     }
 
 
@@ -136,6 +288,12 @@ public class EmployeeTaskController {
     // status=READY_FOR_REVIEW
     //
     // APPROVED is never allowed for employees.
+    //
+    // IMPORTANT: taskService.moveTask() must only ever change
+    // task.status. It must NOT set task.progress to 0/1/20/100
+    // etc. based on the target status — progress is only ever
+    // written by updateProgress() above, from the employee's
+    // manual slider input.
     // ============================================================
 
     @PostMapping("/{id}/move")

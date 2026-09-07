@@ -932,6 +932,58 @@
     }
 
     /* =====================================================
+       MANUAL TASK PROGRESS SLIDER
+       (employee-controlled, independent of status)
+    ====================================================== */
+
+    /*
+     * The progress area is its own zone: normal cursor,
+     * not the card's "grab" cursor, so it visually reads
+     * as slide-only, not drag-only.
+     */
+
+    .progress-area {
+        cursor: default;
+    }
+
+    .progress-slider {
+        width: 100%;
+        margin: 10px 0 8px;
+        cursor: pointer;
+        accent-color: #2563eb;
+    }
+
+    .progress-slider::-webkit-slider-runnable-track {
+        height: 6px;
+        border-radius: 10px;
+    }
+
+    .progress-slider::-webkit-slider-thumb {
+        cursor: pointer;
+    }
+
+    .progress-slider::-moz-range-thumb {
+        cursor: pointer;
+    }
+
+    .progress-saved-tag {
+        margin-left: 8px;
+
+        color: #16a34a;
+
+        font-size: 9px;
+        font-weight: 800;
+
+        opacity: 0;
+
+        transition: opacity .2s ease;
+    }
+
+    .progress-saved-tag.show {
+        opacity: 1;
+    }
+
+    /* =====================================================
        COMPLETION NOTE
     ====================================================== */
 
@@ -1558,7 +1610,7 @@
         </h1>
 
         <p class="description">
-            Drag and drop your tasks to update their workflow.
+            Drag and drop your tasks to update their workflow. Use the slider on each card to update your own progress.
         </p>
 
     </div>
@@ -1661,7 +1713,15 @@
                 </div>
 
 
-                <div class="progress-area">
+                <!-- =====================================================
+                     PROGRESS (employee-controlled, independent of status)
+                     draggable="false" here so grabbing the slider
+                     never starts a card drag — only the top of the
+                     card (down to the due-date chip) is draggable.
+                ====================================================== -->
+
+                <div class="progress-area"
+                     draggable="false">
 
                     <div class="progress-header">
 
@@ -1669,16 +1729,37 @@
                             Progress
                         </span>
 
-                        <span class="progress-number"
-                              th:text="${task.progress + '%'}">
-                            0%
+                        <span>
+                            <span class="progress-number"
+                                  th:id="'progress-number-' + ${task.id}"
+                                  th:text="${task.progress + '%'}">
+                                0%
+                            </span>
+                            <span class="progress-saved-tag"
+                                  th:id="'progress-saved-' + ${task.id}">
+                                Saved
+                            </span>
                         </span>
 
                     </div>
 
+                    <input type="range"
+                           class="progress-slider"
+                           draggable="false"
+                           min="0"
+                           max="100"
+                           step="1"
+                           th:id="'progress-slider-' + ${task.id}"
+                           th:value="${task.progress}"
+                           th:attr="data-task-id=${task.id}"
+                           oninput="updateProgressDisplay(this)"
+                           onchange="saveTaskProgress(this)">
+
                     <div class="progress-track">
 
                         <div class="progress-fill"
+                             th:id="'progress-fill-' + ${task.id}"
+                             th:classappend="${task.progress >= 100} ? ' complete' : ''"
                              th:style="'width:' + ${task.progress} + '%'">
                         </div>
 
@@ -1778,7 +1859,15 @@
                 </div>
 
 
-                <div class="progress-area">
+                <!-- =====================================================
+                     PROGRESS (employee-controlled, independent of status)
+                     draggable="false" here so grabbing the slider
+                     never starts a card drag — only the top of the
+                     card (down to the due-date chip) is draggable.
+                ====================================================== -->
+
+                <div class="progress-area"
+                     draggable="false">
 
                     <div class="progress-header">
 
@@ -1786,16 +1875,37 @@
                             Progress
                         </span>
 
-                        <span class="progress-number"
-                              th:text="${task.progress + '%'}">
-                            50%
+                        <span>
+                            <span class="progress-number"
+                                  th:id="'progress-number-' + ${task.id}"
+                                  th:text="${task.progress + '%'}">
+                                50%
+                            </span>
+                            <span class="progress-saved-tag"
+                                  th:id="'progress-saved-' + ${task.id}">
+                                Saved
+                            </span>
                         </span>
 
                     </div>
 
+                    <input type="range"
+                           class="progress-slider"
+                           draggable="false"
+                           min="0"
+                           max="100"
+                           step="1"
+                           th:id="'progress-slider-' + ${task.id}"
+                           th:value="${task.progress}"
+                           th:attr="data-task-id=${task.id}"
+                           oninput="updateProgressDisplay(this)"
+                           onchange="saveTaskProgress(this)">
+
                     <div class="progress-track">
 
                         <div class="progress-fill"
+                             th:id="'progress-fill-' + ${task.id}"
+                             th:classappend="${task.progress >= 100} ? ' complete' : ''"
                              th:style="'width:' + ${task.progress} + '%'">
                         </div>
 
@@ -1895,7 +2005,16 @@
                 </div>
 
 
-                <div class="progress-area">
+                <!-- =====================================================
+                     PROGRESS — no longer hard-coded to 100%.
+                     Employee can still adjust it here too.
+                     draggable="false" here so grabbing the slider
+                     never starts a card drag — only the top of the
+                     card (down to the due-date chip) is draggable.
+                ====================================================== -->
+
+                <div class="progress-area"
+                     draggable="false">
 
                     <div class="progress-header">
 
@@ -1903,17 +2022,38 @@
                             Progress
                         </span>
 
-                        <span class="progress-number"
-                              style="color:#16a34a">
-                            100%
+                        <span>
+                            <span class="progress-number"
+                                  th:id="'progress-number-' + ${task.id}"
+                                  th:text="${task.progress + '%'}">
+                                0%
+                            </span>
+                            <span class="progress-saved-tag"
+                                  th:id="'progress-saved-' + ${task.id}">
+                                Saved
+                            </span>
                         </span>
 
                     </div>
 
+                    <input type="range"
+                           class="progress-slider"
+                           draggable="false"
+                           min="0"
+                           max="100"
+                           step="1"
+                           th:id="'progress-slider-' + ${task.id}"
+                           th:value="${task.progress}"
+                           th:attr="data-task-id=${task.id}"
+                           oninput="updateProgressDisplay(this)"
+                           onchange="saveTaskProgress(this)">
+
                     <div class="progress-track">
 
-                        <div class="progress-fill complete"
-                             style="width:100%">
+                        <div class="progress-fill"
+                             th:id="'progress-fill-' + ${task.id}"
+                             th:classappend="${task.progress >= 100} ? ' complete' : ''"
+                             th:style="'width:' + ${task.progress} + '%'">
                         </div>
 
                     </div>
@@ -2024,6 +2164,11 @@
                 </p>
 
 
+                <!-- =====================================================
+                     PROGRESS — read-only, shows the actual saved value
+                     (no slider: approved tasks are locked).
+                ====================================================== -->
+
                 <div class="progress-area">
 
                     <div class="progress-header">
@@ -2033,6 +2178,7 @@
                         </span>
 
                         <span class="progress-number"
+                              th:text="${task.progress + '%'}"
                               style="color:#16a34a">
                             100%
                         </span>
@@ -2041,8 +2187,9 @@
 
                     <div class="progress-track">
 
-                        <div class="progress-fill complete"
-                             style="width:100%">
+                        <div class="progress-fill"
+                             th:classappend="${task.progress >= 100} ? ' complete' : ''"
+                             th:style="'width:' + ${task.progress} + '%'">
                         </div>
 
                     </div>
@@ -2164,6 +2311,24 @@
         card.addEventListener(
             'dragstart',
             function(event) {
+
+                /*
+                 * If the drag was started from inside the
+                 * progress area (the slider), block it —
+                 * that zone is for sliding progress only,
+                 * never for moving the card between columns.
+                 */
+
+                if (
+                    event.target.closest(
+                        '.progress-area'
+                    )
+                ) {
+
+                    event.preventDefault();
+
+                    return;
+                }
 
                 draggedCard = this;
 
@@ -2326,6 +2491,10 @@
 
                 /*
                  * Move visually first.
+                 * NOTE: this only changes STATUS.
+                 * Progress is never touched here —
+                 * it is only ever set by the slider
+                 * via saveTaskProgress().
                  */
 
                 const previousParent =
@@ -2346,7 +2515,7 @@
 
 
                 /*
-                 * Save to backend.
+                 * Save status to backend.
                  */
 
                 try {
@@ -2379,21 +2548,10 @@
                     }
 
 
-                    /*
-                     * Backend may normalize
-                     * the progress.
-                     */
-
-                    updateCardProgress(
-                        draggedCard,
-                        result.progress
-                    );
-
-
                     updateCounts();
 
                     showToast(
-                        'Task moved successfully.'
+                        'Task moved successfully. Progress unchanged.'
                     );
 
 
@@ -2431,7 +2589,7 @@
 
 
     /* =========================================================
-       MOVE TASK
+       MOVE TASK (STATUS ONLY — never touches progress)
     ========================================================= */
 
     async function moveTask(
@@ -2480,58 +2638,106 @@
 
 
     /* =========================================================
-       UPDATE CARD PROGRESS
+       MANUAL EMPLOYEE PROGRESS — LIVE DISPLAY WHILE DRAGGING
     ========================================================= */
 
-    function updateCardProgress(
-        card,
-        progress
-    ) {
+    function updateProgressDisplay(slider) {
 
-        if (
-            progress === null ||
-            progress === undefined
-        ) {
+        const taskId = slider.dataset.taskId;
+        const progress = parseInt(slider.value, 10);
 
+        const number = document.getElementById(
+            'progress-number-' + taskId
+        );
+
+        const fill = document.getElementById(
+            'progress-fill-' + taskId
+        );
+
+        if (number) {
+            number.textContent = progress + '%';
+        }
+
+        if (fill) {
+            fill.style.width = progress + '%';
+
+            if (progress >= 100) {
+                fill.classList.add('complete');
+            } else {
+                fill.classList.remove('complete');
+            }
+        }
+    }
+
+
+    /* =========================================================
+       MANUAL EMPLOYEE PROGRESS — SAVE TO BACKEND
+       This is the ONLY place progress is ever written.
+    ========================================================= */
+
+    async function saveTaskProgress(slider) {
+
+        const taskId = slider.dataset.taskId;
+        const progress = parseInt(slider.value, 10);
+
+        if (isNaN(progress)) {
             return;
         }
 
+        const headers = {
+            'Content-Type':
+                'application/x-www-form-urlencoded'
+        };
 
-        const number =
-            card.querySelector(
-                '.progress-number'
-            );
-
-        const fill =
-            card.querySelector(
-                '.progress-fill'
-            );
-
-
-        if (number) {
-
-            number.textContent =
-                progress + '%';
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
         }
 
+        try {
 
-        if (fill) {
+            const response = await fetch(
+                '/employee/tasks/' + taskId + '/progress',
+                {
+                    method: 'POST',
+                    headers: headers,
+                    body: 'progress=' + encodeURIComponent(progress)
+                }
+            );
 
-            fill.style.width =
-                progress + '%';
-
-            if (progress >= 100) {
-
-                fill.classList.add(
-                    'complete'
-                );
-
-            } else {
-
-                fill.classList.remove(
-                    'complete'
-                );
+            if (!response.ok) {
+                throw new Error('Failed to save progress');
             }
+
+            const result = await response.json();
+
+            if (result && result.success === false) {
+                showToast(
+                    result.message || 'Unable to save progress.',
+                    true
+                );
+                return;
+            }
+
+            updateProgressDisplay(slider);
+
+            const savedTag = document.getElementById(
+                'progress-saved-' + taskId
+            );
+
+            if (savedTag) {
+                savedTag.classList.add('show');
+                setTimeout(() => {
+                    savedTag.classList.remove('show');
+                }, 1500);
+            }
+
+            showToast('Progress saved: ' + progress + '%');
+
+        } catch (error) {
+
+            console.error('Progress update failed:', error);
+
+            showToast('Unable to save task progress.', true);
         }
     }
 
@@ -2679,6 +2885,30 @@
                 2500
             );
     }
+
+
+    /* =========================================================
+       PREVENT SLIDER INTERACTION FROM TRIGGERING CARD DRAG
+       Belt-and-suspenders alongside draggable="false" and the
+       dragstart guard above — stops the mouse/touch gesture on
+       the slider from ever being read as "drag the card".
+    ========================================================= */
+
+    document
+        .querySelectorAll('.progress-slider')
+        .forEach(slider => {
+
+            slider.addEventListener(
+                'mousedown',
+                event => event.stopPropagation()
+            );
+
+            slider.addEventListener(
+                'touchstart',
+                event => event.stopPropagation(),
+                { passive: true }
+            );
+        });
 
 
     /* =========================================================
