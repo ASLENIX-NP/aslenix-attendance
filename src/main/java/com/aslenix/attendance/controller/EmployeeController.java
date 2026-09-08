@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin/employees")
@@ -78,34 +79,49 @@ public class EmployeeController {
             @RequestParam String password,
             @RequestParam Long departmentId) {
 
-        // Check employee code
-        if (employeeRepository.existsByEmployeeCode(
-                employee.getEmployeeCode())) {
+        // =========================================================
+        // CHECK USERNAME
+        // =========================================================
 
-            return "redirect:/admin/employees/add?error=code";
-        }
-
-        // Check username
         if (userRepository.existsByUsername(username)) {
 
             return "redirect:/admin/employees/add?error=username";
         }
 
-        // Check email
-        if (employeeRepository.findAll()
-                .stream()
-                .anyMatch(e -> e.getEmail()
-                        .equalsIgnoreCase(employee.getEmail()))) {
+        // =========================================================
+        // CHECK EMAIL
+        // =========================================================
+
+        if (employee.getEmail() != null
+                && employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
 
             return "redirect:/admin/employees/add?error=email";
         }
 
-        // Find department
+        // =========================================================
+        // FIND DEPARTMENT
+        // =========================================================
+
         Department department = departmentRepository
                 .findById(departmentId)
                 .orElseThrow();
 
-        // Create employee user account
+        // =========================================================
+        // AUTOMATICALLY GENERATE UNIQUE EMPLOYEE CODE
+        // =========================================================
+
+        employee.setEmployeeCode(generateEmployeeCode());
+
+        // =========================================================
+        // AUTOMATICALLY GENERATE UNIQUE QR TOKEN
+        // =========================================================
+
+        employee.setQrToken(generateQrToken());
+
+        // =========================================================
+        // CREATE EMPLOYEE USER ACCOUNT
+        // =========================================================
+
         User user = new User();
 
         user.setUsername(username);
@@ -118,22 +134,79 @@ public class EmployeeController {
 
         userRepository.save(user);
 
-        // Connect employee with user
+        // =========================================================
+        // CONNECT EMPLOYEE WITH USER
+        // =========================================================
+
         employee.setUser(user);
 
-        // Connect employee with department
+        // =========================================================
+        // CONNECT EMPLOYEE WITH DEPARTMENT
+        // =========================================================
+
         employee.setDepartment(department);
 
-        // Set joining date if empty
+        // =========================================================
+        // SET JOINING DATE
+        // =========================================================
+
         if (employee.getJoiningDate() == null) {
             employee.setJoiningDate(LocalDate.now());
         }
 
+        // =========================================================
+        // ENABLE EMPLOYEE
+        // =========================================================
+
         employee.setEnabled(true);
+
+        // =========================================================
+        // SAVE EMPLOYEE
+        // =========================================================
 
         employeeRepository.save(employee);
 
         return "redirect:/admin/employees";
+    }
+
+    // ============================================================
+    // GENERATE UNIQUE EMPLOYEE CODE
+    // ============================================================
+
+    private String generateEmployeeCode() {
+
+        String employeeCode;
+
+        do {
+            employeeCode = "ASL-" +
+                    String.format(
+                            "%05d",
+                            (int) (Math.random() * 100000)
+                    );
+
+        } while (
+                employeeRepository.existsByEmployeeCode(employeeCode)
+        );
+
+        return employeeCode;
+    }
+
+    // ============================================================
+    // GENERATE UNIQUE QR TOKEN
+    // ============================================================
+
+    private String generateQrToken() {
+
+        String qrToken;
+
+        do {
+            qrToken = UUID.randomUUID().toString();
+
+        } while (
+                employeeRepository.findByQrToken(qrToken).isPresent()
+        );
+
+        return qrToken;
     }
 
     // =========================
@@ -173,13 +246,49 @@ public class EmployeeController {
                 .findById(id)
                 .orElseThrow();
 
-        existing.setEmployeeCode(
-                employee.getEmployeeCode()
-        );
+        // =========================================================
+        // EMPLOYEE CODE
+        // =========================================================
 
-        existing.setEmail(
-                employee.getEmail()
-        );
+        if (employee.getEmployeeCode() != null
+                && !employee.getEmployeeCode().equals(existing.getEmployeeCode())) {
+
+            if (employeeRepository.existsByEmployeeCode(
+                    employee.getEmployeeCode())) {
+
+                return "redirect:/admin/employees/edit/"
+                        + id
+                        + "?error=code";
+            }
+
+            existing.setEmployeeCode(
+                    employee.getEmployeeCode()
+            );
+        }
+
+        // =========================================================
+        // EMAIL
+        // =========================================================
+
+        if (employee.getEmail() != null
+                && !employee.getEmail().equalsIgnoreCase(existing.getEmail())) {
+
+            if (employeeRepository.findByEmail(
+                    employee.getEmail()).isPresent()) {
+
+                return "redirect:/admin/employees/edit/"
+                        + id
+                        + "?error=email";
+            }
+
+            existing.setEmail(
+                    employee.getEmail()
+            );
+        }
+
+        // =========================================================
+        // BASIC INFORMATION
+        // =========================================================
 
         existing.setFirstName(
                 employee.getFirstName()
@@ -201,11 +310,19 @@ public class EmployeeController {
                 employee.getJoiningDate()
         );
 
+        // =========================================================
+        // DEPARTMENT
+        // =========================================================
+
         Department department = departmentRepository
                 .findById(departmentId)
                 .orElseThrow();
 
         existing.setDepartment(department);
+
+        // =========================================================
+        // SAVE
+        // =========================================================
 
         employeeRepository.save(existing);
 
@@ -227,8 +344,12 @@ public class EmployeeController {
         employee.setEnabled(false);
 
         if (employee.getUser() != null) {
+
             employee.getUser().setEnabled(false);
-            userRepository.save(employee.getUser());
+
+            userRepository.save(
+                    employee.getUser()
+            );
         }
 
         employeeRepository.save(employee);
@@ -251,8 +372,12 @@ public class EmployeeController {
         employee.setEnabled(true);
 
         if (employee.getUser() != null) {
+
             employee.getUser().setEnabled(true);
-            userRepository.save(employee.getUser());
+
+            userRepository.save(
+                    employee.getUser()
+            );
         }
 
         employeeRepository.save(employee);

@@ -1,255 +1,390 @@
 <!DOCTYPE html>
+
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
-    <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
 
-    <title>ASLENIX | Add Employee</title>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-    <!-- NEPALI DATE PICKER -->
+<title>ASLENIX | Add Employee</title>
 
-    <link
-            rel="stylesheet"
-            href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
+<!-- =========================================================
+     NEPALI DATE PICKER
+========================================================== -->
 
-    <script
-            src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js">
-    </script>
+<link
+        rel="stylesheet"
+        href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
 
-    <style>
+<script
+        src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js">
+</script>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-        }
+<style>
 
-        header {
-            background: #0f172a;
-            color: white;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-            padding: 20px 40px;
 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        background: #f1f5f9;
+    }
 
-        .brand {
-            font-size: 24px;
-            font-weight: 800;
-        }
 
-        .back {
-            color: white;
-            text-decoration: none;
+    header {
+        background: #0f172a;
+        color: white;
 
-            background: #2563eb;
+        padding: 20px 40px;
 
-            padding: 10px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-            border-radius: 8px;
-        }
+
+    .brand {
+        font-size: 24px;
+        font-weight: 800;
+    }
+
+
+    .back {
+        color: white;
+        text-decoration: none;
+
+        background: #2563eb;
+
+        padding: 10px 18px;
+
+        border-radius: 8px;
+    }
+
+
+    .back:hover {
+        background: #1d4ed8;
+    }
+
+
+    main {
+        padding: 40px;
+    }
+
+
+    .container {
+        max-width: 750px;
+
+        margin: 0 auto;
+
+        background: white;
+
+        padding: 35px;
+
+        border-radius: 14px;
+
+        box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+
+    h1 {
+        color: #0f172a;
+
+        margin-bottom: 8px;
+    }
+
+
+    .subtitle {
+        color: #64748b;
+
+        margin-bottom: 30px;
+    }
+
+
+    .section-title {
+        margin-top: 25px;
+        margin-bottom: 18px;
+
+        padding-bottom: 8px;
+
+        border-bottom: 1px solid #e2e8f0;
+
+        color: #0f172a;
+
+        font-size: 18px;
+    }
+
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+
+    label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        font-weight: 700;
+
+        color: #334155;
+    }
+
+
+    input,
+    select {
+
+        width: 100%;
+
+        padding: 13px;
+
+        border: 1px solid #cbd5e1;
+
+        border-radius: 8px;
+
+        font-size: 15px;
+
+        outline: none;
+
+        background: white;
+    }
+
+
+    input:focus,
+    select:focus {
+
+        border-color: #2563eb;
+
+        box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+
+    .row {
+
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 18px;
+    }
+
+
+    /* =========================================================
+       AUTOMATIC EMPLOYEE ID INFORMATION
+    ========================================================== */
+
+    .employee-id-info {
+
+        background: #f0fdf4;
+
+        border: 1px solid #bbf7d0;
+
+        color: #166534;
+
+        padding: 14px 16px;
+
+        border-radius: 9px;
+
+        margin-bottom: 22px;
+
+        line-height: 1.5;
+
+        font-size: 14px;
+    }
+
+
+    .employee-id-info strong {
+        color: #15803d;
+    }
+
+
+    .employee-id-info .id-example {
+
+        display: inline-block;
+
+        margin-top: 5px;
+
+        font-family: monospace;
+
+        font-weight: 800;
+
+        color: #166534;
+
+        background: #dcfce7;
+
+        padding: 3px 7px;
+
+        border-radius: 5px;
+    }
+
+
+    /* =========================================================
+       QR INFORMATION
+    ========================================================== */
+
+    .qr-info {
+
+        background: #eff6ff;
+
+        border: 1px solid #bfdbfe;
+
+        color: #1d4ed8;
+
+        padding: 14px 16px;
+
+        border-radius: 9px;
+
+        margin-top: 10px;
+
+        margin-bottom: 22px;
+
+        font-size: 14px;
+
+        line-height: 1.5;
+    }
+
+
+    .qr-info strong {
+        color: #1e40af;
+    }
+
+
+    .buttons {
+
+        display: flex;
+
+        gap: 12px;
+
+        margin-top: 30px;
+    }
+
+
+    button {
+
+        border: none;
+
+        padding: 12px 20px;
+
+        border-radius: 8px;
+
+        font-size: 15px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+    }
+
+
+    .save {
+
+        background: #16a34a;
+
+        color: white;
+    }
+
+
+    .save:hover {
+
+        background: #15803d;
+    }
+
+
+    .cancel {
+
+        background: #e2e8f0;
+
+        color: #334155;
+
+        text-decoration: none;
+
+        padding: 12px 20px;
+
+        border-radius: 8px;
+
+        font-weight: 700;
+    }
+
+
+    .cancel:hover {
+        background: #cbd5e1;
+    }
+
+
+    .error {
+
+        background: #fee2e2;
+
+        color: #b91c1c;
+
+        padding: 12px;
+
+        border-radius: 8px;
+
+        margin-bottom: 20px;
+
+        text-align: center;
+    }
+
+
+    .info {
+
+        background: #eff6ff;
+
+        color: #1d4ed8;
+
+        padding: 12px;
+
+        border-radius: 8px;
+
+        margin-bottom: 20px;
+
+        font-size: 14px;
+
+        line-height: 1.5;
+    }
+
+
+    @media (max-width: 600px) {
 
         main {
-            padding: 40px;
+            padding: 20px;
         }
+
 
         .container {
-            max-width: 750px;
-
-            margin: 0 auto;
-
-            background: white;
-
-            padding: 35px;
-
-            border-radius: 14px;
-
-            box-shadow:
-                    0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
         }
 
-        h1 {
-            color: #0f172a;
-
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #64748b;
-
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            margin-top: 25px;
-            margin-bottom: 18px;
-
-            padding-bottom: 8px;
-
-            border-bottom: 1px solid #e2e8f0;
-
-            color: #0f172a;
-
-            font-size: 18px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-
-            margin-bottom: 7px;
-
-            font-weight: 700;
-
-            color: #334155;
-        }
-
-        input,
-        select {
-
-            width: 100%;
-
-            padding: 13px;
-
-            border: 1px solid #cbd5e1;
-
-            border-radius: 8px;
-
-            font-size: 15px;
-
-            outline: none;
-
-            background: white;
-        }
-
-        input:focus,
-        select:focus {
-
-            border-color: #2563eb;
-        }
 
         .row {
-
-            display: grid;
-
-            grid-template-columns: 1fr 1fr;
-
-            gap: 18px;
+            grid-template-columns: 1fr;
         }
 
-        .buttons {
 
-            display: flex;
-
-            gap: 12px;
-
-            margin-top: 30px;
+        header {
+            padding: 18px 20px;
         }
 
-        button {
 
-            border: none;
-
-            padding: 12px 20px;
-
-            border-radius: 8px;
-
-            font-size: 15px;
-
-            font-weight: 700;
-
-            cursor: pointer;
+        .brand {
+            font-size: 20px;
         }
 
-        .save {
+    }
 
-            background: #16a34a;
+</style>
 
-            color: white;
-        }
-
-        .save:hover {
-
-            background: #15803d;
-        }
-
-        .cancel {
-
-            background: #e2e8f0;
-
-            color: #334155;
-
-            text-decoration: none;
-
-            padding: 12px 20px;
-
-            border-radius: 8px;
-
-            font-weight: 700;
-        }
-
-        .error {
-
-            background: #fee2e2;
-
-            color: #b91c1c;
-
-            padding: 12px;
-
-            border-radius: 8px;
-
-            margin-bottom: 20px;
-
-            text-align: center;
-        }
-
-        .info {
-
-            background: #eff6ff;
-
-            color: #1d4ed8;
-
-            padding: 12px;
-
-            border-radius: 8px;
-
-            margin-bottom: 20px;
-
-            font-size: 14px;
-        }
-
-        @media (max-width: 600px) {
-
-            main {
-                padding: 20px;
-            }
-
-            .container {
-                padding: 25px;
-            }
-
-            .row {
-                grid-template-columns: 1fr;
-            }
-
-        }
-
-    </style>
 
 </head>
 
@@ -257,369 +392,435 @@
 
 <header>
 
-    <div class="brand">
-        ASLENIX ADMIN
-    </div>
 
-    <a href="/admin/employees"
-       class="back">
+<div class="brand">
+    ASLENIX ADMIN
+</div>
 
-        Employees
 
-    </a>
+<a href="/admin/employees"
+   class="back">
+
+    Employees
+
+</a>
+
 
 </header>
 
-
 <main>
 
-    <div class="container">
 
-        <h1>Add Employee</h1>
+<div class="container">
 
-        <p class="subtitle">
-            Create a new employee and their login account.
-        </p>
 
+    <h1>
+        Add Employee
+    </h1>
 
-        <!-- ERROR: EMPLOYEE CODE -->
 
-        <div
-                th:if="${param.error != null and param.error[0] == 'code'}"
-                class="error">
+    <p class="subtitle">
+        Create a new employee and their login account.
+    </p>
 
-            Employee code already exists.
 
-        </div>
+    <!-- =====================================================
+         ERROR: EMPLOYEE CODE
+         ===================================================== -->
 
+    <div
+            th:if="${param.error != null and param.error[0] == 'code'}"
+            class="error">
 
-        <!-- ERROR: USERNAME -->
-
-        <div
-                th:if="${param.error != null and param.error[0] == 'username'}"
-                class="error">
-
-            Username already exists.
-
-        </div>
-
-
-        <!-- ERROR: EMAIL -->
-
-        <div
-                th:if="${param.error != null and param.error[0] == 'email'}"
-                class="error">
-
-            Email already exists.
-
-        </div>
-
-
-        <div class="info">
-
-            The employee will receive an account with
-            <strong>EMPLOYEE</strong> access.
-
-        </div>
-
-
-        <form
-                th:action="@{/admin/employees/add}"
-                th:object="${employee}"
-                method="post">
-
-
-            <!-- ========================= -->
-            <!-- PERSONAL INFORMATION -->
-            <!-- ========================= -->
-
-            <div class="section-title">
-                Personal Information
-            </div>
-
-
-            <div class="row">
-
-                <div class="form-group">
-
-                    <label for="firstName">
-                        First Name
-                    </label>
-
-                    <input
-                            type="text"
-                            id="firstName"
-                            th:field="*{firstName}"
-                            placeholder="Enter first name"
-                            required>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="lastName">
-                        Last Name
-                    </label>
-
-                    <input
-                            type="text"
-                            id="lastName"
-                            th:field="*{lastName}"
-                            placeholder="Enter last name"
-                            required>
-
-                </div>
-
-            </div>
-
-
-            <div class="row">
-
-                <div class="form-group">
-
-                    <label for="employeeCode">
-                        Employee Code
-                    </label>
-
-                    <input
-                            type="text"
-                            id="employeeCode"
-                            th:field="*{employeeCode}"
-                            placeholder="e.g. ASL-0001"
-                            required>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="phone">
-                        Phone
-                    </label>
-
-                    <input
-                            type="text"
-                            id="phone"
-                            th:field="*{phone}"
-                            placeholder="Enter phone number">
-
-                </div>
-
-            </div>
-
-
-            <div class="row">
-
-                <div class="form-group">
-
-                    <label for="email">
-                        Email
-                    </label>
-
-                    <input
-                            type="email"
-                            id="email"
-                            th:field="*{email}"
-                            placeholder="employee@example.com"
-                            required>
-
-                </div>
-
-
-                <!-- ========================= -->
-                <!-- JOINING DATE - NEPALI BS -->
-                <!-- ========================= -->
-
-                <div class="form-group">
-
-                    <label for="joiningDateBs">
-                        Joining Date
-                    </label>
-
-                    <!--
-                        USER SELECTS NEPALI BS DATE HERE
-                    -->
-
-                    <input
-                            type="text"
-                            id="joiningDateBs"
-                            placeholder="Select Nepali Date"
-                            autocomplete="off"
-                            required>
-
-
-                    <!--
-                        THIS HIDDEN INPUT SENDS
-                        THE CONVERTED AD DATE
-                        TO SPRING BOOT
-                    -->
-
-                    <input
-                            type="hidden"
-                            id="joiningDate"
-                            th:field="*{joiningDate}">
-
-                </div>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="position">
-                    Position
-                </label>
-
-                <input
-                        type="text"
-                        id="position"
-                        th:field="*{position}"
-                        placeholder="e.g. Backend Developer"
-                        required>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="departmentId">
-                    Department
-                </label>
-
-                <select
-                        id="departmentId"
-                        name="departmentId"
-                        required>
-
-                    <option value="">
-                        Select Department
-                    </option>
-
-                    <option
-                            th:each="department : ${departments}"
-                            th:value="${department.id}"
-                            th:text="${department.name}">
-
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- ========================= -->
-            <!-- LOGIN INFORMATION -->
-            <!-- ========================= -->
-
-            <div class="section-title">
-                Login Information
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="username">
-                    Username
-                </label>
-
-                <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Enter login username"
-                        required>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="password">
-                    Temporary Password
-                </label>
-
-                <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter temporary password"
-                        minlength="6"
-                        required>
-
-            </div>
-
-
-            <!-- ========================= -->
-            <!-- BUTTONS -->
-            <!-- ========================= -->
-
-            <div class="buttons">
-
-                <button
-                        type="submit"
-                        class="save">
-
-                    Save Employee
-
-                </button>
-
-
-                <a
-                        href="/admin/employees"
-                        class="cancel">
-
-                    Cancel
-
-                </a>
-
-            </div>
-
-        </form>
+        Employee code already exists.
 
     </div>
 
+
+    <!-- =====================================================
+         ERROR: USERNAME
+         ===================================================== -->
+
+    <div
+            th:if="${param.error != null and param.error[0] == 'username'}"
+            class="error">
+
+        Username already exists.
+
+    </div>
+
+
+    <!-- =====================================================
+         ERROR: EMAIL
+         ===================================================== -->
+
+    <div
+            th:if="${param.error != null and param.error[0] == 'email'}"
+            class="error">
+
+        Email already exists.
+
+    </div>
+
+
+    <!-- =====================================================
+         ACCOUNT INFORMATION
+    ====================================================== -->
+
+    <div class="info">
+
+        The employee will receive an account with
+        <strong>EMPLOYEE</strong> access.
+
+    </div>
+
+
+    <!-- =====================================================
+         AUTOMATIC EMPLOYEE ID
+    ====================================================== -->
+
+    <div class="employee-id-info">
+
+        <strong>Employee ID & Code are generated automatically.</strong>
+
+        <br>
+
+        You do not need to enter an employee code.
+
+        <br>
+
+        After the employee is saved, the database-generated
+        employee ID will be used to create the employee's
+        unique employee code.
+
+        <br>
+
+        Example:
+
+        <span class="id-example">
+            Employee ID 25 → ASL-00025
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         QR INFORMATION
+    ====================================================== -->
+
+    <div class="qr-info">
+
+        <strong>Unique QR Code</strong>
+
+        <br>
+
+        A unique QR identity will be associated with this
+        employee after the employee is created.
+
+        The QR must identify this exact employee when their
+        ID card is scanned for attendance.
+
+    </div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+            th:action="@{/admin/employees/add}"
+            th:object="${employee}"
+            method="post">
+
+
+        <!-- =================================================
+             PERSONAL INFORMATION
+        ================================================== -->
+
+        <div class="section-title">
+            Personal Information
+        </div>
+
+
+        <!-- =================================================
+             FIRST + LAST NAME
+        ================================================== -->
+
+        <div class="row">
+
+
+            <div class="form-group">
+
+                <label for="firstName">
+                    First Name
+                </label>
+
+
+                <input
+                        type="text"
+                        id="firstName"
+                        th:field="*{firstName}"
+                        placeholder="Enter first name"
+                        required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="lastName">
+                    Last Name
+                </label>
+
+
+                <input
+                        type="text"
+                        id="lastName"
+                        th:field="*{lastName}"
+                        placeholder="Enter last name"
+                        required>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PHONE
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label for="phone">
+                Phone
+            </label>
+
+
+            <input
+                    type="text"
+                    id="phone"
+                    th:field="*{phone}"
+                    placeholder="Enter phone number">
+
+        </div>
+
+
+        <!-- =================================================
+             EMAIL + JOINING DATE
+        ================================================== -->
+
+        <div class="row">
+
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+
+                <input
+                        type="email"
+                        id="email"
+                        th:field="*{email}"
+                        placeholder="employee@example.com"
+                        required>
+
+            </div>
+
+
+            <!-- =============================================
+                 JOINING DATE - NEPALI BS
+            ============================================== -->
+
+            <div class="form-group">
+
+                <label for="joiningDateBs">
+                    Joining Date
+                </label>
+
+
+                <!--
+                    USER SELECTS NEPALI BS DATE HERE
+                -->
+
+                <input
+                        type="text"
+                        id="joiningDateBs"
+                        placeholder="Select Nepali Date"
+                        autocomplete="off"
+                        required>
+
+
+                <!--
+                    HIDDEN AD DATE SENT TO SPRING BOOT
+                -->
+
+                <input
+                        type="hidden"
+                        id="joiningDate"
+                        th:field="*{joiningDate}">
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             POSITION
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label for="position">
+                Position
+            </label>
+
+
+            <input
+                    type="text"
+                    id="position"
+                    th:field="*{position}"
+                    placeholder="e.g. Backend Developer"
+                    required>
+
+        </div>
+
+
+        <!-- =================================================
+             DEPARTMENT
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label for="departmentId">
+                Department
+            </label>
+
+
+            <select
+                    id="departmentId"
+                    name="departmentId"
+                    required>
+
+
+                <option value="">
+                    Select Department
+                </option>
+
+
+                <option
+                        th:each="department : ${departments}"
+                        th:value="${department.id}"
+                        th:text="${department.name}">
+                </option>
+
+
+            </select>
+
+        </div>
+
+
+        <!-- =================================================
+             LOGIN INFORMATION
+        ================================================== -->
+
+        <div class="section-title">
+            Login Information
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="username">
+                Username
+            </label>
+
+
+            <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter login username"
+                    required>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="password">
+                Temporary Password
+            </label>
+
+
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter temporary password"
+                    minlength="6"
+                    required>
+
+        </div>
+
+
+        <!-- =================================================
+             BUTTONS
+        ================================================== -->
+
+        <div class="buttons">
+
+
+            <button
+                    type="submit"
+                    class="save">
+
+                Save Employee
+
+            </button>
+
+
+            <a
+                    href="/admin/employees"
+                    class="cancel">
+
+                Cancel
+
+            </a>
+
+
+        </div>
+
+
+    </form>
+
+</div>
+
+
 </main>
 
-
-<!-- ========================= -->
-<!-- NEPALI DATE CONVERSION -->
-<!-- ========================= -->
+<!-- =========================================================
+     NEPALI DATE CONVERSION
+========================================================== -->
 
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
 
+
         const nepaliDateInput =
             document.getElementById("joiningDateBs");
+
 
         const actualDateInput =
             document.getElementById("joiningDate");
 
 
         /*
-         * =========================================================
-         * NEPALI BS DATE PICKER
-         * =========================================================
-         *
-         * Calendar remains Bikram Sambat.
-         *
-         * We only change the DISPLAY:
-         *
-         * Nepali:
-         *   भाद्र २०८३
-         *   आइत सोम मंगल बुध बिहि शुक्र शनि
-         *
-         * English:
-         *   Bhadra 2083
-         *   Sun Mon Tue Wed Thu Fri Sat
-         *
-         * The actual selected date is still BS.
-         */
-
-
-        /*
-         * Initialize the Nepali Date Picker.
+         * =====================================================
+         * NEPALI DATE PICKER
+         * =====================================================
          */
 
         nepaliDateInput.nepaliDatePicker({
@@ -634,9 +835,9 @@
 
 
         /*
-         * =========================================================
+         * =====================================================
          * NEPALI NUMBER -> ENGLISH NUMBER
-         * =========================================================
+         * =====================================================
          */
 
         function convertNepaliNumbersToEnglish(value) {
@@ -645,16 +846,21 @@
                 return value;
             }
 
+
             const nepaliNumbers =
                 "०१२३४५६७८९";
+
 
             const englishNumbers =
                 "0123456789";
 
+
             return value.replace(/[०-९]/g, function (character) {
+
 
                 const index =
                     nepaliNumbers.indexOf(character);
+
 
                 return index >= 0
                     ? englishNumbers[index]
@@ -666,12 +872,13 @@
 
 
         /*
-         * =========================================================
-         * BS DATE -> AD DATE
-         * =========================================================
+         * =====================================================
+         * BS -> AD
+         * =====================================================
          */
 
         function convertBsToAd(bsDate) {
+
 
             if (!bsDate) {
 
@@ -684,17 +891,10 @@
 
             try {
 
-                /*
-                 * Make sure BS date contains English digits.
-                 */
 
                 bsDate =
                     convertNepaliNumbersToEnglish(bsDate);
 
-
-                /*
-                 * Convert BS -> AD.
-                 */
 
                 const adDate =
                     NepaliFunctions.BS2AD(bsDate);
@@ -709,16 +909,14 @@
                 }
 
 
-                /*
-                 * Format AD as YYYY-MM-DD.
-                 */
-
                 const year =
                     String(adDate.year);
+
 
                 const month =
                     String(adDate.month)
                         .padStart(2, "0");
+
 
                 const day =
                     String(adDate.day)
@@ -735,10 +933,12 @@
 
             } catch (error) {
 
+
                 console.error(
                     "BS to AD conversion error:",
                     error
                 );
+
 
                 actualDateInput.value = "";
 
@@ -748,14 +948,15 @@
 
 
         /*
-         * =========================================================
-         * SELECTED DATE
-         * =========================================================
+         * =====================================================
+         * DATE CHANGE
+         * =====================================================
          */
 
         nepaliDateInput.addEventListener(
             "change",
             function () {
+
 
                 let bsDate =
                     nepaliDateInput.value.trim();
@@ -770,29 +971,13 @@
                 }
 
 
-                /*
-                 * Convert displayed Nepali digits
-                 * into English digits.
-                 */
-
                 bsDate =
                     convertNepaliNumbersToEnglish(bsDate);
 
 
-                /*
-                 * Keep visible field as BS.
-                 *
-                 * Example:
-                 *
-                 * 2083-05-10
-                 */
+                nepaliDateInput.value =
+                    bsDate;
 
-                nepaliDateInput.value = bsDate;
-
-
-                /*
-                 * Save AD date into hidden field.
-                 */
 
                 convertBsToAd(bsDate);
 
@@ -801,6 +986,7 @@
                     "Selected BS:",
                     bsDate
                 );
+
 
                 console.log(
                     "AD sent to Spring Boot:",
@@ -812,39 +998,16 @@
 
 
         /*
-         * =========================================================
-         * TRANSLATE PICKER DISPLAY
-         * =========================================================
-         *
-         * The v5.0.6 library itself does not expose a language
-         * option for the picker UI.
-         *
-         * Therefore we observe the picker DOM and replace the
-         * Nepali labels/numbers with English equivalents.
+         * =====================================================
+         * NEPALI MONTH TRANSLATION
+         * =====================================================
          */
-
 
         const nepaliMonths = {
 
             "बैशाख": "Baisakh",
             "जेठ": "Jestha",
             "असार": "Asar",
-            "श्रावण": "Shrawan",
-            "भाद्र": "Bhadra",
-            "आश्विन": "Ashwin",
-            "कार्तिक": "Kartik",
-            "मंसिर": "Mangsir",
-            "पौष": "Poush",
-            "माघ": "Magh",
-            "फाल्गुण": "Falgun",
-            "चैत्र": "Chaitra",
-
-            /*
-             * Some versions use these spellings.
-             */
-
-            "बैशाख": "Baisakh",
-            "जेठ": "Jestha",
             "आषाढ": "Asar",
             "श्रावण": "Shrawan",
             "भाद्र": "Bhadra",
@@ -853,11 +1016,18 @@
             "मंसिर": "Mangsir",
             "पौष": "Poush",
             "माघ": "Magh",
+            "फाल्गुण": "Falgun",
             "फाल्गुन": "Falgun",
             "चैत्र": "Chaitra"
 
         };
 
+
+        /*
+         * =====================================================
+         * NEPALI DAY TRANSLATION
+         * =====================================================
+         */
 
         const nepaliDays = {
 
@@ -882,20 +1052,18 @@
 
 
         /*
-         * Replace Nepali text and Nepali numbers
-         * inside the date picker.
+         * =====================================================
+         * TRANSLATE DATE PICKER
+         * =====================================================
          */
 
         function translateDatePicker(root) {
+
 
             if (!root) {
                 return;
             }
 
-
-            /*
-             * Walk through all text nodes.
-             */
 
             const walker =
                 document.createTreeWalker(
@@ -905,6 +1073,7 @@
 
 
             const textNodes = [];
+
 
             let currentNode;
 
@@ -921,16 +1090,18 @@
 
             textNodes.forEach(function (node) {
 
+
                 let text =
                     node.nodeValue;
 
 
                 /*
-                 * Translate months.
+                 * Months
                  */
 
                 Object.keys(nepaliMonths).forEach(
                     function (nepali) {
+
 
                         text =
                             text.replace(
@@ -946,11 +1117,12 @@
 
 
                 /*
-                 * Translate weekdays.
+                 * Days
                  */
 
                 Object.keys(nepaliDays).forEach(
                     function (nepali) {
+
 
                         text =
                             text.replace(
@@ -966,7 +1138,7 @@
 
 
                 /*
-                 * Translate Nepali numerals.
+                 * Numbers
                  */
 
                 text =
@@ -975,7 +1147,8 @@
                     );
 
 
-                node.nodeValue = text;
+                node.nodeValue =
+                    text;
 
             });
 
@@ -983,28 +1156,30 @@
 
 
         /*
-         * =========================================================
-         * OBSERVE DATE PICKER
-         * =========================================================
-         *
-         * The picker is dynamically created when the input is
-         * clicked. MutationObserver catches it immediately.
+         * =====================================================
+         * OBSERVE PICKER
+         * =====================================================
          */
 
         const observer =
             new MutationObserver(function (mutations) {
 
+
                 mutations.forEach(function (mutation) {
+
 
                     mutation.addedNodes.forEach(
                         function (node) {
+
 
                             if (
                                 node.nodeType ===
                                 Node.ELEMENT_NODE
                             ) {
 
-                                translateDatePicker(node);
+                                translateDatePicker(
+                                    node
+                                );
 
                             }
 
@@ -1014,12 +1189,9 @@
                 });
 
 
-                /*
-                 * Also translate the complete document
-                 * after picker changes.
-                 */
-
-                translateDatePicker(document.body);
+                translateDatePicker(
+                    document.body
+                );
 
             });
 
@@ -1034,12 +1206,15 @@
 
 
         /*
-         * Also translate when the input is clicked.
+         * =====================================================
+         * CLICK
+         * =====================================================
          */
 
         nepaliDateInput.addEventListener(
             "click",
             function () {
+
 
                 setTimeout(function () {
 
@@ -1063,12 +1238,15 @@
 
 
         /*
-         * Also translate when the input receives focus.
+         * =====================================================
+         * FOCUS
+         * =====================================================
          */
 
         nepaliDateInput.addEventListener(
             "focus",
             function () {
+
 
                 setTimeout(function () {
 
@@ -1080,6 +1258,7 @@
 
             }
         );
+
 
     });
 

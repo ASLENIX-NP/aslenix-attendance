@@ -5,6 +5,7 @@
 
 <head>
 
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
@@ -34,34 +35,81 @@
 
 
     /* =====================================================
+       ROOT
+    ===================================================== */
+
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #eff6ff;
+        --primary-border: #dbeafe;
+
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --success-border: #bbf7d0;
+
+        --danger: #dc2626;
+        --danger-bg: #fef2f2;
+        --danger-border: #fecaca;
+
+        --warning: #d97706;
+        --warning-bg: #fffbeb;
+        --warning-border: #fde68a;
+
+        --navy: #0f172a;
+        --text: #1e293b;
+        --muted: #64748b;
+        --light-muted: #94a3b8;
+
+        --page-bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-soft: #f8fafc;
+
+        --border: #e2e8f0;
+        --border-dark: #cbd5e1;
+
+        --shadow-sm:
+            0 1px 3px rgba(15, 23, 42, 0.05),
+            0 1px 2px rgba(15, 23, 42, 0.03);
+
+        --shadow-md:
+            0 8px 24px rgba(15, 23, 42, 0.06);
+
+        --radius-sm: 9px;
+        --radius-md: 13px;
+        --radius-lg: 17px;
+    }
+
+
+    /* =====================================================
        BODY
     ===================================================== */
 
     body {
         min-height: 100vh;
+        font-family:
+            Inter,
+            ui-sans-serif,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Arial,
+            Helvetica,
+            sans-serif;
 
-        font-family: Arial, Helvetica, sans-serif;
+        background: var(--page-bg);
+        color: var(--text);
 
-        background:
-            radial-gradient(
-                circle at 80% 10%,
-                rgba(37, 99, 235, 0.16),
-                transparent 30%
-            ),
-            radial-gradient(
-                circle at 10% 90%,
-                rgba(124, 58, 237, 0.12),
-                transparent 30%
-            ),
-            #f1f5f9;
-
-        color: #0f172a;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
     }
+
 
     a {
         text-decoration: none;
         color: inherit;
     }
+
 
     button,
     input,
@@ -76,127 +124,139 @@
     ===================================================== */
 
     header {
-        min-height: 76px;
+        min-height: 72px;
 
-        background:
-            linear-gradient(
-                135deg,
-                #0f172a,
-                #172554
-            );
+        background: var(--surface);
 
-        color: white;
+        border-bottom:
+            1px solid var(--border);
 
-        padding: 18px 40px;
+        padding: 14px 34px;
 
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
 
         gap: 20px;
 
-        box-shadow:
-            0 4px 18px
-            rgba(15, 23, 42, 0.18);
+        position: sticky;
+        top: 0;
 
-        position: relative;
         z-index: 1000;
     }
 
 
+    /* =====================================================
+       BRAND
+    ===================================================== */
+
     .brand-area {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
+        min-width: 0;
     }
 
 
     .logo-box {
-        width: 44px;
-        height: 44px;
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
 
         display: grid;
         place-items: center;
 
-        border-radius: 12px;
+        border-radius: 11px;
 
-        background:
-            linear-gradient(
-                135deg,
-                #2563eb,
-                #7c3aed
-            );
+        background: var(--primary);
 
         color: white;
 
         font-size: 18px;
         font-weight: 800;
+
+        box-shadow:
+            0 5px 12px rgba(37, 99, 235, 0.20);
     }
 
 
     .brand {
-        font-size: 23px;
+        color: var(--navy);
+
+        font-size: 19px;
         font-weight: 800;
-        letter-spacing: 0.5px;
+
+        letter-spacing: -0.2px;
+
+        line-height: 1.2;
     }
 
 
     .brand-subtitle {
         margin-top: 3px;
 
-        color: #bfdbfe;
+        color: var(--muted);
 
-        font-size: 12px;
+        font-size: 11px;
+        font-weight: 500;
     }
 
 
     /* =====================================================
-       HEADER BUTTON
+       HEADER ACTIONS
     ===================================================== */
 
-    .header-button {
-        display: inline-flex;
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
 
+
+    .header-button,
+    .logout-button {
+        display: inline-flex;
         align-items: center;
         justify-content: center;
 
-        padding: 10px 18px;
+        min-height: 38px;
 
-        border: 1px solid
-            rgba(255, 255, 255, 0.15);
+        padding: 8px 14px;
 
         border-radius: 9px;
 
-        background: #2563eb;
-
-        color: white;
-
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
 
         cursor: pointer;
 
         transition:
             background 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease,
             transform 0.2s ease,
             box-shadow 0.2s ease;
     }
 
 
-    .header-button:hover {
-        background: #1d4ed8;
+    .header-button {
+        background: var(--primary-light);
 
-        transform: translateY(-1px);
+        border:
+            1px solid var(--primary-border);
 
-        box-shadow:
-            0 7px 18px
-            rgba(37, 99, 235, 0.25);
+        color: var(--primary);
     }
 
 
-    /* =====================================================
-       HEADER LOGOUT
-    ===================================================== */
+    .header-button:hover {
+        background: #dbeafe;
+        border-color: #bfdbfe;
+
+        transform: translateY(-1px);
+    }
+
 
     .logout-form {
         display: inline;
@@ -204,61 +264,36 @@
 
 
     .logout-button {
-        display: inline-flex;
+        background: white;
 
-        align-items: center;
-        justify-content: center;
+        border:
+            1px solid var(--danger-border);
 
-        padding: 10px 18px;
-
-        border: 1px solid
-            rgba(255, 255, 255, 0.15);
-
-        border-radius: 9px;
-
-        background: #dc2626;
-
-        color: white;
-
-        font-size: 13px;
-        font-weight: 700;
-
-        cursor: pointer;
-
-        transition:
-            background 0.2s ease,
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
+        color: var(--danger);
     }
 
 
     .logout-button:hover {
-        background: #b91c1c;
+        background: var(--danger-bg);
+
+        border-color: #fca5a5;
 
         transform: translateY(-1px);
 
         box-shadow:
-            0 7px 18px
-            rgba(220, 38, 38, 0.20);
-    }
-
-
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+            0 5px 14px rgba(220, 38, 38, 0.08);
     }
 
 
     /* =====================================================
-       MAIN PAGE LAYOUT
+       LAYOUT
     ===================================================== */
 
     .layout {
         display: flex;
 
         min-height:
-            calc(100vh - 76px);
+            calc(100vh - 72px);
 
         width: 100%;
     }
@@ -271,26 +306,20 @@
     .sidebar {
         width: 245px;
         min-width: 245px;
-
         flex: 0 0 245px;
 
-        background: #ffffff;
+        background: var(--surface);
 
         border-right:
-            1px solid #cbd5e1;
+            1px solid var(--border);
 
-        padding: 26px 16px;
-
-        box-shadow:
-            5px 0 20px
-            rgba(15, 23, 42, 0.08);
+        padding: 25px 15px;
 
         position: sticky;
-
-        top: 0;
+        top: 72px;
 
         height:
-            calc(100vh - 76px);
+            calc(100vh - 72px);
 
         overflow-y: auto;
 
@@ -303,17 +332,16 @@
     ===================================================== */
 
     .sidebar-title {
-        padding: 0 12px;
+        padding: 0 11px;
 
-        margin-bottom: 14px;
+        margin-bottom: 12px;
 
-        color: #64748b;
+        color: var(--light-muted);
 
-        font-size: 11px;
-
+        font-size: 10px;
         font-weight: 800;
 
-        letter-spacing: 1.3px;
+        letter-spacing: 1.25px;
 
         text-transform: uppercase;
     }
@@ -325,87 +353,84 @@
 
     .sidebar-menu {
         display: flex;
-
         flex-direction: column;
 
-        gap: 7px;
+        gap: 4px;
 
         width: 100%;
     }
 
 
     /* =====================================================
-       SIDEBAR LINKS
+       SIDEBAR LINK
     ===================================================== */
 
     .sidebar-link {
-        display: flex;
+        position: relative;
 
+        display: flex;
         align-items: center;
 
-        gap: 13px;
+        gap: 11px;
 
         width: 100%;
 
-        padding: 12px 13px;
+        padding: 10px 11px;
 
         border:
             1px solid transparent;
 
         border-radius: 11px;
 
-        text-decoration: none;
-
-        color: #475569;
-
-        background: transparent;
+        color: var(--muted);
 
         transition:
             background 0.2s ease,
-            color 0.2s ease,
             border-color 0.2s ease,
+            color 0.2s ease,
             transform 0.2s ease;
     }
 
 
     .sidebar-link:hover {
-        background: #eff6ff;
+        background: #f8fafc;
 
-        color: #2563eb;
+        border-color: var(--border);
 
-        border-color: #dbeafe;
+        color: var(--primary);
 
         transform: translateX(2px);
     }
 
 
     /* =====================================================
-       ACTIVE DASHBOARD
+       ACTIVE LINK
     ===================================================== */
 
     .sidebar-link.active {
-        background: #eff6ff;
-
-        color: #2563eb;
+        background: var(--primary-light);
 
         border:
-            1px solid #bfdbfe;
+            1px solid var(--primary-border);
 
-        box-shadow:
-            0 3px 10px
-            rgba(37, 99, 235, 0.08);
+        color: var(--primary);
     }
 
 
-    .sidebar-link.active .sidebar-icon {
-        background: #2563eb;
+    .sidebar-link.active::before {
+        content: "";
 
-        color: white;
-    }
+        position: absolute;
 
+        left: -1px;
+        top: 9px;
+        bottom: 9px;
 
-    .sidebar-link.active .sidebar-text strong {
-        color: #2563eb;
+        width: 3px;
+
+        border-radius: 0 4px 4px 0;
+
+        background: var(--primary);
     }
 
 
@@ -414,33 +439,29 @@
     ===================================================== */
 
     .sidebar-icon {
-        width: 38px;
-
-        height: 38px;
+        width: 37px;
+        height: 37px;
 
         flex-shrink: 0;
 
         display: grid;
-
         place-items: center;
 
         border-radius: 9px;
 
         background: #f1f5f9;
 
-        color: #475569;
+        color: #64748b;
 
         transition:
             background 0.2s ease,
-            color 0.2s ease,
-            transform 0.2s ease;
+            color 0.2s ease;
     }
 
 
     .sidebar-icon svg {
-        width: 19px;
-
-        height: 19px;
+        width: 18px;
+        height: 18px;
 
         stroke: currentColor;
 
@@ -449,17 +470,19 @@
         fill: none;
 
         stroke-linecap: round;
-
         stroke-linejoin: round;
     }
 
 
     .sidebar-link:hover .sidebar-icon {
         background: #dbeafe;
+        color: var(--primary);
+    }
 
-        color: #2563eb;
 
-        transform: scale(1.04);
+    .sidebar-link.active .sidebar-icon {
+        background: var(--primary);
+        color: white;
     }
 
 
@@ -474,7 +497,6 @@
 
     .sidebar-text {
         display: flex;
-
         flex-direction: column;
 
         gap: 3px;
@@ -484,10 +506,9 @@
 
 
     .sidebar-text strong {
-        color: #0f172a;
+        color: var(--text);
 
-        font-size: 14px;
-
+        font-size: 13px;
         font-weight: 700;
 
         white-space: nowrap;
@@ -495,16 +516,17 @@
 
 
     .sidebar-text span {
-        color: #94a3b8;
+        color: var(--light-muted);
 
-        font-size: 11px;
+        font-size: 10px;
 
         white-space: nowrap;
     }
 
 
-    .sidebar-link:hover .sidebar-text strong {
-        color: #2563eb;
+    .sidebar-link:hover .sidebar-text strong,
+    .sidebar-link.active .sidebar-text strong {
+        color: var(--primary);
     }
 
 
@@ -513,38 +535,37 @@
     ===================================================== */
 
     .sidebar-footer {
-        margin-top: 28px;
+        margin-top: 24px;
 
-        padding: 15px 13px;
+        padding: 14px;
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
         border-radius: 12px;
 
-        background: #f8fafc;
+        background: var(--surface-soft);
     }
 
 
     .sidebar-footer-title {
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 11px;
-
+        font-size: 10px;
         font-weight: 800;
 
         text-transform: uppercase;
 
         letter-spacing: 0.7px;
 
-        margin-bottom: 7px;
+        margin-bottom: 6px;
     }
 
 
     .sidebar-footer-text {
-        color: #94a3b8;
+        color: var(--light-muted);
 
-        font-size: 11px;
+        font-size: 10px;
 
         line-height: 1.6;
     }
@@ -556,17 +577,17 @@
 
     .main-content {
         flex: 1;
-
         min-width: 0;
     }
 
 
     main {
+        width: 100%;
         max-width: 1500px;
 
         margin: 0 auto;
 
-        padding: 38px 40px 50px;
+        padding: 32px 38px 48px;
     }
 
 
@@ -577,24 +598,23 @@
     .page-header {
         display: flex;
 
-        justify-content: space-between;
-
         align-items: flex-end;
+
+        justify-content: space-between;
 
         gap: 20px;
 
-        margin-bottom: 25px;
+        margin-bottom: 22px;
     }
 
 
     .eyebrow {
-        color: #2563eb;
+        color: var(--primary);
 
-        font-size: 11px;
-
+        font-size: 10px;
         font-weight: 800;
 
-        letter-spacing: 1.4px;
+        letter-spacing: 1.5px;
 
         text-transform: uppercase;
 
@@ -603,46 +623,55 @@
 
 
     .page-header h1 {
-        font-size: 30px;
+        color: var(--navy);
+
+        font-size: 29px;
+        font-weight: 800;
+
+        letter-spacing: -0.7px;
 
         line-height: 1.1;
-
-        color: #0f172a;
     }
 
 
     .subtitle {
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 14px;
+        font-size: 13px;
 
-        margin-top: 8px;
+        margin-top: 7px;
 
         line-height: 1.5;
     }
 
 
+    /* =====================================================
+       DATE BOX
+    ===================================================== */
+
     .date-box {
+        min-height: 42px;
+
+        display: flex;
+        align-items: center;
+
+        padding: 10px 14px;
+
         background: white;
 
         border:
-            1px solid #cbd5e1;
+            1px solid var(--border);
 
         border-radius: 10px;
 
-        padding: 13px 16px;
+        color: var(--muted);
 
-        color: #64748b;
-
-        font-size: 12px;
-
-        font-weight: 600;
+        font-size: 11px;
+        font-weight: 700;
 
         white-space: nowrap;
 
-        box-shadow:
-            0 3px 12px
-            rgba(15, 23, 42, 0.05);
+        box-shadow: var(--shadow-sm);
     }
 
 
@@ -651,20 +680,19 @@
     ===================================================== */
 
     .welcome-card {
-        background:
-            linear-gradient(
-                135deg,
-                #0f172a,
-                #172554
-            );
+        position: relative;
+        overflow: hidden;
 
-        color: white;
+        background: white;
 
-        padding: 30px;
+        border:
+            1px solid var(--border);
 
-        border-radius: 14px;
+        border-radius: var(--radius-lg);
 
-        margin-bottom: 25px;
+        padding: 27px 29px;
+
+        margin-bottom: 22px;
 
         display: flex;
 
@@ -674,60 +702,111 @@
 
         gap: 25px;
 
-        box-shadow:
-            0 5px 20px
-            rgba(15, 23, 42, 0.12);
+        box-shadow: var(--shadow-sm);
+    }
+
+
+    .welcome-card::before {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        top: 0;
+        bottom: 0;
+
+        width: 4px;
+
+        background: var(--primary);
+    }
+
+
+    .welcome-card::after {
+        content: "";
+
+        position: absolute;
+
+        width: 170px;
+        height: 170px;
+
+        right: -80px;
+        top: -90px;
+
+        border-radius: 50%;
+
+        background: #eff6ff;
+
+        pointer-events: none;
+    }
+
+
+    .welcome-content {
+        position: relative;
+        z-index: 2;
     }
 
 
     .welcome-label {
-        color: #bfdbfe;
+        color: var(--primary);
 
-        font-size: 11px;
-
+        font-size: 10px;
         font-weight: 800;
 
-        letter-spacing: 1.4px;
+        letter-spacing: 1.3px;
 
         text-transform: uppercase;
 
-        margin-bottom: 8px;
+        margin-bottom: 7px;
     }
 
 
     .welcome-card h2 {
-        font-size: 28px;
+        color: var(--navy);
 
-        line-height: 1.2;
+        font-size: 25px;
+        font-weight: 800;
+
+        letter-spacing: -0.4px;
+
+        line-height: 1.25;
     }
 
 
     .welcome-card p {
-        color: #cbd5e1;
+        color: var(--muted);
 
-        margin-top: 9px;
+        margin-top: 7px;
 
-        font-size: 13px;
+        font-size: 12px;
+
+        line-height: 1.5;
     }
 
 
     .welcome-date {
-        text-align: right;
+        position: relative;
+        z-index: 2;
 
-        min-width: 160px;
+        min-width: 155px;
+
+        padding-left: 22px;
+
+        border-left:
+            1px solid var(--border);
+
+        text-align: right;
     }
 
 
     .welcome-date span {
         display: block;
 
-        color: #94a3b8;
+        color: var(--light-muted);
 
-        font-size: 10px;
-
+        font-size: 9px;
         font-weight: 800;
 
-        letter-spacing: 1px;
+        letter-spacing: 1.2px;
     }
 
 
@@ -736,7 +815,10 @@
 
         margin-top: 5px;
 
-        font-size: 17px;
+        color: var(--navy);
+
+        font-size: 16px;
+        font-weight: 800;
     }
 
 
@@ -750,79 +832,104 @@
         grid-template-columns:
             repeat(4, minmax(0, 1fr));
 
-        gap: 18px;
+        gap: 15px;
 
-        margin-bottom: 25px;
+        margin-bottom: 22px;
     }
 
 
     .summary-card {
+        position: relative;
+
         background: white;
 
-        padding: 22px;
-
-        border-radius: 13px;
+        padding: 19px 20px;
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
-        box-shadow:
-            0 4px 15px
-            rgba(15, 23, 42, 0.05);
+        border-radius: var(--radius-md);
 
-        border-top:
-            4px solid #cbd5e1;
+        box-shadow: var(--shadow-sm);
+
+        overflow: hidden;
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
 
-    .summary-card.present-card {
-        border-top-color: #16a34a;
+    .summary-card:hover {
+        transform: translateY(-2px);
+
+        box-shadow: var(--shadow-md);
     }
 
 
-    .summary-card.absent-card {
-        border-top-color: #dc2626;
+    .summary-card::before {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        top: 0;
+        bottom: 0;
+
+        width: 3px;
+
+        background: #cbd5e1;
     }
 
 
-    .summary-card.late-card {
-        border-top-color: #f59e0b;
+    .summary-card.present-card::before {
+        background: var(--success);
     }
 
 
-    .summary-card.leave-card {
-        border-top-color: #2563eb;
+    .summary-card.absent-card::before {
+        background: var(--danger);
+    }
+
+
+    .summary-card.late-card::before {
+        background: #f59e0b;
+    }
+
+
+    .summary-card.leave-card::before {
+        background: var(--primary);
     }
 
 
     .card-title {
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 12px;
-
+        font-size: 10px;
         font-weight: 700;
 
         text-transform: uppercase;
 
-        letter-spacing: .4px;
+        letter-spacing: 0.45px;
     }
 
 
     .card-value {
-        color: #0f172a;
+        color: var(--navy);
 
-        font-size: 29px;
-
+        font-size: 27px;
         font-weight: 800;
 
-        margin-top: 8px;
+        margin-top: 7px;
+
+        line-height: 1.1;
     }
 
 
     .card-note {
-        color: #94a3b8;
+        color: var(--light-muted);
 
-        font-size: 11px;
+        font-size: 10px;
 
         margin-top: 5px;
     }
@@ -836,10 +943,12 @@
         display: grid;
 
         grid-template-columns:
-            minmax(0, 1.5fr)
-            minmax(300px, .8fr);
+            minmax(0, 1.55fr)
+            minmax(300px, 0.85fr);
 
-        gap: 22px;
+        gap: 20px;
+
+        align-items: start;
     }
 
 
@@ -851,17 +960,15 @@
         background: white;
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
-        border-radius: 14px;
+        border-radius: var(--radius-lg);
 
-        padding: 25px;
+        padding: 22px;
 
-        box-shadow:
-            0 4px 15px
-            rgba(15, 23, 42, 0.05);
+        box-shadow: var(--shadow-sm);
 
-        margin-bottom: 22px;
+        margin-bottom: 20px;
     }
 
 
@@ -879,44 +986,51 @@
 
         gap: 15px;
 
-        margin-bottom: 20px;
+        margin-bottom: 17px;
     }
 
 
     .panel-header h2 {
-        font-size: 19px;
+        color: var(--navy);
 
-        color: #0f172a;
+        font-size: 17px;
+        font-weight: 800;
+
+        letter-spacing: -0.2px;
     }
 
 
     .panel-header p {
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 12px;
+        font-size: 11px;
 
-        margin-top: 5px;
+        margin-top: 4px;
+
+        line-height: 1.5;
     }
 
 
     .view-link {
-        color: #2563eb;
+        color: var(--primary);
 
-        font-size: 12px;
-
+        font-size: 11px;
         font-weight: 700;
 
         white-space: nowrap;
+
+        padding-top: 2px;
     }
 
 
     .view-link:hover {
+        color: var(--primary-dark);
         text-decoration: underline;
     }
 
 
     /* =====================================================
-       TODAY ATTENDANCE STATUS
+       ATTENDANCE STATUS
     ===================================================== */
 
     .attendance-status {
@@ -929,24 +1043,23 @@
         background: #f8fafc;
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
-        border-radius: 10px;
+        border-radius: 11px;
 
-        padding: 14px 16px;
+        padding: 13px 15px;
 
-        margin-bottom: 18px;
+        margin-bottom: 14px;
     }
 
 
     .status-dot {
         width: 10px;
-
         height: 10px;
 
         border-radius: 50%;
 
-        background: #16a34a;
+        background: #94a3b8;
 
         flex-shrink: 0;
     }
@@ -955,16 +1068,19 @@
     .attendance-status strong {
         display: block;
 
-        font-size: 13px;
+        color: var(--text);
+
+        font-size: 12px;
+        font-weight: 800;
     }
 
 
     .attendance-status span {
         display: block;
 
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 11px;
+        font-size: 10px;
 
         margin-top: 3px;
     }
@@ -980,44 +1096,48 @@
         grid-template-columns:
             repeat(4, minmax(0, 1fr));
 
-        gap: 12px;
+        gap: 10px;
     }
 
 
     .today-item {
-        padding: 16px;
+        min-height: 84px;
 
-        background: #f8fafc;
+        padding: 14px;
+
+        background: var(--surface-soft);
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
-        border-radius: 10px;
+        border-radius: 11px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
 
     .today-item .label {
         display: block;
 
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 10px;
-
+        font-size: 9px;
         font-weight: 800;
 
         text-transform: uppercase;
 
-        letter-spacing: .5px;
+        letter-spacing: 0.6px;
 
-        margin-bottom: 8px;
+        margin-bottom: 7px;
     }
 
 
     .today-item strong {
-        color: #0f172a;
+        color: var(--navy);
 
-        font-size: 18px;
-
+        font-size: 17px;
         font-weight: 800;
     }
 
@@ -1027,107 +1147,141 @@
     ===================================================== */
 
     .status {
-        display: inline-block;
+        display: inline-flex;
 
-        padding: 6px 10px;
+        align-items: center;
+        justify-content: center;
+
+        width: fit-content;
+
+        padding: 5px 9px;
 
         border-radius: 20px;
 
-        font-size: 11px;
-
-        font-weight: 700;
+        font-size: 10px;
+        font-weight: 800;
     }
 
 
     .status-present {
-        background: #dcfce7;
+        background: var(--success-bg);
+        color: #15803d;
 
-        color: #166534;
+        border:
+            1px solid var(--success-border);
     }
 
 
     .status-working {
-        background: #dbeafe;
+        background: var(--primary-light);
+        color: #1d4ed8;
 
-        color: #1e40af;
+        border:
+            1px solid var(--primary-border);
     }
 
 
     .status-late {
-        background: #fef3c7;
+        background: var(--warning-bg);
+        color: #a16207;
 
-        color: #92400e;
+        border:
+            1px solid var(--warning-border);
     }
 
 
     .status-absent {
-        background: #fee2e2;
+        background: var(--danger-bg);
+        color: #b91c1c;
 
-        color: #991b1b;
+        border:
+            1px solid var(--danger-border);
     }
 
 
     /* =====================================================
-       MANUAL ATTENDANCE CARD
+       MANUAL ATTENDANCE
     ===================================================== */
 
     .qr-card {
-        margin-top: 18px;
+        margin-top: 15px;
 
-        padding: 18px;
+        padding: 15px 16px;
 
-        background: #eff6ff;
+        background: var(--primary-light);
 
         border:
-            1px solid #bfdbfe;
+            1px solid var(--primary-border);
 
-        border-radius: 10px;
+        border-radius: 11px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+    }
+
+
+    .qr-content {
+        min-width: 0;
     }
 
 
     .qr-card h3 {
         color: #1e3a8a;
 
-        font-size: 14px;
+        font-size: 12px;
+        font-weight: 800;
 
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
 
 
     .qr-card p {
         color: #475569;
 
-        font-size: 11px;
+        font-size: 10px;
 
         line-height: 1.5;
-
-        margin-bottom: 13px;
     }
 
 
     .qr-button {
+        flex-shrink: 0;
+
         display: inline-flex;
 
         align-items: center;
-
         justify-content: center;
 
-        padding: 9px 13px;
+        padding: 9px 12px;
 
         border-radius: 8px;
 
-        background: #2563eb;
+        background: var(--primary);
 
         color: white;
 
-        font-size: 11px;
+        font-size: 10px;
+        font-weight: 800;
 
-        font-weight: 700;
+        transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
 
     .qr-button:hover {
-        background: #1d4ed8;
+        background: var(--primary-dark);
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 5px 12px rgba(37, 99, 235, 0.16);
     }
 
 
@@ -1141,39 +1295,40 @@
         grid-template-columns:
             repeat(4, minmax(0, 1fr));
 
-        gap: 12px;
+        gap: 10px;
     }
 
 
     .month-item {
-        padding: 16px;
+        padding: 15px;
 
-        background: #f8fafc;
+        background: var(--surface-soft);
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
-        border-radius: 10px;
+        border-radius: 11px;
     }
 
 
     .month-item span {
         display: block;
 
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 11px;
+        font-size: 10px;
     }
 
 
     .month-item strong {
         display: block;
 
-        margin-top: 6px;
+        margin-top: 5px;
 
-        color: #0f172a;
+        color: var(--navy);
 
-        font-size: 22px;
+        font-size: 21px;
+        font-weight: 800;
     }
 
 
@@ -1185,69 +1340,79 @@
         display: flex;
 
         align-items: center;
-
         justify-content: space-between;
 
-        background: #f8fafc;
+        background: var(--surface-soft);
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
-        border-radius: 10px;
+        border-radius: 11px;
 
-        padding: 18px;
+        padding: 16px;
 
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
 
 
     .leave-summary span {
         display: block;
 
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 11px;
+        font-size: 10px;
     }
 
 
     .leave-summary strong {
         display: block;
 
-        margin-top: 5px;
+        margin-top: 4px;
 
-        font-size: 26px;
+        color: var(--navy);
 
-        color: #0f172a;
+        font-size: 25px;
+        font-weight: 800;
     }
 
 
     .leave-button {
-        display: block;
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
 
         width: 100%;
 
+        min-height: 39px;
+
         text-align: center;
 
-        background: #2563eb;
+        background: var(--primary);
 
         color: white;
 
-        padding: 12px;
+        padding: 10px;
 
-        border-radius: 8px;
+        border-radius: 9px;
 
-        font-size: 12px;
+        font-size: 11px;
+        font-weight: 800;
 
-        font-weight: 700;
-
-        transition: .2s ease;
+        transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
 
     .leave-button:hover {
-        background: #1d4ed8;
+        background: var(--primary-dark);
 
         transform: translateY(-1px);
+
+        box-shadow:
+            0 5px 14px rgba(37, 99, 235, 0.15);
     }
 
 
@@ -1261,7 +1426,7 @@
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
 
-        gap: 11px;
+        gap: 9px;
     }
 
 
@@ -1270,21 +1435,22 @@
 
         align-items: center;
 
-        gap: 10px;
+        gap: 9px;
 
-        padding: 13px;
+        padding: 11px;
 
         background: white;
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
         border-radius: 10px;
 
         transition:
-            border-color .2s ease,
-            background .2s ease,
-            transform .2s ease;
+            border-color 0.2s ease,
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
 
@@ -1294,47 +1460,52 @@
         border-color: #bfdbfe;
 
         transform: translateY(-1px);
+
+        box-shadow:
+            0 4px 12px rgba(15, 23, 42, 0.04);
     }
 
 
     .quick-icon {
-        width: 37px;
-
-        height: 37px;
+        width: 34px;
+        height: 34px;
 
         flex-shrink: 0;
 
         display: grid;
-
         place-items: center;
 
-        border-radius: 9px;
+        border-radius: 8px;
 
-        background: #eff6ff;
+        background: var(--primary-light);
 
-        color: #2563eb;
+        color: var(--primary);
 
-        font-size: 16px;
+        font-size: 15px;
+        font-weight: 800;
     }
 
 
     .quick-action strong {
         display: block;
 
-        color: #0f172a;
+        color: var(--navy);
 
-        font-size: 12px;
+        font-size: 11px;
+        font-weight: 800;
     }
 
 
     .quick-action span {
         display: block;
 
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 10px;
+        font-size: 9px;
 
         margin-top: 3px;
+
+        line-height: 1.3;
     }
 
 
@@ -1348,72 +1519,95 @@
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
 
-        gap: 11px;
+        gap: 9px;
     }
 
 
     .info-item {
-        background: #f8fafc;
+        background: var(--surface-soft);
 
         border:
-            1px solid #e2e8f0;
+            1px solid var(--border);
 
         border-radius: 10px;
 
-        padding: 15px;
+        padding: 13px;
     }
 
 
     .info-item span {
         display: block;
 
-        color: #64748b;
+        color: var(--muted);
 
-        font-size: 10px;
-
-        font-weight: 700;
+        font-size: 9px;
+        font-weight: 800;
 
         text-transform: uppercase;
 
-        letter-spacing: .4px;
+        letter-spacing: 0.45px;
 
-        margin-bottom: 6px;
+        margin-bottom: 5px;
     }
 
 
     .info-item strong {
         display: block;
 
-        color: #0f172a;
+        color: var(--navy);
 
-        font-size: 13px;
+        font-size: 12px;
+        font-weight: 700;
 
         word-break: break-word;
     }
 
 
     .info-note {
-        margin-top: 13px;
+        margin-top: 11px;
 
-        padding: 12px 14px;
+        padding: 11px 12px;
 
         border-radius: 9px;
 
         background: #f8fafc;
 
-        color: #64748b;
+        border:
+            1px solid var(--border);
 
-        font-size: 11px;
+        color: var(--muted);
+
+        font-size: 9px;
 
         line-height: 1.5;
     }
 
 
     /* =====================================================
-       RESPONSIVE - 1100px
+       RESPONSIVE - 1200px
     ===================================================== */
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1200px) {
+
+        main {
+            padding-left: 28px;
+            padding-right: 28px;
+        }
+
+        .dashboard-grid {
+            grid-template-columns:
+                minmax(0, 1.35fr)
+                minmax(290px, 0.8fr);
+        }
+
+    }
+
+
+    /* =====================================================
+       RESPONSIVE - 1050px
+    ===================================================== */
+
+    @media (max-width: 1050px) {
 
         .summary {
             grid-template-columns:
@@ -1447,21 +1641,19 @@
     @media (max-width: 900px) {
 
         header {
-            padding: 17px 25px;
-        }
-
-
-        main {
-            padding: 30px 25px 45px;
+            padding: 13px 23px;
         }
 
 
         .sidebar {
             width: 220px;
-
             min-width: 220px;
-
             flex-basis: 220px;
+        }
+
+
+        main {
+            padding: 27px 22px 42px;
         }
 
 
@@ -1486,7 +1678,14 @@
     @media (max-width: 720px) {
 
         header {
-            padding: 16px 20px;
+            min-height: 66px;
+
+            padding: 12px 18px;
+        }
+
+
+        .brand {
+            font-size: 17px;
         }
 
 
@@ -1495,16 +1694,26 @@
         }
 
 
+        .logo-box {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 10px;
+        }
+
+
         .header-actions {
-            gap: 6px;
+            gap: 5px;
         }
 
 
         .header-button,
         .logout-button {
-            padding: 9px 12px;
+            min-height: 34px;
 
-            font-size: 11px;
+            padding: 7px 10px;
+
+            font-size: 10px;
         }
 
 
@@ -1515,25 +1724,22 @@
 
         .sidebar {
             width: 100%;
-
             min-width: 100%;
 
             height: auto;
 
             position: relative;
-
             top: auto;
 
-            padding: 16px 14px;
+            padding: 14px;
 
             border-right: none;
 
             border-bottom:
-                1px solid #cbd5e1;
+                1px solid var(--border);
 
             box-shadow:
-                0 4px 15px
-                rgba(15, 23, 42, 0.07);
+                0 3px 12px rgba(15, 23, 42, 0.04);
         }
 
 
@@ -1542,18 +1748,13 @@
 
             grid-template-columns:
                 repeat(2, minmax(0, 1fr));
+
+            gap: 5px;
         }
 
 
         .sidebar-link {
-            justify-content: flex-start;
-
-            padding: 11px 12px;
-        }
-
-
-        .sidebar-text span {
-            display: block;
+            padding: 9px 10px;
         }
 
 
@@ -1563,7 +1764,7 @@
 
 
         main {
-            padding: 28px 20px 45px;
+            padding: 24px 18px 40px;
         }
 
 
@@ -1576,11 +1777,37 @@
             align-items: flex-start;
 
             flex-direction: column;
+
+            padding: 24px;
         }
 
 
         .welcome-date {
+            width: 100%;
+
+            min-width: 0;
+
+            padding-left: 0;
+            padding-top: 13px;
+
+            border-left: none;
+
+            border-top:
+                1px solid var(--border);
+
             text-align: left;
+        }
+
+
+        .qr-card {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+
+        .qr-button {
+            width: 100%;
         }
 
 
@@ -1598,19 +1825,20 @@
     @media (max-width: 480px) {
 
         header {
-            padding: 14px;
+            padding: 11px 13px;
         }
 
 
         .brand {
-            font-size: 18px;
+            font-size: 15px;
         }
 
 
         .logo-box {
-            width: 38px;
+            width: 35px;
+            height: 35px;
 
-            height: 38px;
+            font-size: 16px;
         }
 
 
@@ -1618,24 +1846,28 @@
             flex-direction: column;
 
             align-items: stretch;
+
+            gap: 4px;
         }
 
 
         .header-button,
         .logout-button {
-            padding: 7px 10px;
+            min-height: 28px;
 
-            font-size: 10px;
+            padding: 5px 8px;
+
+            font-size: 9px;
         }
 
 
         main {
-            padding: 22px 14px 35px;
+            padding: 20px 13px 32px;
         }
 
 
         .sidebar {
-            padding: 13px 12px;
+            padding: 12px;
         }
 
 
@@ -1650,24 +1882,30 @@
 
 
         .sidebar-icon {
-            width: 36px;
+            width: 35px;
+            height: 35px;
+        }
 
-            height: 36px;
+
+        .page-header h1 {
+            font-size: 25px;
         }
 
 
         .welcome-card {
-            padding: 23px;
+            padding: 21px;
         }
 
 
         .welcome-card h2 {
-            font-size: 23px;
+            font-size: 21px;
         }
 
 
         .panel {
-            padding: 19px;
+            padding: 18px;
+
+            border-radius: 14px;
         }
 
 
@@ -1683,6 +1921,16 @@
 
         .info-grid {
             grid-template-columns: 1fr;
+        }
+
+
+        .panel-header {
+            flex-direction: column;
+        }
+
+
+        .view-link {
+            padding-top: 0;
         }
 
     }
@@ -1703,11 +1951,9 @@
 
 <div class="brand-area">
 
-
     <div class="logo-box">
         A
     </div>
-
 
     <div>
 
@@ -1726,12 +1972,9 @@
 
 <div class="header-actions">
 
-
     <a th:href="@{/employee/dashboard}"
        class="header-button">
-
         Dashboard
-
     </a>
 
 
@@ -1745,13 +1988,10 @@
 
         <button type="submit"
                 class="logout-button">
-
             Sign out
-
         </button>
 
     </form>
-
 
 </div>
 
@@ -1780,13 +2020,10 @@
     <nav class="sidebar-menu">
 
 
-        <!-- =================================================
-             DASHBOARD - ACTIVE
-        ================================================== -->
+        <!-- DASHBOARD -->
 
         <a th:href="@{/employee/dashboard}"
            class="sidebar-link active">
-
 
             <div class="sidebar-icon">
 
@@ -1838,18 +2075,13 @@
 
             </div>
 
-
         </a>
 
 
-
-        <!-- =================================================
-             MY ATTENDANCE
-        ================================================== -->
+        <!-- MY ATTENDANCE -->
 
         <a th:href="@{/employee/attendance}"
            class="sidebar-link">
-
 
             <div class="sidebar-icon">
 
@@ -1889,18 +2121,13 @@
 
             </div>
 
-
         </a>
 
 
-
-        <!-- =================================================
-             MY TASKS
-        ================================================== -->
+        <!-- MY TASKS -->
 
         <a th:href="@{/employee/tasks}"
            class="sidebar-link">
-
 
             <div class="sidebar-icon">
 
@@ -1928,18 +2155,13 @@
 
             </div>
 
-
         </a>
 
 
-
-        <!-- =================================================
-             LEAVE
-        ================================================== -->
+        <!-- LEAVE -->
 
         <a th:href="@{/employee/leave}"
            class="sidebar-link">
-
 
             <div class="sidebar-icon">
 
@@ -1981,18 +2203,13 @@
 
             </div>
 
-
         </a>
 
 
-
-        <!-- =================================================
-             MY PROFILE
-        ================================================== -->
+        <!-- MY PROFILE -->
 
         <a th:href="@{/employee/profile}"
            class="sidebar-link">
-
 
             <div class="sidebar-icon">
 
@@ -2026,41 +2243,31 @@
 
             </div>
 
-
         </a>
 
 
     </nav>
 
 
-
-    <!-- =================================================
-         SIDEBAR FOOTER
-    ================================================== -->
+    <!-- SIDEBAR FOOTER -->
 
     <div class="sidebar-footer">
-
 
         <div class="sidebar-footer-title">
             Employee Portal
         </div>
 
-
         <div class="sidebar-footer-text">
-
             Manage your attendance,
             tasks, leave requests
             and employee profile
             from one place.
-
         </div>
-
 
     </div>
 
 
 </aside>
-
 
 
 <!-- =================================================
@@ -2086,11 +2293,9 @@
                     EMPLOYEE PORTAL
                 </p>
 
-
                 <h1>
                     Dashboard
                 </h1>
-
 
                 <p class="subtitle">
                     Your attendance, work and employee overview.
@@ -2099,9 +2304,7 @@
             </div>
 
 
-            <!-- =================================================
-                 TODAY - BS DATE
-            ================================================== -->
+            <!-- TODAY - BS DATE -->
 
             <div class="date-box">
 
@@ -2126,7 +2329,6 @@
         </section>
 
 
-
         <!-- =================================================
              WELCOME
         ================================================== -->
@@ -2134,7 +2336,7 @@
         <section class="welcome-card">
 
 
-            <div>
+            <div class="welcome-content">
 
                 <div class="welcome-label">
                     Employee Portal
@@ -2144,6 +2346,7 @@
                 <h2>
 
                     Welcome back,
+
                     <span
                         th:text="${employee != null
                             ? employee.firstName
@@ -2163,9 +2366,7 @@
             </div>
 
 
-            <!-- =================================================
-                 TODAY - BS DATE
-            ================================================== -->
+            <!-- TODAY - BS DATE -->
 
             <div class="welcome-date">
 
@@ -2195,7 +2396,6 @@
         </section>
 
 
-
         <!-- =================================================
              MONTHLY STATISTICS
         ================================================== -->
@@ -2211,23 +2411,18 @@
                     Present This Month
                 </div>
 
-
                 <div class="card-value"
                      th:text="${presentCount != null
                         ? presentCount
                         : 0}">
-
                     0
-
                 </div>
-
 
                 <div class="card-note">
                     Days present
                 </div>
 
             </div>
-
 
 
             <!-- ABSENT -->
@@ -2238,23 +2433,18 @@
                     Absent This Month
                 </div>
 
-
                 <div class="card-value"
                      th:text="${absentCount != null
                         ? absentCount
                         : 0}">
-
                     0
-
                 </div>
-
 
                 <div class="card-note">
                     Working days missed
                 </div>
 
             </div>
-
 
 
             <!-- LATE -->
@@ -2265,23 +2455,18 @@
                     Late This Month
                 </div>
 
-
                 <div class="card-value"
                      th:text="${lateCount != null
                         ? lateCount
                         : 0}">
-
                     0
-
                 </div>
-
 
                 <div class="card-note">
                     Late arrivals
                 </div>
 
             </div>
-
 
 
             <!-- LEAVE -->
@@ -2292,16 +2477,12 @@
                     Leave This Month
                 </div>
 
-
                 <div class="card-value"
                      th:text="${leaveCount != null
                         ? leaveCount
                         : 0}">
-
                     0
-
                 </div>
-
 
                 <div class="card-note">
                     Approved leave days
@@ -2311,7 +2492,6 @@
 
 
         </section>
-
 
 
         <!-- =================================================
@@ -2337,13 +2517,11 @@
 
                     <div class="panel-header">
 
-
                         <div>
 
                             <h2>
                                 Today's Attendance
                             </h2>
-
 
                             <p>
                                 Your attendance status for today.
@@ -2359,21 +2537,17 @@
 
                         </a>
 
-
                     </div>
-
 
 
                     <!-- STATUS -->
 
                     <div class="attendance-status">
 
-
                         <div class="status-dot"></div>
 
 
                         <div>
-
 
                             <strong
                                 th:if="${attendance == null}">
@@ -2405,12 +2579,9 @@
                                 Today's attendance status
                             </span>
 
-
                         </div>
 
-
                     </div>
-
 
 
                     <!-- TODAY VALUES -->
@@ -2430,9 +2601,10 @@
                             <strong
                                 th:if="${attendance != null
                                     and attendance.checkIn != null}"
+
                                 th:text="${#temporals.format(
                                     attendance.checkIn,
-                                    'hh:mm a')}">
+                                    'hh\:mm a')}">
 
                                 --:--
 
@@ -2450,7 +2622,6 @@
                         </div>
 
 
-
                         <!-- CHECK OUT -->
 
                         <div class="today-item">
@@ -2463,9 +2634,10 @@
                             <strong
                                 th:if="${attendance != null
                                     and attendance.checkOut != null}"
+
                                 th:text="${#temporals.format(
                                     attendance.checkOut,
-                                    'hh:mm a')}">
+                                    'hh\:mm a')}">
 
                                 --:--
 
@@ -2481,7 +2653,6 @@
                             </strong>
 
                         </div>
-
 
 
                         <!-- WORKING TIME -->
@@ -2505,7 +2676,6 @@
                         </div>
 
 
-
                         <!-- STATUS -->
 
                         <div class="today-item">
@@ -2519,6 +2689,7 @@
                                 th:if="${attendance != null
                                     and attendance.checkIn != null
                                     and attendance.checkOut == null}"
+
                                 class="status status-working">
 
                                 Working
@@ -2531,6 +2702,7 @@
                                     and attendance.checkIn != null
                                     and attendance.checkOut != null
                                     and todayStatus == 'PRESENT'}"
+
                                 class="status status-present">
 
                                 Present
@@ -2543,6 +2715,7 @@
                                     and attendance.checkIn != null
                                     and attendance.checkOut != null
                                     and todayStatus == 'LATE'}"
+
                                 class="status status-late">
 
                                 Late
@@ -2553,6 +2726,7 @@
                             <span
                                 th:if="${attendance == null
                                     or attendance.checkIn == null}"
+
                                 class="status status-absent">
 
                                 Not Checked In
@@ -2566,23 +2740,24 @@
                     </div>
 
 
-
                     <!-- =================================================
                          MANUAL ATTENDANCE
                     ================================================== -->
 
                     <div class="qr-card">
 
+                        <div class="qr-content">
 
-                        <h3>
-                            Manual Attendance
-                        </h3>
+                            <h3>
+                                Manual Attendance
+                            </h3>
 
+                            <p>
+                                Record your attendance manually using
+                                the attendance page.
+                            </p>
 
-                        <p>
-                            Record your attendance manually using
-                            the attendance page.
-                        </p>
+                        </div>
 
 
                         <a th:href="@{/employee/attendance}"
@@ -2592,12 +2767,10 @@
 
                         </a>
 
-
                     </div>
 
 
                 </section>
-
 
 
                 <!-- =================================================
@@ -2609,13 +2782,11 @@
 
                     <div class="panel-header">
 
-
                         <div>
 
                             <h2>
                                 Monthly Summary
                             </h2>
-
 
                             <p>
                                 Your attendance overview for this month.
@@ -2623,9 +2794,7 @@
 
                         </div>
 
-
                     </div>
-
 
 
                     <div class="month-grid">
@@ -2636,7 +2805,6 @@
                             <span>
                                 Present
                             </span>
-
 
                             <strong
                                 th:text="${presentCount != null
@@ -2650,13 +2818,11 @@
                         </div>
 
 
-
                         <div class="month-item">
 
                             <span>
                                 Absent
                             </span>
-
 
                             <strong
                                 th:text="${absentCount != null
@@ -2670,13 +2836,11 @@
                         </div>
 
 
-
                         <div class="month-item">
 
                             <span>
                                 Late
                             </span>
-
 
                             <strong
                                 th:text="${lateCount != null
@@ -2690,13 +2854,11 @@
                         </div>
 
 
-
                         <div class="month-item">
 
                             <span>
                                 Leave
                             </span>
-
 
                             <strong
                                 th:text="${leaveCount != null
@@ -2719,7 +2881,6 @@
             </div>
 
 
-
             <!-- =================================================
                  RIGHT COLUMN
             ================================================== -->
@@ -2736,13 +2897,11 @@
 
                     <div class="panel-header">
 
-
                         <div>
 
                             <h2>
                                 Leave
                             </h2>
-
 
                             <p>
                                 Manage your leave requests.
@@ -2750,9 +2909,7 @@
 
                         </div>
 
-
                     </div>
-
 
 
                     <div class="leave-summary">
@@ -2763,7 +2920,6 @@
                             <span>
                                 Approved Leave
                             </span>
-
 
                             <strong
                                 th:text="${leaveCount != null
@@ -2789,7 +2945,6 @@
                     </div>
 
 
-
                     <a th:href="@{/employee/leave}"
                        class="leave-button">
 
@@ -2801,7 +2956,6 @@
                 </section>
 
 
-
                 <!-- =================================================
                      QUICK ACTIONS
                 ================================================== -->
@@ -2811,13 +2965,11 @@
 
                     <div class="panel-header">
 
-
                         <div>
 
                             <h2>
                                 Quick Actions
                             </h2>
-
 
                             <p>
                                 Frequently used employee tools.
@@ -2825,9 +2977,7 @@
 
                         </div>
 
-
                     </div>
-
 
 
                     <div class="quick-actions">
@@ -2838,13 +2988,9 @@
                         <a th:href="@{/employee/attendance}"
                            class="quick-action">
 
-
                             <div class="quick-icon">
-
                                 ◷
-
                             </div>
-
 
                             <div>
 
@@ -2852,16 +2998,13 @@
                                     My Attendance
                                 </strong>
 
-
                                 <span>
                                     View attendance history
                                 </span>
 
                             </div>
 
-
                         </a>
-
 
 
                         <!-- TASKS -->
@@ -2869,13 +3012,9 @@
                         <a th:href="@{/employee/tasks}"
                            class="quick-action">
 
-
                             <div class="quick-icon">
-
                                 ✓
-
                             </div>
-
 
                             <div>
 
@@ -2883,16 +3022,13 @@
                                     My Tasks
                                 </strong>
 
-
                                 <span>
                                     View assigned tasks
                                 </span>
 
                             </div>
 
-
                         </a>
-
 
 
                         <!-- LEAVE -->
@@ -2900,13 +3036,9 @@
                         <a th:href="@{/employee/leave}"
                            class="quick-action">
 
-
                             <div class="quick-icon">
-
                                 ◫
-
                             </div>
-
 
                             <div>
 
@@ -2914,16 +3046,13 @@
                                     Leave
                                 </strong>
 
-
                                 <span>
                                     Apply or view requests
                                 </span>
 
                             </div>
 
-
                         </a>
-
 
 
                         <!-- PROFILE -->
@@ -2931,13 +3060,9 @@
                         <a th:href="@{/employee/profile}"
                            class="quick-action">
 
-
                             <div class="quick-icon">
-
                                 ◎
-
                             </div>
-
 
                             <div>
 
@@ -2945,13 +3070,11 @@
                                     My Profile
                                 </strong>
 
-
                                 <span>
                                     View your profile
                                 </span>
 
                             </div>
-
 
                         </a>
 
@@ -2960,7 +3083,6 @@
 
 
                 </section>
-
 
 
                 <!-- =================================================
@@ -2972,13 +3094,11 @@
 
                     <div class="panel-header">
 
-
                         <div>
 
                             <h2>
                                 My Information
                             </h2>
-
 
                             <p>
                                 Your employee details.
@@ -2986,9 +3106,7 @@
 
                         </div>
 
-
                     </div>
-
 
 
                     <div class="info-grid">
@@ -3002,7 +3120,6 @@
                                 Employee Code
                             </span>
 
-
                             <strong
                                 th:text="${employee != null
                                     ? employee.employeeCode
@@ -3015,7 +3132,6 @@
                         </div>
 
 
-
                         <!-- POSITION -->
 
                         <div class="info-item">
@@ -3023,7 +3139,6 @@
                             <span>
                                 Position
                             </span>
-
 
                             <strong
                                 th:text="${employee != null
@@ -3037,7 +3152,6 @@
                         </div>
 
 
-
                         <!-- DEPARTMENT -->
 
                         <div class="info-item">
@@ -3045,7 +3159,6 @@
                             <span>
                                 Department
                             </span>
-
 
                             <strong
                                 th:text="${employee != null
@@ -3060,10 +3173,7 @@
                         </div>
 
 
-
-                        <!-- =================================================
-                             JOINING DATE - BS
-                        ================================================== -->
+                        <!-- JOINING DATE - BS -->
 
                         <div class="info-item">
 
@@ -3075,10 +3185,13 @@
                             <strong
                                 th:if="${employee != null
                                     and employee.joiningDate != null}"
+
                                 class="bs-date"
+
                                 th:attr="data-ad-date=${#temporals.format(
                                     employee.joiningDate,
                                     'yyyy-MM-dd')}"
+
                                 data-bs-format="DD MMM YYYY">
 
                                 Loading...
@@ -3098,7 +3211,6 @@
 
 
                     </div>
-
 
 
                     <div class="info-note">
@@ -3141,9 +3253,11 @@
 
         document.querySelectorAll(".bs-date").forEach(function (element) {
 
-            const adDate = element.getAttribute("data-ad-date");
+            const adDate =
+                element.getAttribute("data-ad-date");
 
-            const format = element.getAttribute("data-bs-format")
+            const format =
+                element.getAttribute("data-bs-format")
                 || "DD MMM YYYY";
 
 
@@ -3168,11 +3282,20 @@
                  * introduce timezone-related date shifts.
                  */
 
-                const parts = adDate.split("-");
+                const parts =
+                    adDate.split("-");
 
-                const year = parseInt(parts[0], 10);
-                const month = parseInt(parts[1], 10) - 1;
-                const day = parseInt(parts[2], 10);
+
+                const year =
+                    parseInt(parts[0], 10);
+
+
+                const month =
+                    parseInt(parts[1], 10) - 1;
+
+
+                const day =
+                    parseInt(parts[2], 10);
 
 
                 const javascriptDate =
@@ -3188,16 +3311,13 @@
                  */
 
                 const nepaliDate =
-                    new NepaliDate(javascriptDate);
+                    new NepaliDate(
+                        javascriptDate
+                    );
 
 
                 /*
                  * Format the BS date.
-                 *
-                 * Supported examples:
-                 *
-                 * DD MMM YYYY
-                 * ddd DD MMMM YYYY
                  */
 
                 element.textContent =
@@ -3218,7 +3338,8 @@
                  * the dashboard blank.
                  */
 
-                element.textContent = adDate;
+                element.textContent =
+                    adDate;
 
             }
 
