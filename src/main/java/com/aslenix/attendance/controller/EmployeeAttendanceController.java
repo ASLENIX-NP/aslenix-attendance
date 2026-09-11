@@ -6,6 +6,7 @@ import com.aslenix.attendance.entity.OfficeSettings;
 import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.service.AttendanceService;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -191,6 +192,11 @@ public class EmployeeAttendanceController {
         // --------------------------------------------------------
         // MODEL
         // --------------------------------------------------------
+
+        model.addAttribute(
+                "employee",
+                employee
+        );
 
         model.addAttribute(
                 "attendance",

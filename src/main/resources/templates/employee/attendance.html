@@ -2763,59 +2763,101 @@
             </div>
 
 
-            <!-- =================================================
-                 PROFILE
-            ================================================== -->
+          <!-- =================================================
+     PROFILE
+================================================== -->
 
             <div class="profile-wrapper">
 
-                <button
-                    type="button"
-                    class="profile"
-                    id="profileButton"
-                    aria-label="Open profile menu"
-                    aria-expanded="false">
 
-                    <div class="profile-avatar">
-                        E
+            <button
+                type="button"
+                class="profile"
+                id="profileButton"
+                aria-label="Open profile menu"
+                aria-expanded="false">
+
+                <div class="profile-avatar"
+                    th:text="${employee.firstName != null and !employee.firstName.isEmpty()
+                        ? employee.firstName.substring(0,1).toUpperCase()
+                        : 'E'}">
+                    E
+                </div>
+
+                <div class="profile-info">
+
+                    <div
+                        class="profile-name"
+                        th:text="${employee.firstName + ' ' + employee.lastName}">
+                        Employee
                     </div>
 
-                    <div class="profile-info">
-
-                        <div class="profile-name">
-                            Employee
-                        </div>
-
-                        <div class="profile-role">
-                            Employee Portal
-                        </div>
-
+                    <div class="profile-role">
+                        Employee Portal
                     </div>
+
+                </div>
+
+                <svg
+                    class="profile-arrow"
+                    id="profileArrow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+
+                    <path d="m6 9 6 6 6-6"></path>
+
+                </svg>
+
+            </button>
+
+
+            <!-- PROFILE DROPDOWN -->
+
+            <div
+                class="profile-dropdown"
+                id="profileDropdown">
+
+                <a
+                    th:href="@{/employee/profile}"
+                    class="profile-dropdown-item">
 
                     <svg
-                        class="profile-arrow"
-                        id="profileArrow"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2">
+                        stroke-width="1.8">
 
-                        <path d="m6 9 6 6 6-6"></path>
+                        <circle cx="12" cy="8" r="4"></circle>
+
+                        <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path>
 
                     </svg>
 
-                </button>
+                    <span>
+                        Profile
+                    </span>
+
+                </a>
 
 
-                <!-- PROFILE DROPDOWN -->
+                <div class="profile-dropdown-divider"></div>
 
-                <div
-                    class="profile-dropdown"
-                    id="profileDropdown">
 
-                    <a
-                        th:href="@{/employee/profile}"
-                        class="profile-dropdown-item">
+                <form
+                    th:action="@{/logout}"
+                    method="post"
+                    class="logout-form">
+
+                    <input
+                        type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}">
+
+                    <button
+                        type="submit"
+                        class="profile-dropdown-item logout-item">
 
                         <svg
                             viewBox="0 0 24 24"
@@ -2823,59 +2865,25 @@
                             stroke="currentColor"
                             stroke-width="1.8">
 
-                            <circle cx="12" cy="8" r="4"></circle>
-
-                            <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path>
+                            <path d="M10 17l5-5-5-5"></path>
+                            <path d="M15 12H3"></path>
+                            <path d="M21 19V5a2 2 0 0 0-2-2h-6"></path>
 
                         </svg>
 
                         <span>
-                            Profile
+                            Logout
                         </span>
 
-                    </a>
+                    </button>
 
-
-                    <div class="profile-dropdown-divider"></div>
-
-
-                    <form
-                        th:action="@{/logout}"
-                        method="post"
-                        class="logout-form">
-
-                        <input
-                            type="hidden"
-                            th:name="${_csrf.parameterName}"
-                            th:value="${_csrf.token}">
-
-                        <button
-                            type="submit"
-                            class="profile-dropdown-item logout-item">
-
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.8">
-
-                                <path d="M10 17l5-5-5-5"></path>
-                                <path d="M15 12H3"></path>
-                                <path d="M21 19V5a2 2 0 0 0-2-2h-6"></path>
-
-                            </svg>
-
-                            <span>
-                                Logout
-                            </span>
-
-                        </button>
-
-                    </form>
-
-                </div>
+                </form>
 
             </div>
+          
+
+            </div>
+
 
 
             <!-- =================================================
