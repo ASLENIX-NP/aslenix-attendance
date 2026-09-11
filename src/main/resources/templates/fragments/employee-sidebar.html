@@ -1,0 +1,326 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<aside class="sidebar" th:fragment="sidebar(activeLink)">
+
+    <!-- =====================================================
+         BRAND / LOGO
+         ===================================================== -->
+
+    <div class="brand">
+        <a class="brand-logo" th:href="@{/employee/dashboard}" aria-label="ASLENIX Employee Dashboard">
+            <img
+                th:src="@{/images/logo1.png}"
+                src="/images/logo1.png"
+                alt="ASLENIX Logo"
+                class="aslenix-logo"
+            >
+        </a>
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR TITLE
+         ===================================================== -->
+
+    <div class="sidebar-title">
+        My Workspace
+    </div>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <nav class="sidebar-menu">
+
+
+        <!-- =================================================
+             DASHBOARD
+             ================================================= -->
+
+        <a
+            th:href="@{/employee/dashboard}"
+            class="sidebar-link"
+        >
+
+            <div class="sidebar-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <rect
+                        x="3"
+                        y="3"
+                        width="7"
+                        height="7"
+                        rx="1.5"
+                    ></rect>
+
+                    <rect
+                        x="14"
+                        y="3"
+                        width="7"
+                        height="7"
+                        rx="1.5"
+                    ></rect>
+
+                    <rect
+                        x="3"
+                        y="14"
+                        width="7"
+                        height="7"
+                        rx="1.5"
+                    ></rect>
+
+                    <rect
+                        x="14"
+                        y="14"
+                        width="7"
+                        height="7"
+                        rx="1.5"
+                    ></rect>
+
+                </svg>
+
+            </div>
+
+
+            <div class="sidebar-text">
+
+                <strong>
+                    Dashboard
+                </strong>
+
+                <span>
+                    Employee dashboard
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- =================================================
+             MY ATTENDANCE
+             ================================================= -->
+
+        <a
+            th:href="@{/employee/attendance}"
+            class="sidebar-link active"
+        >
+
+            <div class="sidebar-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <rect
+                        x="3"
+                        y="4"
+                        width="18"
+                        height="17"
+                        rx="2.5"
+                    ></rect>
+
+                    <path d="M16 2v4"></path>
+
+                    <path d="M8 2v4"></path>
+
+                    <path d="M3 10h18"></path>
+
+                    <path d="m8 15 2 2 5-5"></path>
+
+                </svg>
+
+            </div>
+
+
+            <div class="sidebar-text">
+
+                <strong>
+                    My Attendance
+                </strong>
+
+                <span>
+                    View attendance
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- =================================================
+             MY TASKS
+             ================================================= -->
+
+        <a
+            th:href="@{/employee/tasks}"
+            class="sidebar-link"
+        >
+
+            <div class="sidebar-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <path
+                        d="M9 11l3 3L22 4"
+                    ></path>
+
+                    <path
+                        d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                    ></path>
+
+                </svg>
+
+            </div>
+
+
+            <div class="sidebar-text">
+
+                <strong>
+                    My Tasks
+                </strong>
+
+                <span>
+                    Assigned tasks
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- =================================================
+             LEAVE
+             ================================================= -->
+
+        <a
+            th:href="@{/employee/leave}"
+            class="sidebar-link"
+        >
+
+            <div class="sidebar-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <rect
+                        x="3"
+                        y="4"
+                        width="18"
+                        height="17"
+                        rx="2.5"
+                    ></rect>
+
+                    <path d="M16 2v4"></path>
+
+                    <path d="M8 2v4"></path>
+
+                    <path d="M3 10h18"></path>
+
+                    <path d="M8 14h3"></path>
+
+                    <path d="M8 18h6"></path>
+
+                </svg>
+
+            </div>
+
+
+            <div class="sidebar-text">
+
+                <strong>
+                    Leave
+                </strong>
+
+                <span>
+                    Leave requests
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- =================================================
+             MY PROFILE
+             ================================================= -->
+
+        <a
+            th:href="@{/employee/profile}"
+            class="sidebar-link"
+        >
+
+            <div class="sidebar-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <circle
+                        cx="12"
+                        cy="8"
+                        r="4"
+                    ></circle>
+
+                    <path
+                        d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7"
+                    ></path>
+
+                </svg>
+
+            </div>
+
+
+            <div class="sidebar-text">
+
+                <strong>
+                    My Profile
+                </strong>
+
+                <span>
+                    Employee information
+                </span>
+
+            </div>
+
+        </a>
+
+
+    </nav>
+
+
+    <!-- =====================================================
+         SIDEBAR FOOTER
+         ===================================================== -->
+
+    <div class="sidebar-footer">
+
+        <div class="sidebar-footer-title">
+            Employee Portal
+        </div>
+
+        <div class="sidebar-footer-text">
+
+            Manage your attendance,
+            tasks, leave requests
+            and employee profile
+            from one place.
+
+        </div>
+
+    </div>
+
+
+</aside>
+</html>

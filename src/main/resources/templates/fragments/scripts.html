@@ -1,0 +1,158 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="scripts">
+<script>
+        /* =========================================================
+           NOTIFICATIONS
+        ========================================================= */
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationBtn = document.getElementById('notificationBtn');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationDot = document.getElementById('notificationDot');
+            const notificationList = document.getElementById('notificationList');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            const profileBtn = document.getElementById('profileBtn');
+            const profileDropdown = document.getElementById('profileDropdown');
+
+            function getCsrfToken() {
+                const csrfInput = document.querySelector('input[name="_csrf"]');
+                return csrfInput ? csrfInput.value : '';
+            }
+
+            function postWithCsrf(url) {
+                const token = getCsrfToken();
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: token ? new URLSearchParams({ _csrf: token }) : null
+                });
+            }
+
+            function fetchUnreadCount() {
+                fetch('/api/notifications/count')
+                    .then(res => {
+                        if (!res.ok) throw new Error('Network response was not ok');
+                        return res.json();
+                    })
+                    .then(data => {
+                        if (data.count && data.count > 0) {
+                            notificationDot.style.display = 'block';
+                        } else {
+                            notificationDot.style.display = 'none';
+                        }
+                    })
+                    .catch(err => console.error('Error fetching unread count:', err));
+            }
+
+            function fetchNotifications() {
+                fetch('/api/notifications')
+                    .then(res => {
+                        if (!res.ok) throw new Error('Network response was not ok');
+                        return res.json();
+                    })
+                    .then(data => {
+                        notificationList.innerHTML = '';
+                        if (!data || data.length === 0) {
+                            notificationList.innerHTML = '<div class="notification-empty">No new notifications</div>';
+                            return;
+                        }
+                        
+                        data.forEach(notification => {
+                            const item = document.createElement('div');
+                            item.className = 'notification-item' + (notification.read ? '' : ' unread');
+                            
+                            const date = new Date(notification.createdAt);
+                            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            
+                            item.innerHTML = `
+                                <div class="notification-item-title">${notification.title}</div>
+                                <div class="notification-item-message">${notification.message}</div>
+                                <div class="notification-item-date">${formattedDate}</div>
+                            `;
+                            
+                            item.addEventListener('click', () => {
+                                if (!notification.read) {
+                                    postWithCsrf(`/api/notifications/${notification.id}/read`)
+                                        .then(() => {
+                                            item.classList.remove('unread');
+                                            notification.read = true;
+                                            fetchUnreadCount();
+                                        })
+                                        .catch(err => console.error('Error marking as read:', err));
+                                }
+                            });
+                            
+                            notificationList.appendChild(item);
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Error fetching notifications:', err);
+                        notificationList.innerHTML = '<div class="notification-empty">Failed to load notifications</div>';
+                    });
+            }
+
+            if (notificationBtn && notificationDropdown) {
+                notificationBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isShowing = notificationDropdown.classList.contains('show');
+                    if (!isShowing) {
+                        fetchNotifications();
+                        notificationDropdown.classList.add('show');
+                    } else {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+
+                if (markAllReadBtn) {
+                    markAllReadBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        postWithCsrf('/api/notifications/read-all')
+                            .then(() => {
+                                fetchNotifications();
+                                fetchUnreadCount();
+                            })
+                            .catch(err => console.error('Error marking all as read:', err));
+                    });
+                }
+
+                document.addEventListener('click', function(e) {
+                    if (notificationBtn && notificationDropdown && !notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                    if (profileBtn && profileDropdown && !profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.remove('show');
+                    }
+                });
+
+                if (profileBtn && profileDropdown) {
+                    profileBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const isShowing = profileDropdown.classList.contains('show');
+                        if (!isShowing) {
+                            profileDropdown.classList.add('show');
+                            if (notificationDropdown) notificationDropdown.classList.remove('show');
+                        } else {
+                            profileDropdown.classList.remove('show');
+                        }
+                    });
+                }
+                
+                // also close profile dropdown if notification btn is clicked
+                if (notificationBtn) {
+                    notificationBtn.addEventListener('click', function() {
+                        if (profileDropdown) profileDropdown.classList.remove('show');
+                    });
+                }
+
+                // Initial fetch
+                fetchUnreadCount();
+                
+                // Periodically check for new notifications every 60s
+                setInterval(fetchUnreadCount, 60000);
+            }
+        });
+    </script>
+</div>
+</html>

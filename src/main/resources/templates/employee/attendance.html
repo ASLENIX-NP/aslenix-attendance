@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
-```
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
@@ -444,10 +444,12 @@
     .header-right {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
 
         gap: 18px;
 
         min-width: 0;
+        margin-left: auto;
     }
 
 
@@ -572,6 +574,109 @@
         margin-left: 4px;
 
         color: #8b95a8;
+    }
+
+
+    /* =====================================================
+       PROFILE DROPDOWN
+    ===================================================== */
+
+    .profile-wrapper {
+        position: relative;
+    }
+
+    .profile {
+        cursor: pointer;
+        border: 0;
+        background: transparent;
+        font: inherit;
+        color: inherit;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding-left: 4px;
+    }
+
+    .profile-dropdown {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        width: 190px;
+        padding: 7px;
+        background: #ffffff;
+        border: 1px solid #e8edf4;
+        border-radius: 11px;
+        box-shadow: 0 12px 30px rgba(35,48,85,.12);
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-7px);
+        transition:
+            opacity .18s ease,
+            transform .18s ease,
+            visibility .18s ease;
+    }
+
+    .profile-dropdown.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .profile-dropdown-item {
+        width: 100%;
+        min-height: 40px;
+        padding: 0 11px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 8px;
+        background: transparent;
+        color: #4d5870;
+        font-size: 11px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        text-align: left;
+        transition:
+            background .18s ease,
+            color .18s ease;
+    }
+
+    .profile-dropdown-item:hover {
+        background: #f5f7fb;
+        color: #5365df;
+    }
+
+    .profile-dropdown-item svg {
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+    }
+
+    .profile-dropdown-divider {
+        height: 1px;
+        margin: 5px 4px;
+        background: #edf0f5;
+    }
+
+    .logout-form {
+        margin: 0;
+        padding: 0;
+    }
+
+    .logout-item {
+        border: 0;
+        font-family: inherit;
+    }
+
+    .profile-arrow {
+        transition: transform .18s ease;
+    }
+
+    .profile-arrow.rotate {
+        transform: rotate(180deg);
     }
 
 
@@ -1816,7 +1921,7 @@
     }
 
 </style>
-```
+
 
 </head>
 
@@ -1824,7 +1929,7 @@
 
 <div class="app-layout">
 
-```
+
 <!-- =====================================================
      SIDEBAR
 ====================================================== -->
@@ -2040,25 +2145,7 @@
     <header class="top-header">
 
 
-        <!-- SEARCH -->
-
-        <div class="search-box">
-
-            <svg viewBox="0 0 24 24">
-
-                <circle cx="11" cy="11" r="7"></circle>
-
-                <path d="m20 20-4-4"></path>
-
-            </svg>
-
-            <input
-                type="text"
-                placeholder="Search attendance records..."
-                aria-label="Search attendance"
-            >
-
-        </div>
+        
 
 
         <!-- HEADER RIGHT -->
@@ -2088,39 +2175,111 @@
 
             <!-- PROFILE -->
 
-            <div class="profile">
+            <div class="profile-wrapper">
 
-                <div class="profile-avatar">
-                    E
-                </div>
+                <button
+                    type="button"
+                    class="profile"
+                    id="profileButton"
+                    aria-label="Open profile menu"
+                    aria-expanded="false">
 
-                <div class="profile-info">
-
-                    <div class="profile-name">
-                        Employee
+                    <div class="profile-avatar">
+                        E
                     </div>
 
-                    <div class="profile-role">
-                        Employee Portal
+                    <div class="profile-info">
+
+                        <div class="profile-name">
+                            Employee
+                        </div>
+
+                        <div class="profile-role">
+                            Employee Portal
+                        </div>
+
                     </div>
 
+                    <svg
+                        class="profile-arrow"
+                        id="profileArrow"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path d="m6 9 6 6 6-6"></path>
+
+                    </svg>
+
+                </button>
+
+                <!-- PROFILE DROPDOWN -->
+
+                <div
+                    class="profile-dropdown"
+                    id="profileDropdown">
+
+                    <a
+                        th:href="@{/employee/profile}"
+                        class="profile-dropdown-item">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8">
+
+                            <circle cx="12" cy="8" r="4"></circle>
+
+                            <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path>
+
+                        </svg>
+
+                        <span>Profile</span>
+
+                    </a>
+
+                    <div class="profile-dropdown-divider"></div>
+
+                    <form
+                        th:action="@{/logout}"
+                        method="post"
+                        class="logout-form">
+
+                        <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}">
+
+                        <button
+                            type="submit"
+                            class="profile-dropdown-item logout-item">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8">
+
+                                <path d="M10 17l5-5-5-5"></path>
+                                <path d="M15 12H3"></path>
+                                <path d="M21 19V5a2 2 0 0 0-2-2h-6"></path>
+
+                            </svg>
+
+                            <span>Logout</span>
+
+                        </button>
+
+                    </form>
+
                 </div>
-
-                <svg
-                    class="profile-arrow"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2">
-
-                    <path d="m6 9 6 6 6-6"></path>
-
-                </svg>
 
             </div>
 
 
-            <!-- CURRENT DATE -->
+<!-- CURRENT DATE -->
 
             <div class="header-date">
 
@@ -3119,7 +3278,7 @@
     </main>
 
 </div>
-```
+
 
 </div>
 
@@ -3128,6 +3287,116 @@
 ========================================================= -->
 
 <script>
+
+/* =========================================================
+   PROFILE DROPDOWN
+========================================================= */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const profileButton =
+            document.getElementById('profileButton');
+
+        const profileDropdown =
+            document.getElementById('profileDropdown');
+
+        const profileArrow =
+            document.getElementById('profileArrow');
+
+
+        if (!profileButton || !profileDropdown) {
+            return;
+        }
+
+
+        profileButton.addEventListener(
+            'click',
+            function (event) {
+
+                event.stopPropagation();
+
+                const isOpen =
+                    profileDropdown.classList.toggle('show');
+
+                profileButton.setAttribute(
+                    'aria-expanded',
+                    isOpen
+                );
+
+                if (profileArrow) {
+
+                    profileArrow.classList.toggle(
+                        'rotate',
+                        isOpen
+                    );
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            'click',
+            function (event) {
+
+                if (
+                    !profileButton.contains(event.target) &&
+                    !profileDropdown.contains(event.target)
+                ) {
+
+                    profileDropdown.classList.remove('show');
+
+                    profileButton.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+                    if (profileArrow) {
+
+                        profileArrow.classList.remove('rotate');
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            function (event) {
+
+                if (event.key === 'Escape') {
+
+                    profileDropdown.classList.remove('show');
+
+                    profileButton.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+                    if (profileArrow) {
+
+                        profileArrow.classList.remove('rotate');
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   EXISTING ATTENDANCE JAVASCRIPT
+========================================================= */
 
 (function () {
 
