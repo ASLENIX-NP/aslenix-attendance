@@ -16,12 +16,17 @@ import java.util.List;
 public class LeaveRequestService {
 
     private final LeaveRequestRepository leaveRequestRepository;
+    private final NotificationService notificationService;
 
     public LeaveRequestService(
-            LeaveRequestRepository leaveRequestRepository) {
+            LeaveRequestRepository leaveRequestRepository,
+            NotificationService notificationService) {
 
         this.leaveRequestRepository =
                 leaveRequestRepository;
+
+        this.notificationService =
+                notificationService;
     }
 
     // ============================================================
@@ -121,11 +126,6 @@ public class LeaveRequestService {
 
             // ----------------------------------------------------
             // Calculate total days.
-            //
-            // Example:
-            // 2026-08-26 -> 2026-08-26 = 1 day
-            // 2026-08-26 -> 2026-08-27 = 2 days
-            // 2026-08-26 -> 2026-08-28 = 3 days
             // ----------------------------------------------------
 
             totalDays =
@@ -223,9 +223,6 @@ public class LeaveRequestService {
 
         // --------------------------------------------------------
         // Half-day session
-        //
-        // NULL for full day
-        // FIRST_HALF / SECOND_HALF for half day
         // --------------------------------------------------------
 
         request.setHalfDaySession(
@@ -283,15 +280,7 @@ public class LeaveRequestService {
         );
 
         // ========================================================
-        // IMPORTANT
-        // ========================================================
-        //
-        // Your existing database contains:
-        //
-        // total_days DOUBLE NOT NULL
-        //
-        // Therefore we MUST set totalDays before saving.
-        //
+        // TOTAL DAYS
         // ========================================================
 
         request.setTotalDays(
@@ -401,9 +390,45 @@ public class LeaveRequestService {
                 LocalDateTime.now()
         );
 
-        return leaveRequestRepository.save(
-                request
+        // --------------------------------------------------------
+        // SAVE LEAVE REQUEST
+        // --------------------------------------------------------
+
+        LeaveRequest savedRequest =
+                leaveRequestRepository.save(
+                        request
+                );
+
+        // ========================================================
+        // CREATE EMPLOYEE NOTIFICATION
+        // ========================================================
+
+        String leaveName =
+                formatLeaveType(
+                        request.getLeaveType()
+                );
+
+        String message =
+                "Your " +
+                leaveName +
+                " leave request has been approved.";
+
+        if (request.getReviewNote() != null &&
+                !request.getReviewNote().trim().isEmpty()) {
+
+            message +=
+                    " Review note: " +
+                    request.getReviewNote().trim();
+        }
+
+        notificationService.createNotification(
+                request.getEmployee(),
+                "Leave Approved",
+                message,
+                "LEAVE_APPROVED"
         );
+
+        return savedRequest;
     }
 
     // ============================================================
@@ -456,9 +481,45 @@ public class LeaveRequestService {
                 LocalDateTime.now()
         );
 
-        return leaveRequestRepository.save(
-                request
+        // --------------------------------------------------------
+        // SAVE LEAVE REQUEST
+        // --------------------------------------------------------
+
+        LeaveRequest savedRequest =
+                leaveRequestRepository.save(
+                        request
+                );
+
+        // ========================================================
+        // CREATE EMPLOYEE NOTIFICATION
+        // ========================================================
+
+        String leaveName =
+                formatLeaveType(
+                        request.getLeaveType()
+                );
+
+        String message =
+                "Your " +
+                leaveName +
+                " leave request has been rejected.";
+
+        if (request.getReviewNote() != null &&
+                !request.getReviewNote().trim().isEmpty()) {
+
+            message +=
+                    " Review note: " +
+                    request.getReviewNote().trim();
+        }
+
+        notificationService.createNotification(
+                request.getEmployee(),
+                "Leave Rejected",
+                message,
+                "LEAVE_REJECTED"
         );
+
+        return savedRequest;
     }
 
     // ============================================================
@@ -573,4 +634,47 @@ public class LeaveRequestService {
                         today
                 );
     }
+
+    // ============================================================
+    // FORMAT LEAVE TYPE
+    // ============================================================
+
+    private String formatLeaveType(
+            String leaveType) {
+
+        if (leaveType == null ||
+                leaveType.trim().isEmpty()) {
+
+            return "leave";
+        }
+
+        String value =
+                leaveType
+                        .trim()
+                        .toUpperCase();
+
+        return switch (value) {
+
+            case "SICK" ->
+                    "sick";
+
+            case "CASUAL" ->
+                    "casual";
+
+            case "VACATION" ->
+                    "vacation";
+
+            case "EMERGENCY" ->
+                    "emergency";
+
+            case "WORK_FROM_HOME" ->
+                    "work from home";
+
+            default ->
+                    leaveType
+                            .trim()
+                            .toLowerCase();
+        };
+    }
 }
+
