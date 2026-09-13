@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org">
@@ -613,59 +613,33 @@ button {
 
 .notification-button {
     position: relative;
-
-    width: 36px;
-    height: 36px;
-
-    padding: 0;
-
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    border: 1px solid #e7ebf3;
+    background: #ffffff;
+    color: #55627a;
     display: grid;
-
     place-items: center;
-
-    border-radius: 10px;
-
-    background: transparent;
-
-    color: #69758b;
-
     cursor: pointer;
-
-    transition:
-        background .18s ease,
-        color .18s ease,
-        transform .18s ease;
+    transition: all .2s ease;
+    box-shadow: 0 2px 8px rgba(25, 35, 65, 0.04);
 }
 
 .notification-button:hover {
-    background: #f4f6fb;
-
     color: #5365df;
-}
-
-.notification-button:active {
-    transform: scale(.96);
-}
-
-.notification-button:focus-visible {
-    outline: none;
-
-    box-shadow:
-        0 0 0 3px rgba(83,101,223,.14);
+    border-color: #d8def0;
+    background: #fbfbfe;
+    transform: translateY(-1px);
 }
 
 .notification-button svg {
     width: 19px;
     height: 19px;
-
     fill: none;
-
     stroke: currentColor;
-
     stroke-width: 1.8;
-
     stroke-linecap: round;
-
     stroke-linejoin: round;
 }
 

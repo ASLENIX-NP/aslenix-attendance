@@ -23,6 +23,7 @@
 
 <style>
 
+
     /* =====================================================
        RESET
     ===================================================== */
@@ -119,459 +120,1444 @@
     }
 
 
-    /* =====================================================
-       HEADER
-    ===================================================== */
+    
 
-    header {
-        min-height: 72px;
+/* =====================================================
+   LAYOUT
+===================================================== */
 
-        background: var(--surface);
+.app-layout {
+    min-height: 100vh;
+    display: flex;
+}
 
-        border-bottom:
-            1px solid var(--border);
 
-        padding: 14px 34px;
+/* =====================================================
+   SIDEBAR
+===================================================== */
 
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+.sidebar {
+    position: fixed;
 
-        gap: 20px;
+    left: 0;
+    top: 0;
+    bottom: 0;
 
-        position: sticky;
-        top: 0;
+    width: 250px;
 
-        z-index: 1000;
+    padding: 23px 14px 18px;
+
+    display: flex;
+    flex-direction: column;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #f9faff 100%
+        );
+
+    border-right: 1px solid #e4e9f3;
+
+    box-shadow:
+        8px 0 32px rgba(25, 35, 65, 0.055),
+        inset -1px 0 0 rgba(99, 102, 241, 0.06);
+
+    z-index: 1000;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.brand {
+    height: 78px;
+
+    margin-bottom: 25px;
+
+    padding: 0 8px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    background: transparent;
+}
+
+.brand img {
+    display: block;
+
+    width: auto;
+    height: 52px;
+
+    max-width: 175px;
+
+    object-fit: contain;
+
+    background: transparent;
+
+    border: none;
+
+    box-shadow: none;
+
+    transition: transform .25s ease, opacity .25s ease;
+}
+
+.brand img:hover {
+    transform: scale(1.04);
+
+    opacity: .92;
+}
+
+
+/* =====================================================
+   SIDEBAR TITLE
+===================================================== */
+
+.sidebar-section-title {
+    padding: 0 13px;
+
+    margin-bottom: 10px;
+
+    color: #a0a9bc;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.3px;
+
+    text-transform: uppercase;
+}
+
+
+/* =====================================================
+   SIDEBAR MENU
+===================================================== */
+
+.sidebar-menu {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+/* =====================================================
+   SIDEBAR LINK
+===================================================== */
+
+.sidebar-link {
+    position: relative;
+
+    width: 100%;
+
+    min-height: 59px;
+
+    padding: 10px 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    border-radius: 11px;
+
+    color: #536078;
+
+    background: transparent;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+/* =====================================================
+   SIDEBAR HOVER
+===================================================== */
+
+.sidebar-link:hover {
+    background: #f7f8fc;
+
+    color: #4656d9;
+
+    transform: translateX(2px);
+}
+
+
+/* =====================================================
+   SIDEBAR ACTIVE
+===================================================== */
+
+.sidebar-link.active {
+    color: #3f4fd0;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ededff 0%,
+            #f3f4ff 60%,
+            #f8f9ff 100%
+        );
+
+    box-shadow:
+        0 2px 10px rgba(83, 101, 223, 0.09);
+
+    transform: none;
+}
+
+
+/* =====================================================
+   ACTIVE LEFT INDICATOR
+===================================================== */
+
+.sidebar-link.active::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 10px;
+
+    bottom: 10px;
+
+    width: 3.5px;
+
+    border-radius: 0 6px 6px 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ef2ba8,
+            #9b3df0,
+            #168ff5
+        );
+
+    box-shadow:
+        0 2px 10px rgba(104, 69, 220, 0.28);
+}
+
+
+/* =====================================================
+   SIDEBAR ICON
+===================================================== */
+
+.sidebar-icon {
+    width: 37px;
+    height: 37px;
+
+    flex: 0 0 37px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 9px;
+
+    background: #f4f6fb;
+
+    color: #68748b;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+
+/* =====================================================
+   ICON HOVER
+===================================================== */
+
+.sidebar-link:hover .sidebar-icon {
+    background: #e9edff;
+
+    color: #5364e8;
+}
+
+
+/* =====================================================
+   ACTIVE ICON
+===================================================== */
+
+.sidebar-link.active .sidebar-icon {
+    background:
+        linear-gradient(
+            135deg,
+            #eeeaff,
+            #eaf1ff
+        );
+
+    color: #5365df;
+
+    box-shadow:
+        0 3px 8px rgba(83, 101, 223, 0.08);
+}
+
+
+/* =====================================================
+   SIDEBAR SVG
+===================================================== */
+
+.sidebar-icon svg {
+    width: 18px;
+    height: 18px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.9;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+
+/* =====================================================
+   SIDEBAR TEXT
+===================================================== */
+
+.sidebar-text {
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.sidebar-text strong {
+    color: inherit;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.sidebar-text span {
+    color: #a1aabd;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   ACTIVE TEXT
+===================================================== */
+
+.sidebar-link.active .sidebar-text strong {
+    color: #3f4fd0;
+}
+
+.sidebar-link.active .sidebar-text span {
+    color: #858fb0;
+}
+
+
+/* =====================================================
+   SIDEBAR BRANDING
+===================================================== */
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    padding: 14px 8px 4px;
+}
+
+.sidebar-bottom-logo {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 11px 10px;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            110deg,
+            #f7f8fc 0%,
+            #f2f4fb 100%
+        );
+
+    border: 1px solid #e8ecf4;
+}
+
+.sidebar-bottom-logo img {
+    width: auto;
+
+    height: 30px;
+
+    max-width: 30px;
+
+    object-fit: contain;
+}
+
+.sidebar-bottom-logo-text {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 1px;
+
+    min-width: 0;
+}
+
+.sidebar-brand-title {
+    color: #17213d;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    letter-spacing: .8px;
+}
+
+.sidebar-brand-lines {
+    display: flex;
+
+    flex-direction: row;
+
+    gap: 4px;
+
+    flex-wrap: wrap;
+
+    color: #a0a9bc;
+
+    font-size: 8px;
+
+    font-weight: 600;
+
+    line-height: 1.45;
+
+    letter-spacing: .3px;
+}
+
+.sidebar-brand-lines span + span::before {
+    content: "·";
+
+    margin-right: 4px;
+
+    color: #cbd2e0;
+}
+
+.sidebar-gradient-line {
+    width: 30px;
+
+    height: 2px;
+
+    margin-top: 9px;
+
+    border-radius: 99px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ef2ba8,
+            #9b3df0,
+            #168ff5
+        );
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.main-area {
+    width: calc(100% - 250px);
+
+    margin-left: 250px;
+
+    min-width: 0;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.top-header {
+    position: sticky;
+
+    top: 0;
+
+    height: 70px;
+
+    padding: 0 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 25px;
+
+    background: rgba(255,255,255,.92);
+
+    border-bottom: 1px solid rgba(228, 233, 245, 0.9);
+
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    box-shadow: 0 2px 12px rgba(25, 35, 65, 0.045);
+
+    z-index: 900;
+}
+
+
+/* =====================================================
+   HEADER RIGHT
+===================================================== */
+
+.header-right {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 18px;
+
+    min-width: 0;
+
+    margin-left: auto;
+}
+
+
+/* =====================================================
+   NOTIFICATION WRAPPER
+===================================================== */
+
+.notification-wrapper {
+    position: relative;
+}
+
+
+/* =====================================================
+   NOTIFICATION BUTTON
+===================================================== */
+
+.notification-button {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    border: 1px solid #e7ebf3;
+    background: #ffffff;
+    color: #55627a;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all .2s ease;
+    box-shadow: 0 2px 8px rgba(25, 35, 65, 0.04);
+}
+
+.notification-button:hover {
+    color: #5365df;
+    border-color: #d8def0;
+    background: #fbfbfe;
+    transform: translateY(-1px);
+}
+
+.notification-button svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* =====================================================
+   NOTIFICATION DOT / COUNT
+===================================================== */
+
+.notification-dot {
+    position: absolute;
+
+    top: 5px;
+    right: 5px;
+
+    min-width: 8px;
+    height: 8px;
+
+    padding: 0 2px;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 99px;
+
+    background: #ef2ba8;
+
+    border: 2px solid #ffffff;
+
+    color: #ffffff;
+
+    font-size: 7px;
+
+    font-weight: 900;
+
+    line-height: 1;
+
+    box-shadow:
+        0 2px 7px rgba(239,43,168,.25);
+}
+
+.notification-dot.has-count {
+    min-width: 17px;
+
+    height: 17px;
+
+    top: 0;
+    right: -3px;
+
+    display: flex;
+
+    border-width: 2px;
+}
+
+
+/* =====================================================
+   NOTIFICATION DROPDOWN
+===================================================== */
+
+.notification-dropdown {
+    position: absolute;
+
+    top: calc(100% + 12px);
+
+    right: 0;
+
+    width: 370px;
+
+    max-width: calc(100vw - 28px);
+
+    background: #ffffff;
+
+    border: 1px solid #e7ebf3;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 18px 45px rgba(25, 35, 65, 0.16);
+
+    overflow: hidden;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform: translateY(-7px);
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease,
+        visibility .18s ease;
+
+    z-index: 9999;
+}
+
+.notification-dropdown.show {
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translateY(0);
+}
+
+
+/* =====================================================
+   NOTIFICATION HEADER
+===================================================== */
+
+.notification-dropdown-header {
+    min-height: 56px;
+
+    padding: 0 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    border-bottom: 1px solid #edf0f5;
+
+    background: #ffffff;
+}
+
+.notification-header-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.notification-header-title strong {
+    color: #202a44;
+
+    font-size: 13px;
+
+    font-weight: 850;
+}
+
+.notification-header-count {
+    min-width: 20px;
+
+    height: 20px;
+
+    padding: 0 6px;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 99px;
+
+    background: #fff0f8;
+
+    color: #df2397;
+
+    font-size: 8px;
+
+    font-weight: 850;
+}
+
+.notification-header-count.show {
+    display: inline-flex;
+}
+
+.mark-all-read-button {
+    padding: 6px 8px;
+
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #5365df;
+
+    font-size: 9px;
+
+    font-weight: 750;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        color .18s ease;
+}
+
+.mark-all-read-button:hover {
+    background: #f2f4ff;
+}
+
+.mark-all-read-button:disabled {
+    opacity: .45;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   NOTIFICATION BODY
+===================================================== */
+
+.notification-dropdown-body {
+    max-height: 420px;
+
+    overflow-y: auto;
+
+    background: #ffffff;
+}
+
+.notification-dropdown-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.notification-dropdown-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notification-dropdown-body::-webkit-scrollbar-thumb {
+    background: #dce1eb;
+
+    border-radius: 99px;
+}
+
+
+/* =====================================================
+   NOTIFICATION ITEM
+===================================================== */
+
+.notification-item {
+    position: relative;
+
+    width: 100%;
+
+    padding: 14px 15px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 11px;
+
+    background: #ffffff;
+
+    border: 0;
+
+    border-bottom: 1px solid #f0f2f6;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease;
+}
+
+.notification-item:hover {
+    background: #f8f9fd;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.unread {
+    background: #fcfaff;
+}
+
+.notification-item.unread:hover {
+    background: #f8f4ff;
+}
+
+.notification-item.unread::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 13px;
+
+    bottom: 13px;
+
+    width: 3px;
+
+    border-radius: 0 4px 4px 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ef2ba8,
+            #8242ed,
+            #168ff5
+        );
+}
+
+
+/* =====================================================
+   NOTIFICATION ICON
+===================================================== */
+
+.notification-item-icon {
+    width: 34px;
+    height: 34px;
+
+    flex: 0 0 34px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 9px;
+
+    background: #eef1ff;
+
+    color: #5365df;
+}
+
+.notification-item-icon svg {
+    width: 16px;
+    height: 16px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+.notification-item[data-type="SUCCESS"] .notification-item-icon {
+    background: #e8f8ef;
+
+    color: #159452;
+}
+
+.notification-item[data-type="ERROR"] .notification-item-icon {
+    background: #fff0f1;
+
+    color: #df4850;
+}
+
+.notification-item[data-type="WARNING"] .notification-item-icon {
+    background: #fff4e4;
+
+    color: #d48a16;
+}
+
+.notification-item[data-type="LEAVE"] .notification-item-icon {
+    background: #fff0f8;
+
+    color: #df2397;
+}
+
+.notification-item[data-type="TASK"] .notification-item-icon {
+    background: #eef4ff;
+
+    color: #3978e9;
+}
+
+
+/* =====================================================
+   NOTIFICATION CONTENT
+===================================================== */
+
+.notification-item-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.notification-item-top {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.notification-item-title {
+    color: #27314b;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    line-height: 1.35;
+}
+
+.notification-item.unread .notification-item-title {
+    color: #17213d;
+}
+
+.notification-item-time {
+    flex-shrink: 0;
+
+    color: #a0a8b8;
+
+    font-size: 8px;
+
+    font-weight: 650;
+
+    white-space: nowrap;
+}
+
+.notification-item-message {
+    margin-top: 4px;
+
+    color: #7e899e;
+
+    font-size: 9px;
+
+    line-height: 1.55;
+
+    word-break: break-word;
+}
+
+.notification-item-type {
+    display: inline-flex;
+
+    margin-top: 7px;
+
+    padding: 3px 6px;
+
+    border-radius: 5px;
+
+    background: #f2f4f8;
+
+    color: #8a94a6;
+
+    font-size: 7px;
+
+    font-weight: 800;
+
+    letter-spacing: .4px;
+
+    text-transform: uppercase;
+}
+
+
+/* =====================================================
+   EMPTY / LOADING / ERROR
+===================================================== */
+
+.notification-empty {
+    padding: 38px 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+}
+
+.notification-empty-icon {
+    width: 42px;
+    height: 42px;
+
+    margin-bottom: 10px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f0eaff,
+            #e9f2ff
+        );
+
+    color: #675ddc;
+}
+
+.notification-empty-icon svg {
+    width: 19px;
+    height: 19px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+.notification-empty-title {
+    color: #47526a;
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+.notification-empty-text {
+    max-width: 240px;
+
+    margin-top: 4px;
+
+    color: #9aa3b4;
+
+    font-size: 9px;
+
+    line-height: 1.5;
+}
+
+.notification-loading {
+    padding: 35px 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    color: #8c96a9;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+.notification-spinner {
+    width: 14px;
+    height: 14px;
+
+    border: 2px solid #e5e8f0;
+
+    border-top-color: #5365df;
+
+    border-radius: 50%;
+
+    animation:
+        notificationSpin .7s linear infinite;
+}
+
+@keyframes notificationSpin {
+    to {
+        transform: rotate(360deg);
     }
+}
 
+.notification-error {
+    padding: 25px 20px;
 
-    /* =====================================================
-       BRAND
-    ===================================================== */
+    text-align: center;
+}
 
-    .brand-area {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 0;
-    }
+.notification-error-title {
+    color: #d1434d;
 
+    font-size: 10px;
 
-    .logo-box {
-        width: 42px;
-        height: 42px;
+    font-weight: 800;
+}
 
-        flex-shrink: 0;
+.notification-error-text {
+    margin-top: 5px;
 
-        display: grid;
-        place-items: center;
+    color: #9a6670;
 
-        border-radius: 11px;
+    font-size: 8px;
 
-        background: var(--primary);
+    line-height: 1.5;
+}
 
-        color: white;
+.notification-retry-button {
+    margin-top: 10px;
 
-        font-size: 18px;
-        font-weight: 800;
+    padding: 7px 10px;
 
-        box-shadow:
-            0 5px 12px rgba(37, 99, 235, 0.20);
-    }
+    border-radius: 7px;
 
+    background: #f1f3ff;
 
-    .brand {
-        color: var(--navy);
+    color: #5365df;
 
-        font-size: 19px;
-        font-weight: 800;
+    font-size: 8px;
 
-        letter-spacing: -0.2px;
+    font-weight: 800;
 
-        line-height: 1.2;
-    }
+    cursor: pointer;
+}
 
 
-    .brand-subtitle {
-        margin-top: 3px;
+/* =====================================================
+   PROFILE
+===================================================== */
 
-        color: var(--muted);
+.profile {
+    display: flex;
 
-        font-size: 11px;
-        font-weight: 500;
-    }
+    align-items: center;
 
+    gap: 9px;
 
-    /* =====================================================
-       HEADER ACTIONS
-    ===================================================== */
+    padding-left: 4px;
+}
 
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-    }
+.profile-avatar {
+    width: 36px;
+    height: 36px;
 
+    display: grid;
 
-    .header-button,
-    .logout-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+    place-items: center;
 
-        min-height: 38px;
+    border-radius: 50%;
 
-        padding: 8px 14px;
+    color: #ffffff;
 
-        border-radius: 9px;
+    font-size: 13px;
 
-        font-size: 12px;
-        font-weight: 700;
+    font-weight: 800;
 
-        cursor: pointer;
+    background:
+        linear-gradient(
+            135deg,
+            #6846d9,
+            #394fe1
+        );
 
-        transition:
-            background 0.2s ease,
-            border-color 0.2s ease,
-            color 0.2s ease,
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
-    }
+    box-shadow:
+        0 4px 12px rgba(70,70,190,.16);
+}
 
+.profile-info {
+    display: flex;
 
-    .header-button {
-        background: var(--primary-light);
+    flex-direction: column;
 
-        border:
-            1px solid var(--primary-border);
+    gap: 2px;
+}
 
-        color: var(--primary);
-    }
+.profile-name {
+    color: #1b2440;
 
+    font-size: 11px;
 
-    .header-button:hover {
-        background: #dbeafe;
-        border-color: #bfdbfe;
+    font-weight: 800;
+}
 
-        transform: translateY(-1px);
-    }
+.profile-role {
+    color: #929caf;
 
+    font-size: 9px;
+}
 
-    .logout-form {
-        display: inline;
-    }
+.profile-arrow {
+    width: 14px;
+    height: 14px;
 
+    margin-left: 4px;
 
-    .logout-button {
-        background: white;
+    color: #8b95a8;
+}
 
-        border:
-            1px solid var(--danger-border);
 
-        color: var(--danger);
-    }
+/* =====================================================
+   PROFILE DROPDOWN
+===================================================== */
 
+.profile-wrapper {
+    position: relative;
+}
 
-    .logout-button:hover {
-        background: var(--danger-bg);
+.profile {
+    cursor: pointer;
 
-        border-color: #fca5a5;
+    border: 0;
 
-        transform: translateY(-1px);
+    background: transparent;
 
-        box-shadow:
-            0 5px 14px rgba(220, 38, 38, 0.08);
-    }
+    font: inherit;
 
+    color: inherit;
 
-    /* =====================================================
-       LAYOUT
-    ===================================================== */
+    padding: 0;
 
-    .layout {
-        display: flex;
+    display: flex;
 
-        min-height:
-            calc(100vh - 72px);
+    align-items: center;
 
-        width: 100%;
-    }
+    gap: 9px;
 
+    padding-left: 4px;
+}
 
-    /* =====================================================
-       SIDEBAR
-    ===================================================== */
+.profile-dropdown {
+    position: absolute;
 
-    .sidebar {
-        width: 245px;
-        min-width: 245px;
-        flex: 0 0 245px;
+    top: calc(100% + 10px);
 
-        background: var(--surface);
+    right: 0;
 
-        border-right:
-            1px solid var(--border);
+    width: 190px;
 
-        padding: 25px 15px;
+    padding: 7px;
 
-        position: sticky;
-        top: 72px;
+    background: #ffffff;
 
-        height:
-            calc(100vh - 72px);
+    border: 1px solid #e8edf4;
 
-        overflow-y: auto;
+    border-radius: 11px;
 
-        z-index: 100;
-    }
+    box-shadow:
+        0 12px 30px rgba(35,48,85,.12);
 
+    z-index: 2000;
 
-    /* =====================================================
-       SIDEBAR TITLE
-    ===================================================== */
+    opacity: 0;
 
-    .sidebar-title {
-        padding: 0 11px;
+    visibility: hidden;
 
-        margin-bottom: 12px;
+    transform: translateY(-7px);
 
-        color: var(--light-muted);
+    transition:
+        opacity .18s ease,
+        transform .18s ease,
+        visibility .18s ease;
+}
 
-        font-size: 10px;
-        font-weight: 800;
+.profile-dropdown.show {
+    opacity: 1;
 
-        letter-spacing: 1.25px;
+    visibility: visible;
 
-        text-transform: uppercase;
-    }
+    transform: translateY(0);
+}
 
+.profile-dropdown-item {
+    width: 100%;
 
-    /* =====================================================
-       SIDEBAR MENU
-    ===================================================== */
+    min-height: 40px;
 
-    .sidebar-menu {
-        display: flex;
-        flex-direction: column;
+    padding: 0 11px;
 
-        gap: 4px;
+    display: flex;
 
-        width: 100%;
-    }
+    align-items: center;
 
+    gap: 10px;
 
-    /* =====================================================
-       SIDEBAR LINK
-    ===================================================== */
+    border-radius: 8px;
 
-    .sidebar-link {
-        position: relative;
+    background: transparent;
 
-        display: flex;
-        align-items: center;
+    color: #4d5870;
 
-        gap: 11px;
+    font-size: 11px;
 
-        width: 100%;
+    font-weight: 700;
 
-        padding: 10px 11px;
+    text-decoration: none;
 
-        border:
-            1px solid transparent;
+    cursor: pointer;
 
-        border-radius: 11px;
+    text-align: left;
 
-        color: var(--muted);
+    transition:
+        background .18s ease,
+        color .18s ease;
+}
 
-        transition:
-            background 0.2s ease,
-            border-color 0.2s ease,
-            color 0.2s ease,
-            transform 0.2s ease;
-    }
+.profile-dropdown-item:hover {
+    background: #f5f7fb;
 
+    color: #5365df;
+}
 
-    .sidebar-link:hover {
-        background: #f8fafc;
+.profile-dropdown-item svg {
+    width: 17px;
+    height: 17px;
 
-        border-color: var(--border);
+    flex-shrink: 0;
+}
 
-        color: var(--primary);
+.profile-dropdown-divider {
+    height: 1px;
 
-        transform: translateX(2px);
-    }
+    margin: 5px 4px;
 
+    background: #edf0f5;
+}
 
-    /* =====================================================
-       ACTIVE LINK
-    ===================================================== */
+.logout-form {
+    margin: 0;
 
-    .sidebar-link.active {
-        background: var(--primary-light);
+    padding: 0;
+}
 
-        border:
-            1px solid var(--primary-border);
+.logout-item {
+    border: 0;
 
-        color: var(--primary);
-    }
+    font-family: inherit;
+}
 
+.profile-arrow {
+    transition:
+        transform .18s ease;
+}
 
-    .sidebar-link.active::before {
-        content: "";
+.profile-arrow.rotate {
+    transform: rotate(180deg);
+}
 
-        position: absolute;
 
-        left: -1px;
-        top: 9px;
-        bottom: 9px;
+/* =====================================================
+   HEADER DATE
+===================================================== */
 
-        width: 3px;
+.header-date {
+    height: 35px;
 
-        border-radius: 0 4px 4px 0;
+    padding-left: 17px;
 
-        background: var(--primary);
-    }
+    border-left: 1px solid #e8edf4;
 
+    display: flex;
 
-    /* =====================================================
-       SIDEBAR ICON
-    ===================================================== */
+    align-items: center;
 
-    .sidebar-icon {
-        width: 37px;
-        height: 37px;
+    gap: 7px;
 
-        flex-shrink: 0;
+    color: #59657b;
 
-        display: grid;
-        place-items: center;
+    font-size: 10px;
 
-        border-radius: 9px;
+    font-weight: 600;
 
-        background: #f1f5f9;
+    white-space: nowrap;
+}
 
-        color: #64748b;
+.header-date svg {
+    width: 15px;
+    height: 15px;
 
-        transition:
-            background 0.2s ease,
-            color 0.2s ease;
-    }
+    fill: none;
 
+    stroke: currentColor;
 
-    .sidebar-icon svg {
-        width: 18px;
-        height: 18px;
+    stroke-width: 1.7;
 
-        stroke: currentColor;
+    stroke-linecap: round;
 
-        stroke-width: 2;
+    stroke-linejoin: round;
+}
 
-        fill: none;
 
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
 
 
-    .sidebar-link:hover .sidebar-icon {
-        background: #dbeafe;
-        color: var(--primary);
-    }
-
-
-    .sidebar-link.active .sidebar-icon {
-        background: var(--primary);
-        color: white;
-    }
-
-
-    .sidebar-link.active .sidebar-icon svg {
-        stroke-width: 2.2;
-    }
-
-
-    /* =====================================================
-       SIDEBAR TEXT
-    ===================================================== */
-
-    .sidebar-text {
-        display: flex;
-        flex-direction: column;
-
-        gap: 3px;
-
-        min-width: 0;
-    }
-
-
-    .sidebar-text strong {
-        color: var(--text);
-
-        font-size: 13px;
-        font-weight: 700;
-
-        white-space: nowrap;
-    }
-
-
-    .sidebar-text span {
-        color: var(--light-muted);
-
-        font-size: 10px;
-
-        white-space: nowrap;
-    }
-
-
-    .sidebar-link:hover .sidebar-text strong,
-    .sidebar-link.active .sidebar-text strong {
-        color: var(--primary);
-    }
-
-
-    /* =====================================================
-       SIDEBAR FOOTER
-    ===================================================== */
-
-    .sidebar-footer {
-        margin-top: 24px;
-
-        padding: 14px;
-
-        border:
-            1px solid var(--border);
-
-        border-radius: 12px;
-
-        background: var(--surface-soft);
-    }
-
-
-    .sidebar-footer-title {
-        color: var(--muted);
-
-        font-size: 10px;
-        font-weight: 800;
-
-        text-transform: uppercase;
-
-        letter-spacing: 0.7px;
-
-        margin-bottom: 6px;
-    }
-
-
-    .sidebar-footer-text {
-        color: var(--light-muted);
-
-        font-size: 10px;
-
-        line-height: 1.6;
-    }
-
-
-    /* =====================================================
+/* =====================================================
        MAIN CONTENT
     ===================================================== */
 
@@ -1587,7 +2573,12 @@
        RESPONSIVE - 1200px
     ===================================================== */
 
-    @media (max-width: 1200px) {
+    
+
+/* =====================================================
+   DASHBOARD RESPONSIVE CONTENT
+===================================================== */
+@media (max-width: 1200px) {
 
         main {
             padding-left: 28px;
@@ -1640,7 +2631,7 @@
 
     @media (max-width: 900px) {
 
-        header {
+         .top- .top-header {
             padding: 13px 23px;
         }
 
@@ -1657,7 +2648,7 @@
         }
 
 
-        .page-header {
+        .page- .top- .top-header {
             align-items: flex-start;
 
             flex-direction: column;
@@ -1677,7 +2668,7 @@
 
     @media (max-width: 720px) {
 
-        header {
+         .top- .top-header {
             min-height: 66px;
 
             padding: 12px 18px;
@@ -1717,7 +2708,7 @@
         }
 
 
-        .layout {
+        .app-layout {
             display: block;
         }
 
@@ -1824,7 +2815,7 @@
 
     @media (max-width: 480px) {
 
-        header {
+         .top- .top-header {
             padding: 11px 13px;
         }
 
@@ -1924,7 +2915,7 @@
         }
 
 
-        .panel-header {
+        .panel- .top- .top-header {
             flex-direction: column;
         }
 
@@ -1935,349 +2926,1151 @@
 
     }
 
-</style>
 
+
+/* =====================================================
+   RESPONSIVE 1100
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .summary {
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+    }
+
+    .header-date {
+        display: none;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE 850
+===================================================== */
+
+@media (max-width: 850px) {
+
+    .sidebar {
+        width: 210px;
+    }
+
+    .main-area {
+        width: calc(100% - 210px);
+
+        margin-left: 210px;
+    }
+
+    .top-header {
+        padding: 0 20px;
+    }
+
+    main {
+        padding: 25px 20px 40px;
+    }
+
+    .profile-info,
+    .profile-arrow {
+        display: none;
+    }
+
+    .hero-message {
+        display: none;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE 680
+===================================================== */
+
+@media (max-width: 680px) {
+
+    .app-layout {
+        display: block;
+    }
+
+    .sidebar {
+        position: relative;
+
+        width: 100%;
+
+        height: auto;
+
+        padding: 15px;
+
+        border-right: none;
+
+        border-bottom: 1px solid #e8edf6;
+    }
+
+    .brand {
+        height: 60px;
+
+        margin-bottom: 12px;
+
+        padding: 0;
+
+        justify-content: center;
+    }
+
+    .brand img {
+        width: auto;
+
+        height: 40px;
+
+        max-width: 140px;
+    }
+
+    .sidebar-menu {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+        gap: 5px;
+    }
+
+    .sidebar-bottom {
+        display: none;
+    }
+
+    .main-area {
+        width: 100%;
+
+        margin-left: 0;
+    }
+
+    .top-header {
+        position: relative;
+
+        height: auto;
+
+        min-height: 65px;
+
+        padding: 13px 16px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .header-right {
+        gap: 5px;
+    }
+
+    .page-hero {
+        padding: 22px;
+    }
+
+    .summary {
+        grid-template-columns: 1fr;
+    }
+
+    .attendance-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .attendance-time-info {
+        grid-template-columns: 1fr;
+    }
+
+    .page-footer {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .notification-dropdown {
+        right: -5px;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE 450
+===================================================== */
+
+@media (max-width: 450px) {
+
+    main {
+        padding: 18px 13px 30px;
+    }
+
+    .top-header {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .header-right {
+        justify-content: space-between;
+    }
+
+    .page-hero h1 {
+        font-size: 23px;
+    }
+
+    .attendance-action-panel,
+    .panel {
+        padding: 15px;
+    }
+
+    .attendance-action-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .sidebar-menu {
+        grid-template-columns: 1fr;
+    }
+
+    .notification-dropdown {
+        width: calc(100vw - 26px);
+
+        right: -5px;
+    }
+}
+
+
+
+
+
+    /* =====================================================
+       ASLENIX DASHBOARD BODY — VISUAL REFRESH
+       Matches the employee attendance page palette
+    ===================================================== */
+
+    :root {
+        --as-pink: #ef2ba8;
+        --as-purple: #8242ed;
+        --as-blue: #168ff5;
+        --as-indigo: #5365df;
+        --as-bg: #f7faff;
+        --as-text: #17213d;
+        --as-muted: #7d889d;
+        --as-border: #e7ebf3;
+    }
+
+    body {
+        background:
+            radial-gradient(circle at 78% 12%, rgba(239,43,168,.055), transparent 27%),
+            radial-gradient(circle at 92% 42%, rgba(22,143,245,.055), transparent 30%),
+            #f7faff;
+    }
+
+    /* MAIN CONTENT */
+    .main-content main {
+        max-width: 1500px;
+        padding: 30px 32px 48px;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+        margin-bottom: 20px;
+    }
+
+    .page-header .eyebrow {
+        color: #6a5ae0;
+        letter-spacing: 1.7px;
+        font-weight: 900;
+    }
+
+    .page-header h1 {
+        color: #17213d;
+        font-weight: 850;
+    }
+
+    .page-header .subtitle {
+        color: #7d889d;
+    }
+
+    .date-box {
+        background: linear-gradient(135deg, #ffffff, #faf9ff);
+        border: 1px solid #e8e9f3;
+        color: #5365df;
+        box-shadow: 0 5px 18px rgba(35,48,85,.045);
+    }
+
+    /* WELCOME */
+    .welcome-card {
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(110deg, #ffffff 0%, #fafbff 55%, #f6f0ff 100%);
+        border: 1px solid #e6eaf3;
+        box-shadow:
+            0 8px 30px rgba(35,48,85,.055),
+            0 1px 0 rgba(255,255,255,.9) inset;
+    }
+
+    .welcome-card::before {
+        content: "";
+        position: absolute;
+        width: 430px;
+        height: 170px;
+        right: -100px;
+        top: -85px;
+        border-radius: 50%;
+        background: linear-gradient(
+            135deg,
+            rgba(239,43,168,.16),
+            rgba(130,66,237,.13),
+            rgba(22,143,245,.14)
+        );
+        filter: blur(12px);
+    }
+
+    .welcome-content,
+    .welcome-date {
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-label {
+        color: #6a5ae0;
+        font-weight: 900;
+        letter-spacing: 1.2px;
+    }
+
+    .welcome-card h2 {
+        color: #17213d;
+    }
+
+    .welcome-card p {
+        color: #7d889d;
+    }
+
+    .welcome-date {
+        border-left-color: #e5e8f1;
+    }
+
+    .welcome-date span {
+        color: #9aa3b4;
+    }
+
+    .welcome-date strong {
+        color: #5365df;
+    }
+
+    /* MONTHLY STATISTICS */
+    .summary {
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        position: relative;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #e6eaf2;
+        border-radius: 15px;
+        box-shadow: 0 6px 22px rgba(35,48,85,.045);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    .summary-card::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #ef2ba8, #8242ed, #168ff5);
+        opacity: .85;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(35,48,85,.075);
+        border-color: #dfe3ef;
+    }
+
+    .summary-card .card-title {
+        color: #69758b;
+        font-weight: 800;
+    }
+
+    .summary-card .card-value {
+        color: #17213d;
+        font-weight: 850;
+    }
+
+    .summary-card .card-note {
+        color: #9aa3b4;
+    }
+
+    .present-card .card-value { color: #159452; }
+    .absent-card .card-value { color: #df4850; }
+    .late-card .card-value { color: #d48a16; }
+    .leave-card .card-value { color: #df2397; }
+
+    /* PANELS */
+    .panel {
+        background: rgba(255,255,255,.96);
+        border: 1px solid #e6eaf2;
+        border-radius: 16px;
+        box-shadow:
+            0 6px 24px rgba(35,48,85,.045),
+            0 1px 3px rgba(35,48,85,.025);
+    }
+
+    .panel-header h2 {
+        color: #1a2440;
+        font-weight: 800;
+    }
+
+    .panel-header p {
+        color: #8b95a8;
+    }
+
+    .view-link {
+        color: #5365df;
+        font-weight: 800;
+    }
+
+    .view-link:hover {
+        color: #8242ed;
+    }
+
+    /* TODAY'S ATTENDANCE */
+    .attendance-status {
+        background: linear-gradient(135deg, #fbfcff, #f8f5ff);
+        border: 1px solid #e7e8f2;
+    }
+
+    .status-dot {
+        background: linear-gradient(135deg, #ef2ba8, #8242ed, #168ff5);
+        box-shadow: 0 0 0 4px rgba(130,66,237,.08);
+    }
+
+    .attendance-status strong,
+    .today-item strong {
+        color: #17213d;
+    }
+
+    .attendance-status span,
+    .today-item .label {
+        color: #8b95a8;
+    }
+
+    .today-item {
+        background: #fbfcff;
+        border: 1px solid #e7ebf2;
+        transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .today-item:hover {
+        background: #faf8ff;
+        border-color: #dddaf1;
+        transform: translateY(-1px);
+    }
+
+    .status-working {
+        background: #eef1ff;
+        color: #5365df;
+        border-color: #dfe4ff;
+    }
+
+    .status-present {
+        background: #e8f8ef;
+        color: #159452;
+        border-color: #c9efd9;
+    }
+
+    .status-late {
+        background: #fff4e4;
+        color: #c47d0e;
+        border-color: #f8dfae;
+    }
+
+    .status-absent {
+        background: #fff0f1;
+        color: #d9434d;
+        border-color: #f7d0d3;
+    }
+
+    /* ATTENDANCE ACTION */
+    .qr-card {
+        background: linear-gradient(110deg, #f7f1ff, #f1f6ff);
+        border: 1px solid #e1ddf7;
+    }
+
+    .qr-card h3 {
+        color: #5365df;
+    }
+
+    .qr-card p {
+        color: #7d889d;
+    }
+
+    .qr-button,
+    .leave-button {
+        background: linear-gradient(135deg, #ef2ba8, #8242ed 55%, #168ff5);
+        box-shadow: 0 6px 16px rgba(104,70,217,.14);
+    }
+
+    .qr-button:hover,
+    .leave-button:hover {
+        background: linear-gradient(135deg, #df2397, #7435db 55%, #0e80df);
+        box-shadow: 0 8px 20px rgba(104,70,217,.2);
+    }
+
+    /* MONTHLY SUMMARY */
+    .month-item {
+        position: relative;
+        background: #fbfcff;
+        border: 1px solid #e7ebf2;
+    }
+
+    .month-item::before {
+        content: "";
+        display: block;
+        width: 24px;
+        height: 3px;
+        margin-bottom: 10px;
+        border-radius: 99px;
+        background: linear-gradient(90deg, #ef2ba8, #8242ed, #168ff5);
+    }
+
+    .month-item span {
+        color: #8b95a8;
+    }
+
+    .month-item strong {
+        color: #17213d;
+    }
+
+    /* LEAVE */
+    .leave-summary {
+        background: linear-gradient(135deg, #fbfcff, #faf7ff);
+        border: 1px solid #e7e5f1;
+    }
+
+    .leave-summary span {
+        color: #8b95a8;
+    }
+
+    .leave-summary strong {
+        color: #df2397;
+    }
+
+    /* QUICK ACTIONS */
+    .quick-action {
+        background: #ffffff;
+        border: 1px solid #e7ebf2;
+    }
+
+    .quick-action:hover {
+        background: #fbfaff;
+        border-color: #dddaf0;
+        box-shadow: 0 6px 16px rgba(35,48,85,.055);
+    }
+
+    .quick-icon {
+        background: linear-gradient(135deg, #f5edff, #eef4ff);
+        color: #5365df;
+    }
+
+    .quick-action strong {
+        color: #27314b;
+    }
+
+    .quick-action span {
+        color: #8b95a8;
+    }
+
+    /* EMPLOYEE INFORMATION */
+    .info-item {
+        background: #fbfcff;
+        border: 1px solid #e7ebf2;
+    }
+
+    .info-item span {
+        color: #8b95a8;
+    }
+
+    .info-item strong {
+        color: #27314b;
+    }
+
+    .info-note {
+        background: linear-gradient(135deg, #fafbff, #f8f5ff);
+        border: 1px solid #e7e5f1;
+        color: #8b95a8;
+    }
+
+    @media (max-width: 720px) {
+        .main-content main {
+            padding: 24px 18px 40px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main-content main {
+            padding: 20px 13px 32px;
+        }
+    }
+
+</style>
 
 </head>
 
 <body>
 
-<!-- =====================================================
-     HEADER
-====================================================== -->
-
-<header>
+<div class="app-layout">
 
 
-<div class="brand-area">
-
-    <div class="logo-box">
-        A
-    </div>
-
-    <div>
-
-        <div class="brand">
-            ASLENIX EMPLOYEE
-        </div>
-
-        <div class="brand-subtitle">
-            Attendance Management System
-        </div>
-
-    </div>
-
-</div>
-
-
-<div class="header-actions">
-
-    <a th:href="@{/employee/dashboard}"
-       class="header-button">
-        Dashboard
-    </a>
-
-
-    <form th:action="@{/logout}"
-          method="post"
-          class="logout-form">
-
-        <input type="hidden"
-               th:name="${_csrf.parameterName}"
-               th:value="${_csrf.token}">
-
-        <button type="submit"
-                class="logout-button">
-            Sign out
-        </button>
-
-    </form>
-
-</div>
-
-
-</header>
-
-<!-- =====================================================
-     PAGE LAYOUT
-====================================================== -->
-
-<div class="layout">
-
-
-<!-- =================================================
-     SIDEBAR
-================================================== -->
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
 <aside class="sidebar">
-
-
-    <div class="sidebar-title">
-        My Workspace
-    </div>
-
-
-    <nav class="sidebar-menu">
-
-
-        <!-- DASHBOARD -->
-
-        <a th:href="@{/employee/dashboard}"
-           class="sidebar-link active">
-
-            <div class="sidebar-icon">
-
-                <svg viewBox="0 0 24 24"
-                     aria-hidden="true">
-
-                    <rect
-                        x="3"
-                        y="3"
-                        width="7"
-                        height="7">
-                    </rect>
-
-                    <rect
-                        x="14"
-                        y="3"
-                        width="7"
-                        height="7">
-                    </rect>
-
-                    <rect
-                        x="3"
-                        y="14"
-                        width="7"
-                        height="7">
-                    </rect>
-
-                    <rect
-                        x="14"
-                        y="14"
-                        width="7"
-                        height="7">
-                    </rect>
-
-                </svg>
-
-            </div>
-
-
-            <div class="sidebar-text">
-
-                <strong>
-                    Dashboard
-                </strong>
-
-                <span>
-                    Employee dashboard
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- MY ATTENDANCE -->
-
-        <a th:href="@{/employee/attendance}"
-           class="sidebar-link">
-
-            <div class="sidebar-icon">
-
-                <svg viewBox="0 0 24 24"
-                     aria-hidden="true">
-
-                    <rect
-                        x="3"
-                        y="4"
-                        width="18"
-                        height="17"
-                        rx="2">
-                    </rect>
-
-                    <path d="M16 2v4"></path>
-
-                    <path d="M8 2v4"></path>
-
-                    <path d="M3 10h18"></path>
-
-                    <path d="m8 15 2 2 5-5"></path>
-
-                </svg>
-
-            </div>
-
-
-            <div class="sidebar-text">
-
-                <strong>
-                    My Attendance
-                </strong>
-
-                <span>
-                    View attendance
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- MY TASKS -->
-
-        <a th:href="@{/employee/tasks}"
-           class="sidebar-link">
-
-            <div class="sidebar-icon">
-
-                <svg viewBox="0 0 24 24"
-                     aria-hidden="true">
-
-                    <path d="M9 11l3 3L22 4"></path>
-
-                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-
-                </svg>
-
-            </div>
-
-
-            <div class="sidebar-text">
-
-                <strong>
-                    My Tasks
-                </strong>
-
-                <span>
-                    Assigned tasks
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- LEAVE -->
-
-        <a th:href="@{/employee/leave}"
-           class="sidebar-link">
-
-            <div class="sidebar-icon">
-
-                <svg viewBox="0 0 24 24"
-                     aria-hidden="true">
-
-                    <rect
-                        x="3"
-                        y="4"
-                        width="18"
-                        height="17"
-                        rx="2">
-                    </rect>
-
-                    <path d="M16 2v4"></path>
-
-                    <path d="M8 2v4"></path>
-
-                    <path d="M3 10h18"></path>
-
-                    <path d="M8 14h3"></path>
-
-                    <path d="M8 18h6"></path>
-
-                </svg>
-
-            </div>
-
-
-            <div class="sidebar-text">
-
-                <strong>
-                    Leave
-                </strong>
-
-                <span>
-                    Leave requests
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- MY PROFILE -->
-
-        <a th:href="@{/employee/profile}"
-           class="sidebar-link">
-
-            <div class="sidebar-icon">
-
-                <svg viewBox="0 0 24 24"
-                     aria-hidden="true">
-
-                    <circle
-                        cx="12"
-                        cy="8"
-                        r="4">
-                    </circle>
-
-                    <path
-                        d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7">
-                    </path>
-
-                </svg>
-
-            </div>
-
-
-            <div class="sidebar-text">
-
-                <strong>
-                    My Profile
-                </strong>
-
-                <span>
-                    Employee information
-                </span>
-
-            </div>
-
-        </a>
-
-
-    </nav>
-
-
-    <!-- SIDEBAR FOOTER -->
-
-    <div class="sidebar-footer">
-
-        <div class="sidebar-footer-title">
-            Employee Portal
+        <!-- =================================================
+            SECTION TITLE
+        ================================================== -->
+
+        <div class="sidebar-section-title">
+            My Workspace
         </div>
 
-        <div class="sidebar-footer-text">
-            Manage your attendance,
-            tasks, leave requests
-            and employee profile
-            from one place.
+
+        <!-- =================================================
+            NAVIGATION
+        ================================================== -->
+
+        <nav class="sidebar-menu">
+
+
+            <!-- =================================================
+                DASHBOARD
+            ================================================== -->
+
+            <a
+                th:href="@{/employee/dashboard}"
+                class="sidebar-link active"
+            >
+
+                <div class="sidebar-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <rect
+                            x="3"
+                            y="3"
+                            width="7"
+                            height="7">
+                        </rect>
+
+                        <rect
+                            x="14"
+                            y="3"
+                            width="7"
+                            height="7">
+                        </rect>
+
+                        <rect
+                            x="3"
+                            y="14"
+                            width="7"
+                            height="7">
+                        </rect>
+
+                        <rect
+                            x="14"
+                            y="14"
+                            width="7"
+                            height="7">
+                        </rect>
+
+                    </svg>
+
+                </div>
+
+
+                <div class="sidebar-text">
+
+                    <strong>Dashboard</strong>
+
+                    <span>Employee dashboard</span>
+
+                </div>
+
+            </a>
+
+
+            <!-- =================================================
+                ATTENDANCE
+            ================================================== -->
+
+            <a
+                th:href="@{/employee/attendance}"
+                class="sidebar-link"
+            >
+
+                <div class="sidebar-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <rect
+                            x="3"
+                            y="4"
+                            width="18"
+                            height="17"
+                            rx="2">
+                        </rect>
+
+                        <path d="M16 2v4"></path>
+
+                        <path d="M8 2v4"></path>
+
+                        <path d="M3 10h18"></path>
+
+                        <path d="m8 15 2 2 5-5"></path>
+
+                    </svg>
+
+                </div>
+
+
+                <div class="sidebar-text">
+
+                    <strong>My Attendance</strong>
+
+                    <span>View attendance</span>
+
+                </div>
+
+            </a>
+
+
+            <!-- =================================================
+                TASKS
+            ================================================== -->
+
+            <a
+                th:href="@{/employee/tasks}"
+                class="sidebar-link"
+            >
+
+                <div class="sidebar-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <rect
+                            x="5"
+                            y="3"
+                            width="14"
+                            height="18"
+                            rx="2">
+                        </rect>
+
+                        <path d="M9 3V2h6v1"></path>
+
+                        <path d="M8 8h8"></path>
+
+                        <path d="m8 12 1.5 1.5L12 11"></path>
+
+                        <path d="M13 13h3"></path>
+
+                        <path d="M8 17h8"></path>
+
+                    </svg>
+
+                </div>
+
+
+                <div class="sidebar-text">
+
+                    <strong>My Tasks</strong>
+
+                    <span>Assigned tasks</span>
+
+                </div>
+
+            </a>
+
+
+            <!-- =================================================
+                LEAVE
+            ================================================== -->
+
+            <a
+                th:href="@{/employee/leave}"
+                class="sidebar-link"
+            >
+
+                <div class="sidebar-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <rect
+                            x="3"
+                            y="4"
+                            width="18"
+                            height="17"
+                            rx="2">
+                        </rect>
+
+                        <path d="M16 2v4"></path>
+
+                        <path d="M8 2v4"></path>
+
+                        <path d="M3 10h18"></path>
+
+                        <path d="M8 14h3"></path>
+
+                        <path d="M8 18h2"></path>
+
+                        <path d="M15 14h2"></path>
+
+                        <path d="M15 18h2"></path>
+
+                    </svg>
+
+                </div>
+
+
+                <div class="sidebar-text">
+
+                    <strong>Leave</strong>
+
+                    <span>Leave requests</span>
+
+                </div>
+
+            </a>
+
+
+            <!-- =================================================
+                PROFILE
+            ================================================== -->
+
+            <a
+                th:href="@{/employee/profile}"
+                class="sidebar-link"
+            >
+
+                <div class="sidebar-icon">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M20 21a8 8 0 0 0-16 0"></path>
+
+                        <circle
+                            cx="12"
+                            cy="7"
+                            r="4">
+                        </circle>
+
+                    </svg>
+
+                </div>
+
+
+                <div class="sidebar-text">
+
+                    <strong>My Profile</strong>
+
+                    <span>Employee information</span>
+
+                </div>
+
+            </a>
+
+        </nav>
+
+
+        <!-- =================================================
+            SIDEBAR BOTTOM BRAND
+        ================================================== -->
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-bottom-logo">
+
+                <img
+                    th:src="@{/images/logo1.jpeg}"
+                    src="/images/logo1.jpeg"
+                    alt="ASLENIX"
+                >
+
+                <div class="sidebar-bottom-logo-text">
+
+                    <div class="sidebar-brand-title">
+                        ASLENIX
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="sidebar-gradient-line"></div>
+
         </div>
 
-    </div>
+     </aside>
 
 
-</aside>
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
+
+    <div class="main-area">
+
+<header class="top-header">
+
+        <!-- HEADER RIGHT -->
+
+        <div class="header-right">
 
 
-<!-- =================================================
-     MAIN CONTENT
+            <!-- =================================================
+                 NOTIFICATIONS
+            ================================================== -->
+
+            <div class="notification-wrapper">
+
+                <button
+                    type="button"
+                    class="notification-button"
+                    id="notificationButton"
+                    aria-label="Notifications"
+                    aria-expanded="false">
+
+                    <svg viewBox="0 0 24 24">
+
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+
+                        <path d="M10 21h4"></path>
+
+                    </svg>
+
+                    <span
+                        class="notification-dot"
+                        id="notificationDot">
+                    </span>
+
+                </button>
+
+
+                <!-- =================================================
+                     NOTIFICATION DROPDOWN
+                ================================================== -->
+
+                <div
+                    class="notification-dropdown"
+                    id="notificationDropdown"
+                    aria-hidden="true">
+
+
+                    <!-- HEADER -->
+
+                    <div class="notification-dropdown-header">
+
+                        <div class="notification-header-title">
+
+                            <strong>
+                                Notifications
+                            </strong>
+
+                            <span
+                                class="notification-header-count"
+                                id="notificationHeaderCount">
+                                0
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="mark-all-read-button"
+                            id="markAllReadButton"
+                            disabled>
+
+                            Mark all as read
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- BODY -->
+
+                    <div
+                        class="notification-dropdown-body"
+                        id="notificationDropdownBody">
+
+                        <div class="notification-loading">
+
+                            <div class="notification-spinner"></div>
+
+                            <span>
+                                Loading notifications...
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+          <!-- =================================================
+     PROFILE
 ================================================== -->
 
-<div class="main-content">
+            <div class="profile-wrapper">
 
 
-    <main>
+            <button
+                type="button"
+                class="profile"
+                id="profileButton"
+                aria-label="Open profile menu"
+                aria-expanded="false">
+
+                <div class="profile-avatar"
+                    th:text="${employee.firstName != null and !employee.firstName.isEmpty()
+                        ? employee.firstName.substring(0,1).toUpperCase()
+                        : 'E'}">
+                    E
+                </div>
+
+                <div class="profile-info">
+
+                    <div
+                        class="profile-name"
+                        th:text="${employee.firstName + ' ' + employee.lastName}">
+                        Employee
+                    </div>
+
+                    <div class="profile-role">
+                        Employee Portal
+                    </div>
+
+                </div>
+
+                <svg
+                    class="profile-arrow"
+                    id="profileArrow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+
+                    <path d="m6 9 6 6 6-6"></path>
+
+                </svg>
+
+            </button>
+
+
+            <!-- PROFILE DROPDOWN -->
+
+            <div
+                class="profile-dropdown"
+                id="profileDropdown">
+
+                <a
+                    th:href="@{/employee/profile}"
+                    class="profile-dropdown-item">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8">
+
+                        <circle cx="12" cy="8" r="4"></circle>
+
+                        <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path>
+
+                    </svg>
+
+                    <span>
+                        Profile
+                    </span>
+
+                </a>
+
+
+                <div class="profile-dropdown-divider"></div>
+
+
+                <form
+                    th:action="@{/logout}"
+                    method="post"
+                    class="logout-form">
+
+                    <input
+                        type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}">
+
+                    <button
+                        type="submit"
+                        class="profile-dropdown-item logout-item">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8">
+
+                            <path d="M10 17l5-5-5-5"></path>
+                            <path d="M15 12H3"></path>
+                            <path d="M21 19V5a2 2 0 0 0-2-2h-6"></path>
+
+                        </svg>
+
+                        <span>
+                            Logout
+                        </span>
+
+                    </button>
+
+                </form>
+
+            </div>
+          
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CURRENT DATE
+            ================================================== -->
+
+            <div class="header-date">
+
+                <svg viewBox="0 0 24 24">
+
+                    <rect x="3" y="4" width="18" height="17" rx="2"></rect>
+
+                    <path d="M16 2v4"></path>
+                    <path d="M8 2v4"></path>
+                    <path d="M3 10h18"></path>
+
+                </svg>
+
+                <span
+                    id="headerBsDate">
+                    Loading...
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+<main>
 
 
         <!-- =================================================
@@ -3232,15 +5025,1165 @@
 
     </main>
 
+    </div>
 
 </div>
 
+<script>
 
-</div>
+/* =========================================================
+   PROFILE DROPDOWN
+========================================================= */
 
-<!-- =====================================================
-     AD → BS DATE CONVERSION
-====================================================== -->
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const profileButton =
+            document.getElementById('profileButton');
+
+        const profileDropdown =
+            document.getElementById('profileDropdown');
+
+        const profileArrow =
+            document.getElementById('profileArrow');
+
+
+        if (!profileButton || !profileDropdown) {
+            return;
+        }
+
+
+        profileButton.addEventListener(
+            'click',
+            function (event) {
+
+                event.stopPropagation();
+
+                const isOpen =
+                    profileDropdown.classList.toggle('show');
+
+                profileButton.setAttribute(
+                    'aria-expanded',
+                    isOpen
+                );
+
+                if (profileArrow) {
+
+                    profileArrow.classList.toggle(
+                        'rotate',
+                        isOpen
+                    );
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            'click',
+            function (event) {
+
+                if (
+                    !profileButton.contains(event.target) &&
+                    !profileDropdown.contains(event.target)
+                ) {
+
+                    profileDropdown.classList.remove('show');
+
+                    profileButton.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+                    if (profileArrow) {
+
+                        profileArrow.classList.remove('rotate');
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            function (event) {
+
+                if (event.key === 'Escape') {
+
+                    profileDropdown.classList.remove('show');
+
+                    profileButton.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+                    if (profileArrow) {
+
+                        profileArrow.classList.remove('rotate');
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   NOTIFICATION SYSTEM
+========================================================= */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const notificationButton =
+            document.getElementById(
+                'notificationButton'
+            );
+
+        const notificationDropdown =
+            document.getElementById(
+                'notificationDropdown'
+            );
+
+        const notificationDropdownBody =
+            document.getElementById(
+                'notificationDropdownBody'
+            );
+
+        const notificationDot =
+            document.getElementById(
+                'notificationDot'
+            );
+
+        const notificationHeaderCount =
+            document.getElementById(
+                'notificationHeaderCount'
+            );
+
+        const markAllReadButton =
+            document.getElementById(
+                'markAllReadButton'
+            );
+
+        const profileDropdown =
+            document.getElementById(
+                'profileDropdown'
+            );
+
+        const profileButton =
+            document.getElementById(
+                'profileButton'
+            );
+
+        const profileArrow =
+            document.getElementById(
+                'profileArrow'
+            );
+
+
+        if (
+            !notificationButton ||
+            !notificationDropdown ||
+            !notificationDropdownBody
+        ) {
+
+            return;
+
+        }
+
+
+        /* =====================================================
+           CSRF
+        ===================================================== */
+
+        function getCsrfToken() {
+
+            const csrfInput =
+                document.querySelector(
+                    'input[name="_csrf"]'
+                );
+
+            if (!csrfInput) {
+                return null;
+            }
+
+            return csrfInput.value;
+        }
+
+
+        /* =====================================================
+           NOTIFICATION ICON
+        ===================================================== */
+
+        function getNotificationIcon(type) {
+
+            const normalizedType =
+                String(type || '')
+                    .trim()
+                    .toUpperCase();
+
+
+            if (normalizedType === 'SUCCESS') {
+
+                return `
+                    <svg viewBox="0 0 24 24">
+                        <path d="m5 12 4 4L19 6"></path>
+                    </svg>
+                `;
+
+            }
+
+
+            if (normalizedType === 'ERROR') {
+
+                return `
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="8.5"></circle>
+                        <path d="M12 8v5"></path>
+                        <path d="M12 16h.01"></path>
+                    </svg>
+                `;
+
+            }
+
+
+            if (normalizedType === 'WARNING') {
+
+                return `
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3 2.8 20h18.4L12 3z"></path>
+                        <path d="M12 9v4"></path>
+                        <path d="M12 16h.01"></path>
+                    </svg>
+                `;
+
+            }
+
+
+            if (normalizedType === 'LEAVE') {
+
+                return `
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="17" rx="2"></rect>
+                        <path d="M16 2v4"></path>
+                        <path d="M8 2v4"></path>
+                        <path d="M3 10h18"></path>
+                        <path d="M8 14h3"></path>
+                        <path d="M8 18h2"></path>
+                    </svg>
+                `;
+
+            }
+
+
+            if (normalizedType === 'TASK') {
+
+                return `
+                    <svg viewBox="0 0 24 24">
+                        <rect x="5" y="3" width="14" height="18" rx="2"></rect>
+                        <path d="M8 8h8"></path>
+                        <path d="m8 12 1.5 1.5L12 11"></path>
+                        <path d="M13 13h3"></path>
+                    </svg>
+                `;
+
+            }
+
+
+            return `
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                    <path d="M10 21h4"></path>
+                </svg>
+            `;
+
+        }
+
+
+        /* =====================================================
+           ESCAPE HTML
+        ===================================================== */
+
+        function escapeHtml(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                return '';
+
+            }
+
+            const div =
+                document.createElement('div');
+
+            div.textContent =
+                String(value);
+
+            return div.innerHTML;
+
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+        ===================================================== */
+
+        function showEmptyNotifications() {
+
+            notificationDropdownBody.innerHTML = `
+
+                <div class="notification-empty">
+
+                    <div class="notification-empty-icon">
+
+                        <svg viewBox="0 0 24 24">
+
+                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+
+                            <path d="M10 21h4"></path>
+
+                        </svg>
+
+                    </div>
+
+                    <div class="notification-empty-title">
+                        No notifications yet
+                    </div>
+
+                    <div class="notification-empty-text">
+                        You are all caught up. New notifications will appear here.
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+
+        /* =====================================================
+           LOADING STATE
+        ===================================================== */
+
+        function showNotificationLoading() {
+
+            notificationDropdownBody.innerHTML = `
+
+                <div class="notification-loading">
+
+                    <div class="notification-spinner"></div>
+
+                    <span>
+                        Loading notifications...
+                    </span>
+
+                </div>
+
+            `;
+
+        }
+
+
+        /* =====================================================
+           ERROR STATE
+        ===================================================== */
+
+        function showNotificationError() {
+
+            notificationDropdownBody.innerHTML = `
+
+                <div class="notification-error">
+
+                    <div class="notification-error-title">
+                        Unable to load notifications
+                    </div>
+
+                    <div class="notification-error-text">
+                        Please check your connection and try again.
+                    </div>
+
+                    <button
+                        type="button"
+                        class="notification-retry-button"
+                        id="notificationRetryButton">
+
+                        Try again
+
+                    </button>
+
+                </div>
+
+            `;
+
+
+            const retryButton =
+                document.getElementById(
+                    'notificationRetryButton'
+                );
+
+
+            if (retryButton) {
+
+                retryButton.addEventListener(
+                    'click',
+                    function (event) {
+
+                        event.stopPropagation();
+
+                        loadNotifications();
+
+                    }
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           UPDATE UNREAD BADGE
+        ===================================================== */
+
+        function updateUnreadBadge(count) {
+
+            const safeCount =
+                Number.isFinite(Number(count))
+                    ? Math.max(0, Number(count))
+                    : 0;
+
+
+            if (safeCount > 0) {
+
+                notificationDot.textContent =
+                    safeCount > 99
+                        ? '99+'
+                        : String(safeCount);
+
+                notificationDot.classList.add(
+                    'has-count'
+                );
+
+
+                notificationHeaderCount.textContent =
+                    safeCount > 99
+                        ? '99+'
+                        : String(safeCount);
+
+                notificationHeaderCount.classList.add(
+                    'show'
+                );
+
+
+                markAllReadButton.disabled =
+                    false;
+
+            } else {
+
+                notificationDot.textContent =
+                    '';
+
+                notificationDot.classList.remove(
+                    'has-count'
+                );
+
+
+                notificationHeaderCount.textContent =
+                    '0';
+
+                notificationHeaderCount.classList.remove(
+                    'show'
+                );
+
+
+                markAllReadButton.disabled =
+                    true;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           GET UNREAD COUNT
+        ===================================================== */
+
+        async function loadUnreadCount() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/employee/notifications/unread-count',
+                        {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'same-origin'
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        'Failed to load unread count'
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                updateUnreadBadge(
+                    data.count || 0
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Notification unread count error:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           RENDER NOTIFICATIONS
+        ===================================================== */
+
+        function renderNotifications(
+            notifications
+        ) {
+
+            notificationDropdownBody.innerHTML =
+                '';
+
+
+            if (
+                !Array.isArray(notifications) ||
+                notifications.length === 0
+            ) {
+
+                showEmptyNotifications();
+
+                return;
+
+            }
+
+
+            notifications.forEach(
+                function (notification) {
+
+                    const item =
+                        document.createElement(
+                            'button'
+                        );
+
+
+                    item.type =
+                        'button';
+
+                    item.className =
+                        'notification-item';
+
+
+                    if (!notification.read) {
+
+                        item.classList.add(
+                            'unread'
+                        );
+
+                    }
+
+
+                    const notificationType =
+                        String(
+                            notification.type || 'GENERAL'
+                        )
+                            .trim()
+                            .toUpperCase();
+
+
+                    item.dataset.type =
+                        notificationType;
+
+
+                    item.dataset.notificationId =
+                        notification.id;
+
+
+                    item.setAttribute(
+                        'aria-label',
+                        'Notification: ' +
+                        (
+                            notification.title ||
+                            'Notification'
+                        )
+                    );
+
+
+                    item.innerHTML = `
+
+                        <div class="notification-item-icon">
+
+                            ${getNotificationIcon(
+                                notificationType
+                            )}
+
+                        </div>
+
+
+                        <div class="notification-item-content">
+
+                            <div class="notification-item-top">
+
+                                <div class="notification-item-title">
+
+                                    ${escapeHtml(
+                                        notification.title ||
+                                        'Notification'
+                                    )}
+
+                                </div>
+
+
+                                <div class="notification-item-time">
+
+                                    ${escapeHtml(
+                                        notification.time ||
+                                        ''
+                                    )}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="notification-item-message">
+
+                                ${escapeHtml(
+                                    notification.message ||
+                                    ''
+                                )}
+
+                            </div>
+
+
+                            <span class="notification-item-type">
+
+                                ${escapeHtml(
+                                    notificationType
+                                )}
+
+                            </span>
+
+                        </div>
+
+                    `;
+
+
+                    item.addEventListener(
+                        'click',
+                        function (event) {
+
+                            event.stopPropagation();
+
+
+                            if (
+                                notification.read
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            markNotificationAsRead(
+                                notification.id,
+                                item
+                            );
+
+                        }
+                    );
+
+
+                    notificationDropdownBody.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           GET ALL NOTIFICATIONS
+        ===================================================== */
+
+        async function loadNotifications() {
+
+            showNotificationLoading();
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/employee/notifications',
+                        {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            },
+                            credentials: 'same-origin'
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        'Failed to load notifications'
+                    );
+
+                }
+
+
+                const notifications =
+                    await response.json();
+
+
+                renderNotifications(
+                    notifications
+                );
+
+
+                await loadUnreadCount();
+
+
+            } catch (error) {
+
+                console.error(
+                    'Notification loading error:',
+                    error
+                );
+
+                showNotificationError();
+
+            }
+
+        }
+
+
+        /* =====================================================
+           MARK ONE NOTIFICATION AS READ
+        ===================================================== */
+
+        async function markNotificationAsRead(
+            notificationId,
+            item
+        ) {
+
+            if (
+                notificationId === null ||
+                notificationId === undefined
+            ) {
+
+                return;
+
+            }
+
+
+            const csrfToken =
+                getCsrfToken();
+
+
+            try {
+
+                const headers = {
+                    'Accept': 'application/json'
+                };
+
+
+                if (csrfToken) {
+
+                    headers[
+                        'X-CSRF-TOKEN'
+                    ] =
+                        csrfToken;
+
+                }
+
+
+                const response =
+                    await fetch(
+                        '/employee/notifications/' +
+                        encodeURIComponent(
+                            notificationId
+                        ) +
+                        '/read',
+                        {
+                            method: 'POST',
+                            headers: headers,
+                            credentials: 'same-origin'
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        'Failed to mark notification as read'
+                    );
+
+                }
+
+
+                if (item) {
+
+                    item.classList.remove(
+                        'unread'
+                    );
+
+                }
+
+
+                await loadUnreadCount();
+
+
+            } catch (error) {
+
+                console.error(
+                    'Mark notification as read error:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           MARK ALL NOTIFICATIONS AS READ
+        ===================================================== */
+
+        async function markAllNotificationsAsRead() {
+
+            const csrfToken =
+                getCsrfToken();
+
+
+            markAllReadButton.disabled =
+                true;
+
+
+            try {
+
+                const headers = {
+                    'Accept': 'application/json'
+                };
+
+
+                if (csrfToken) {
+
+                    headers[
+                        'X-CSRF-TOKEN'
+                    ] =
+                        csrfToken;
+
+                }
+
+
+                const response =
+                    await fetch(
+                        '/employee/notifications/read-all',
+                        {
+                            method: 'POST',
+                            headers: headers,
+                            credentials: 'same-origin'
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        'Failed to mark all notifications as read'
+                    );
+
+                }
+
+
+                const unreadItems =
+                    notificationDropdownBody.querySelectorAll(
+                        '.notification-item.unread'
+                    );
+
+
+                unreadItems.forEach(
+                    function (item) {
+
+                        item.classList.remove(
+                            'unread'
+                        );
+
+                    }
+                );
+
+
+                updateUnreadBadge(
+                    0
+                );
+
+
+                await loadNotifications();
+
+
+            } catch (error) {
+
+                console.error(
+                    'Mark all notifications as read error:',
+                    error
+                );
+
+
+                await loadUnreadCount();
+
+            }
+
+        }
+
+
+        /* =====================================================
+           OPEN NOTIFICATION DROPDOWN
+        ===================================================== */
+
+        notificationButton.addEventListener(
+            'click',
+            async function (event) {
+
+                event.stopPropagation();
+
+
+                const isOpen =
+                    notificationDropdown.classList.toggle(
+                        'show'
+                    );
+
+
+                notificationButton.setAttribute(
+                    'aria-expanded',
+                    String(isOpen)
+                );
+
+
+                notificationDropdown.setAttribute(
+                    'aria-hidden',
+                    String(!isOpen)
+                );
+
+
+                /* ---------------------------------------------
+                   CLOSE PROFILE DROPDOWN
+                --------------------------------------------- */
+
+                if (
+                    isOpen &&
+                    profileDropdown
+                ) {
+
+                    profileDropdown.classList.remove(
+                        'show'
+                    );
+
+
+                    if (profileButton) {
+
+                        profileButton.setAttribute(
+                            'aria-expanded',
+                            'false'
+                        );
+
+                    }
+
+
+                    if (profileArrow) {
+
+                        profileArrow.classList.remove(
+                            'rotate'
+                        );
+
+                    }
+
+                }
+
+
+                /* ---------------------------------------------
+                   LOAD FRESH NOTIFICATIONS
+                --------------------------------------------- */
+
+                if (isOpen) {
+
+                    await loadNotifications();
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           MARK ALL BUTTON
+        ===================================================== */
+
+        markAllReadButton.addEventListener(
+            'click',
+            function (event) {
+
+                event.stopPropagation();
+
+                markAllNotificationsAsRead();
+
+            }
+        );
+
+
+        /* =====================================================
+           CLICK OUTSIDE
+        ===================================================== */
+
+        document.addEventListener(
+            'click',
+            function (event) {
+
+                if (
+                    !notificationButton.contains(
+                        event.target
+                    ) &&
+                    !notificationDropdown.contains(
+                        event.target
+                    )
+                ) {
+
+                    notificationDropdown.classList.remove(
+                        'show'
+                    );
+
+
+                    notificationButton.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+
+                    notificationDropdown.setAttribute(
+                        'aria-hidden',
+                        'true'
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           ESCAPE KEY
+        ===================================================== */
+
+        document.addEventListener(
+            'keydown',
+            function (event) {
+
+                if (
+                    event.key === 'Escape' &&
+                    notificationDropdown.classList.contains(
+                        'show'
+                    )
+                ) {
+
+                    notificationDropdown.classList.remove(
+                        'show'
+                    );
+
+
+                    notificationButton.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+
+                    notificationDropdown.setAttribute(
+                        'aria-hidden',
+                        'true'
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           INITIAL UNREAD COUNT
+        ===================================================== */
+
+        loadUnreadCount();
+
+    }
+);
+
+
+
+</script>
+
+<script>
+
+/* =========================================================
+   CURRENT BS DATE IN HEADER
+========================================================= */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const headerDate =
+            document.getElementById('headerBsDate');
+
+        if (
+            headerDate &&
+            typeof NepaliDate !== 'undefined'
+        ) {
+            try {
+                headerDate.textContent =
+                    new NepaliDate(new Date()).format('DD MMM YYYY');
+            } catch (error) {
+                headerDate.textContent = 'ASLENIX';
+            }
+        }
+    }
+);
+
+</script>
 
 <script>
 
