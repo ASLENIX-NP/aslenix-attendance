@@ -5,6 +5,7 @@ import com.aslenix.attendance.entity.WeeklyWorkingSchedule;
 import com.aslenix.attendance.repository.OfficeSettingsRepository;
 import com.aslenix.attendance.repository.WeeklyWorkingScheduleRepository;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin/settings")
@@ -556,6 +558,123 @@ public class OfficeSettingsController {
         // ============================================================
 
         return "redirect:/admin/settings?saved=true";
+    }
+
+
+    // ============================================================
+    // TOGGLE SPECIFIC DAY IN CURRENT WEEK SCHEDULE (AJAX)
+    // ============================================================
+
+    @PostMapping("/schedule/toggle")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> toggleScheduleDay(
+            @RequestParam("date") String dateStr) {
+
+        try {
+            LocalDate date = LocalDate.parse(dateStr.trim());
+            LocalDate weekStart = date.with(
+                    TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)
+            );
+
+            OfficeSettings settings = officeSettingsRepository
+                    .findFirstByOrderByIdAsc()
+                    .orElseGet(OfficeSettings::new);
+
+            WeeklyWorkingSchedule schedule = weeklyWorkingScheduleRepository
+                    .findByWeekStartAndWorkDate(weekStart, date)
+                    .orElseGet(() -> new WeeklyWorkingSchedule(
+                            weekStart,
+                            date,
+                            isWorkingDay(settings, date.getDayOfWeek())
+                    ));
+
+            schedule.setWorkingDay(!schedule.isWorkingDay());
+            weeklyWorkingScheduleRepository.save(schedule);
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "success", true,
+                            "date", date.toString(),
+                            "workingDay", schedule.isWorkingDay(),
+                            "dayName", date.getDayOfWeek().name(),
+                            "message", "Schedule updated for " + date.getDayOfWeek().name()
+                    )
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of(
+                            "success", false,
+                            "message", "Failed to update schedule: " + e.getMessage()
+                    )
+            );
+        }
+    }
+
+
+    // ============================================================
+    // UPDATE WORKING DAYS DIRECTLY (AJAX)
+    // ============================================================
+
+    @PostMapping("/working-days/update")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateWorkingDays(
+            @RequestParam(name = "sunday", defaultValue = "false") boolean sunday,
+            @RequestParam(name = "monday", defaultValue = "false") boolean monday,
+            @RequestParam(name = "tuesday", defaultValue = "false") boolean tuesday,
+            @RequestParam(name = "wednesday", defaultValue = "false") boolean wednesday,
+            @RequestParam(name = "thursday", defaultValue = "false") boolean thursday,
+            @RequestParam(name = "friday", defaultValue = "false") boolean friday,
+            @RequestParam(name = "saturday", defaultValue = "false") boolean saturday) {
+
+        try {
+            OfficeSettings settings = officeSettingsRepository
+                    .findFirstByOrderByIdAsc()
+                    .orElseGet(OfficeSettings::new);
+
+            settings.setSunday(sunday);
+            settings.setMonday(monday);
+            settings.setTuesday(tuesday);
+            settings.setWednesday(wednesday);
+            settings.setThursday(thursday);
+            settings.setFriday(friday);
+            settings.setSaturday(saturday);
+
+            settings = officeSettingsRepository.save(settings);
+
+            // Synchronize current week
+            LocalDate today = LocalDate.now();
+            LocalDate weekStart = today.with(
+                    TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)
+            );
+
+            List<WeeklyWorkingSchedule> weeklySchedule =
+                    weeklyWorkingScheduleRepository.findByWeekStartOrderByWorkDateAsc(weekStart);
+
+            if (weeklySchedule.isEmpty()) {
+                createWeeklySchedule(weekStart, settings);
+            } else {
+                for (WeeklyWorkingSchedule s : weeklySchedule) {
+                    s.setWorkingDay(isWorkingDay(settings, s.getWorkDate().getDayOfWeek()));
+                    weeklyWorkingScheduleRepository.save(s);
+                }
+            }
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "success", true,
+                            "message", "Working days updated successfully."
+                    )
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of(
+                            "success", false,
+                            "message", "Failed to update working days: " + e.getMessage()
+                    )
+            );
+        }
     }
 
 

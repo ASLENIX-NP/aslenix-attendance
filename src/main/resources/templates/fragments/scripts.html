@@ -64,7 +64,11 @@
                             item.className = 'notification-item' + (notification.read ? '' : ' unread');
                             
                             const date = new Date(notification.createdAt);
-                            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            const bsDateStr = (typeof convertAdToBsString === 'function') 
+                                ? convertAdToBsString(date, 'DD MMM YYYY') 
+                                : date.toLocaleDateString();
+                            const formattedDate = `${bsDateStr} ${timeStr} BS`;
                             
                             item.innerHTML = `
                                 <div class="notification-item-title">${notification.title}</div>

@@ -3,9 +3,11 @@ package com.aslenix.attendance.controller;
 import com.aslenix.attendance.entity.Attendance;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.entity.OfficeSettings;
+import com.aslenix.attendance.entity.WeeklyWorkingSchedule;
 import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.repository.OfficeSettingsRepository;
+import com.aslenix.attendance.repository.WeeklyWorkingScheduleRepository;
 import com.aslenix.attendance.util.GeoUtils;
 
 import org.springframework.http.ResponseEntity;
@@ -18,8 +20,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/employee/attendance")
@@ -28,15 +32,18 @@ public class EmployeeQrAttendanceController {
     private final EmployeeRepository employeeRepository;
     private final AttendanceRepository attendanceRepository;
     private final OfficeSettingsRepository officeSettingsRepository;
+    private final WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository;
 
     public EmployeeQrAttendanceController(
             EmployeeRepository employeeRepository,
             AttendanceRepository attendanceRepository,
-            OfficeSettingsRepository officeSettingsRepository) {
+            OfficeSettingsRepository officeSettingsRepository,
+            WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository) {
 
         this.employeeRepository = employeeRepository;
         this.attendanceRepository = attendanceRepository;
         this.officeSettingsRepository = officeSettingsRepository;
+        this.weeklyWorkingScheduleRepository = weeklyWorkingScheduleRepository;
     }
 
     // ============================================================
@@ -507,6 +514,23 @@ public class EmployeeQrAttendanceController {
     private boolean isWorkingDay(
             LocalDate date,
             OfficeSettings settings) {
+
+        if (date == null) {
+            return false;
+        }
+
+        if (weeklyWorkingScheduleRepository != null) {
+            LocalDate weekStart = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            Optional<WeeklyWorkingSchedule> schedule =
+                    weeklyWorkingScheduleRepository.findByWeekStartAndWorkDate(weekStart, date);
+            if (schedule.isPresent()) {
+                return schedule.get().isWorkingDay();
+            }
+        }
+
+        if (settings == null) {
+            return false;
+        }
 
         DayOfWeek day = date.getDayOfWeek();
 

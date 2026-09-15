@@ -1,125 +1,180 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASLENIX | Edit Employee</title>
 
-    <style>
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;850&display=swap" rel="stylesheet">
 
-        * {
+    <!-- NEPALI DATE CONVERTER & PICKER -->
+    <link rel="stylesheet" href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/nepali-date-converter/dist/nepali-date-converter.umd.js"></script>
+    <script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js"></script>
+    <script src="/js/nepali-date-utils.js"></script>
+
+    <style>
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-            color: #0f172a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f7faff;
+            background-image:
+                radial-gradient(at 10% 10%, rgba(83, 101, 223, 0.04) 0px, transparent 45%),
+                radial-gradient(at 90% 90%, rgba(239, 43, 168, 0.03) 0px, transparent 45%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #17213d;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
-        /* =========================
-           HEADER
-        ========================= */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
 
+        button, input, select {
+            font-family: inherit;
+        }
+
+        /* HEADER */
         header {
-            background: #0f172a;
-            color: white;
-
-            padding: 20px 40px;
-
+            height: 66px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid #edf1f8;
+            padding: 0 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 900;
         }
 
-        .brand {
-            font-size: 24px;
-            font-weight: 800;
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .back {
-            color: white;
-            text-decoration: none;
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            object-fit: cover;
+        }
 
-            background: #2563eb;
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
 
-            padding: 10px 18px;
+        .brand-title {
+            font-size: 15px;
+            font-weight: 850;
+            letter-spacing: 0.8px;
+            background: linear-gradient(135deg, #17213d 0%, #5365df 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-            border-radius: 8px;
+        .brand-sub {
+            font-size: 10.5px;
+            color: #8a96aa;
+            font-weight: 600;
+        }
 
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #e3e8f2;
+            color: #43516d;
+            font-size: 12.5px;
             font-weight: 700;
+            transition: all 0.2s ease;
         }
 
-        .back:hover {
-            background: #1d4ed8;
+        .back-btn:hover {
+            border-color: #5365df;
+            color: #5365df;
+            background: #fbfbfe;
+            box-shadow: 0 2px 8px rgba(83, 101, 223, 0.12);
         }
 
-        /* =========================
-           MAIN
-        ========================= */
+        .back-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
 
+        /* MAIN */
         main {
-            max-width: 900px;
-
-            margin: 40px auto;
-
+            max-width: 800px;
+            margin: 36px auto 60px;
             padding: 0 20px;
         }
 
-        .page-title {
-            margin-bottom: 25px;
+        .page-header {
+            margin-bottom: 24px;
         }
 
-        .page-title h1 {
-            margin-bottom: 8px;
+        .eyebrow {
+            font-size: 11.5px;
+            font-weight: 850;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: #5365df;
+            margin-bottom: 6px;
         }
 
-        .page-title p {
-            color: #64748b;
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 850;
+            color: #17213d;
+            letter-spacing: -0.4px;
         }
 
-        /* =========================
-           FORM CARD
-        ========================= */
+        .subtitle {
+            color: #7d889d;
+            font-size: 13.5px;
+            margin-top: 4px;
+        }
 
+        /* FORM CARD */
         .form-card {
-            background: white;
-
-            padding: 35px;
-
-            border-radius: 14px;
-
-            box-shadow:
-                0 5px 20px rgba(0, 0, 0, 0.08);
+            background: #ffffff;
+            border: 1px solid #e8ecf4;
+            border-radius: 16px;
+            box-shadow: 0 2px 14px rgba(25, 35, 65, 0.04);
+            padding: 32px;
         }
-
-        /* =========================
-           FORM GRID
-        ========================= */
 
         .form-grid {
             display: grid;
-
-            grid-template-columns:
-                repeat(2, 1fr);
-
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
         }
 
         .form-group {
             display: flex;
-
             flex-direction: column;
-
-            gap: 8px;
+            gap: 6px;
         }
 
         .form-group.full {
@@ -127,398 +182,253 @@
         }
 
         label {
-            font-size: 14px;
-
-            font-weight: 700;
-
-            color: #334155;
+            font-size: 11.5px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #5a667d;
         }
 
-        input,
-        select {
+        input, select {
             width: 100%;
-
-            padding: 12px 14px;
-
-            border: 1px solid #cbd5e1;
-
-            border-radius: 8px;
-
-            font-size: 15px;
-
+            padding: 10px 14px;
+            border: 1px solid #d9e1ec;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #17213d;
+            background: #ffffff;
+            transition: all 0.2s ease;
             outline: none;
-
-            background: white;
         }
 
-        input:focus,
-        select:focus {
-            border-color: #2563eb;
-
-            box-shadow:
-                0 0 0 3px rgba(37, 99, 235, 0.12);
+        input:focus, select:focus {
+            border-color: #5365df;
+            box-shadow: 0 0 0 3px rgba(83, 101, 223, 0.12);
         }
 
-        /* =========================
-           READ ONLY
-        ========================= */
-
-        input[readonly] {
-            background: #f8fafc;
-
-            color: #64748b;
-
-            cursor: not-allowed;
-        }
-
-        /* =========================
-           BUTTONS
-        ========================= */
-
-        .actions {
+        .buttons {
             display: flex;
-
             justify-content: flex-end;
-
+            align-items: center;
             gap: 12px;
-
-            margin-top: 30px;
-
-            padding-top: 25px;
-
-            border-top: 1px solid #e2e8f0;
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid #edf1f8;
         }
 
-        .cancel {
-            text-decoration: none;
-
-            background: #e2e8f0;
-
-            color: #334155;
-
-            padding: 12px 20px;
-
-            border-radius: 8px;
-
+        .cancel-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid #e3e8f2;
+            background: #ffffff;
+            color: #55627a;
+            font-size: 13px;
             font-weight: 700;
-        }
-
-        .cancel:hover {
-            background: #cbd5e1;
-        }
-
-        .save {
-            border: none;
-
-            background: #2563eb;
-
-            color: white;
-
-            padding: 12px 22px;
-
-            border-radius: 8px;
-
-            font-weight: 700;
-
             cursor: pointer;
-
-            font-size: 15px;
+            transition: all 0.15s ease;
         }
 
-        .save:hover {
-            background: #1d4ed8;
+        .cancel-btn:hover {
+            background: #f1f4fd;
+            color: #17213d;
         }
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
-
-        @media (max-width: 700px) {
-
-            header {
-                padding: 15px 20px;
-            }
-
-            .brand {
-                font-size: 19px;
-            }
-
-            main {
-                margin: 25px auto;
-            }
-
-            .form-card {
-                padding: 22px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-group.full {
-                grid-column: auto;
-            }
-
-            .actions {
-                flex-direction: column;
-            }
-
-            .cancel,
-            .save {
-                width: 100%;
-
-                text-align: center;
-            }
-
+        .save-btn {
+            background: linear-gradient(135deg, #5365df 0%, #3f4fd0 100%);
+            color: #ffffff;
+            border: none;
+            padding: 11px 24px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 750;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(83, 101, 223, 0.25);
+            transition: all 0.2s ease;
         }
 
+        .save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(83, 101, 223, 0.35);
+        }
+
+        @media (max-width: 650px) {
+            header { padding: 0 16px; }
+            main { padding: 0 14px; margin-top: 20px; }
+            .form-card { padding: 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: auto; }
+            .buttons { flex-direction: column; }
+            .cancel-btn, .save-btn { width: 100%; text-align: center; justify-content: center; }
+        }
     </style>
-
 </head>
-
-
 <body>
 
-
-<!-- =========================
-     HEADER
-========================= -->
-
+<!-- TOP HEADER -->
 <header>
-
-    <div class="brand">
-        ASLENIX ADMIN
+    <div class="brand-area">
+        <img th:src="@{/images/logo1.jpeg}" src="/images/logo1.jpeg" alt="ASLENIX" class="brand-logo">
+        <div class="brand-text">
+            <span class="brand-title">ASLENIX</span>
+            <span class="brand-sub">Admin Portal</span>
+        </div>
     </div>
-
-    <a href="/admin/employees"
-       class="back">
-
-        ← Employees
-
+    <a th:href="@{/admin/employees}" href="/admin/employees" class="back-btn">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Employees
     </a>
-
 </header>
 
-
-<!-- =========================
-     MAIN
-========================= -->
-
+<!-- MAIN CONTENT -->
 <main>
-
-
-    <div class="page-title">
-
-        <h1>
-            Edit Employee
-        </h1>
-
-        <p>
-            Update the employee's information below.
-        </p>
-
+    <div class="page-header">
+        <p class="eyebrow">EMPLOYEE MANAGEMENT</p>
+        <h1>Edit Employee</h1>
+        <p class="subtitle">Update the employee profile and department assignment details below.</p>
     </div>
 
-
-    <!-- =========================
-         FORM
-    ========================= -->
-
     <div class="form-card">
-
-        <form
-                th:action="@{/admin/employees/edit/{id}(id=${employee.id})}"
-                th:object="${employee}"
-                method="post">
-
-
+        <form th:action="@{/admin/employees/edit/{id}(id=${employee.id})}" th:object="${employee}" method="post">
             <div class="form-grid">
-
-
                 <!-- EMPLOYEE CODE -->
-
                 <div class="form-group">
-
-                    <label for="employeeCode">
-                        Employee Code
-                    </label>
-
-                    <input
-                            type="text"
-                            id="employeeCode"
-                            th:field="*{employeeCode}"
-                            required>
-
+                    <label for="employeeCode">Employee Code</label>
+                    <input type="text" id="employeeCode" th:field="*{employeeCode}" required>
                 </div>
-
 
                 <!-- EMAIL -->
-
                 <div class="form-group">
-
-                    <label for="email">
-                        Email
-                    </label>
-
-                    <input
-                            type="email"
-                            id="email"
-                            th:field="*{email}"
-                            required>
-
+                    <label for="email">Work Email</label>
+                    <input type="email" id="email" th:field="*{email}" required>
                 </div>
-
 
                 <!-- FIRST NAME -->
-
                 <div class="form-group">
-
-                    <label for="firstName">
-                        First Name
-                    </label>
-
-                    <input
-                            type="text"
-                            id="firstName"
-                            th:field="*{firstName}"
-                            required>
-
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" th:field="*{firstName}" required>
                 </div>
-
 
                 <!-- LAST NAME -->
-
                 <div class="form-group">
-
-                    <label for="lastName">
-                        Last Name
-                    </label>
-
-                    <input
-                            type="text"
-                            id="lastName"
-                            th:field="*{lastName}"
-                            required>
-
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" th:field="*{lastName}" required>
                 </div>
-
 
                 <!-- PHONE -->
-
                 <div class="form-group">
-
-                    <label for="phone">
-                        Phone
-                    </label>
-
-                    <input
-                            type="text"
-                            id="phone"
-                            th:field="*{phone}">
-
+                    <label for="phone">Phone Number</label>
+                    <input type="text" id="phone" th:field="*{phone}">
                 </div>
-
 
                 <!-- POSITION -->
-
                 <div class="form-group">
-
-                    <label for="position">
-                        Position
-                    </label>
-
-                    <input
-                            type="text"
-                            id="position"
-                            th:field="*{position}"
-                            required>
-
+                    <label for="position">Position</label>
+                    <input type="text" id="position" th:field="*{position}" required>
                 </div>
 
-
-                <!-- JOINING DATE -->
-
+                <!-- JOINING DATE (NEPALI BS) -->
                 <div class="form-group">
-
-                    <label for="joiningDate">
-                        Joining Date
-                    </label>
-
-                    <input
-                        type="date"
-                        id="joiningDate"
-                        name="joiningDate"
-                        th:value="${employee.joiningDate}"
-                        required>
-
+                    <label for="joiningDateBs">Joining Date (Nepali BS)</label>
+                    <input type="text" id="joiningDateBs" placeholder="Select Nepali Date (BS)" autocomplete="off" required>
+                    <input type="hidden" id="joiningDate" name="joiningDate" th:value="${employee.joiningDate}">
                 </div>
-
 
                 <!-- DEPARTMENT -->
-
                 <div class="form-group">
-
-                    <label for="departmentId">
-                        Department
-                    </label>
-
-                    <select
-                            id="departmentId"
-                            name="departmentId"
-                            required>
-
-                        <option value="">
-                            Select Department
-                        </option>
-
-                        <option
-                                th:each="department : ${departments}"
+                    <label for="departmentId">Department</label>
+                    <select id="departmentId" name="departmentId" required>
+                        <option value="">Select Department</option>
+                        <option th:each="department : ${departments}"
                                 th:value="${department.id}"
                                 th:text="${department.name}"
                                 th:selected="${employee.department != null and employee.department.id == department.id}">
-
                         </option>
-
                     </select>
-
                 </div>
-
-
             </div>
 
-
-            <!-- =========================
-                 ACTIONS
-            ========================= -->
-
-            <div class="actions">
-
-                <a href="/admin/employees"
-                   class="cancel">
-
-                    Cancel
-
-                </a>
-
-                <button
-                        type="submit"
-                        class="save">
-
-                    Save Changes
-
-                </button>
-
+            <!-- BUTTONS -->
+            <div class="buttons">
+                <a th:href="@{/admin/employees}" href="/admin/employees" class="cancel-btn">Cancel</a>
+                <button type="submit" class="save-btn">Save Changes</button>
             </div>
-
-
         </form>
-
     </div>
-
-
 </main>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const nepaliDateInput = document.getElementById("joiningDateBs");
+    const actualDateInput = document.getElementById("joiningDate");
+
+    if (nepaliDateInput && typeof nepaliDateInput.nepaliDatePicker === 'function') {
+        nepaliDateInput.nepaliDatePicker({
+            ndpYear: true,
+            ndpMonth: true,
+            ndpYearCount: 100,
+            onChange: function () {
+                syncBsToAd();
+            }
+        });
+    }
+
+    // Pre-fill existing date in BS
+    if (actualDateInput && actualDateInput.value && nepaliDateInput) {
+        const parts = actualDateInput.value.trim().split('-');
+        if (parts.length === 3 && typeof NepaliFunctions !== 'undefined' && NepaliFunctions.AD2BS) {
+            try {
+                const bsObj = NepaliFunctions.AD2BS({
+                    year: parseInt(parts[0], 10),
+                    month: parseInt(parts[1], 10),
+                    day: parseInt(parts[2], 10)
+                });
+                if (bsObj) {
+                    nepaliDateInput.value = bsObj.year + '-' + 
+                                           String(bsObj.month).padStart(2, '0') + '-' + 
+                                           String(bsObj.day).padStart(2, '0');
+                }
+            } catch (e) {
+                console.error("AD to BS prefill error:", e);
+            }
+        }
+    }
+
+    function syncBsToAd() {
+        if (!nepaliDateInput || !actualDateInput) return;
+        let bsDate = nepaliDateInput.value.trim();
+        if (!bsDate) {
+            actualDateInput.value = "";
+            return;
+        }
+        if (typeof convertNepaliNumbersToEnglish === 'function') {
+            bsDate = convertNepaliNumbersToEnglish(bsDate);
+        }
+        nepaliDateInput.value = bsDate;
+
+        if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.BS2AD) {
+            try {
+                const adDate = NepaliFunctions.BS2AD(bsDate);
+                if (adDate) {
+                    const year = String(adDate.year);
+                    const month = String(adDate.month).padStart(2, "0");
+                    const day = String(adDate.day).padStart(2, "0");
+                    actualDateInput.value = year + "-" + month + "-" + day;
+                } else {
+                    actualDateInput.value = "";
+                }
+            } catch (err) {
+                console.error("BS to AD error:", err);
+                actualDateInput.value = "";
+            }
+        }
+    }
+
+    if (nepaliDateInput) {
+        nepaliDateInput.addEventListener("change", syncBsToAd);
+        nepaliDateInput.addEventListener("input", syncBsToAd);
+    }
+});
+</script>
 
 </body>
-
 </html>

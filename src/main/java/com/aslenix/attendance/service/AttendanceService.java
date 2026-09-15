@@ -3,8 +3,10 @@ package com.aslenix.attendance.service;
 import com.aslenix.attendance.entity.Attendance;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.entity.OfficeSettings;
+import com.aslenix.attendance.entity.WeeklyWorkingSchedule;
 import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.OfficeSettingsRepository;
+import com.aslenix.attendance.repository.WeeklyWorkingScheduleRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -13,20 +15,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
     private final OfficeSettingsRepository officeSettingsRepository;
+    private final WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository;
 
     public AttendanceService(
             AttendanceRepository attendanceRepository,
-            OfficeSettingsRepository officeSettingsRepository) {
+            OfficeSettingsRepository officeSettingsRepository,
+            WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository) {
 
         this.attendanceRepository = attendanceRepository;
         this.officeSettingsRepository = officeSettingsRepository;
+        this.weeklyWorkingScheduleRepository = weeklyWorkingScheduleRepository;
     }
 
     // ============================================================
@@ -190,9 +197,9 @@ public class AttendanceService {
                 date = date.plusDays(1)
         ) {
 
-            if (isWorkingDay(
-                    settings,
-                    date.getDayOfWeek())) {
+            if (isDateWorkingDay(
+                    date,
+                    settings)) {
 
                 count++;
             }
@@ -440,12 +447,12 @@ public class AttendanceService {
         // WORKING DAY
         // --------------------------------------------------------
 
-        if (!isWorkingDay(
-                settings,
-                today.getDayOfWeek())) {
+        if (!isDateWorkingDay(
+                today,
+                settings)) {
 
             throw new IllegalStateException(
-                    "Today is not a working day."
+                    "Today is not an operational working day."
             );
         }
 
@@ -760,8 +767,32 @@ public class AttendanceService {
     }
 
     // ============================================================
-    // WORKING DAY
+    // WORKING DAY (DATE-AWARE WITH SCHEDULE OVERRIDE)
     // ============================================================
+
+    public boolean isDateWorkingDay(
+            LocalDate date,
+            OfficeSettings settings) {
+
+        if (date == null) {
+            return false;
+        }
+
+        if (weeklyWorkingScheduleRepository != null) {
+            LocalDate weekStart = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            Optional<WeeklyWorkingSchedule> schedule =
+                    weeklyWorkingScheduleRepository.findByWeekStartAndWorkDate(weekStart, date);
+            if (schedule.isPresent()) {
+                return schedule.get().isWorkingDay();
+            }
+        }
+
+        if (settings != null) {
+            return isWorkingDay(settings, date.getDayOfWeek());
+        }
+
+        return false;
+    }
 
     private boolean isWorkingDay(
             OfficeSettings settings,

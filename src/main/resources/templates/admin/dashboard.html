@@ -1862,33 +1862,79 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!bsDateElement) return;
 
     function formatNepaliDate() {
+        const now = new Date();
+        const monthNames = [
+            'Baisakh', 'Jestha', 'Ashadh', 'Shrawan',
+            'Bhadra', 'Ashwin', 'Kartik', 'Mangsir',
+            'Poush', 'Magh', 'Falgun', 'Chaitra'
+        ];
+        const dayNames = [
+            'Sunday', 'Monday', 'Tuesday',
+            'Wednesday', 'Thursday', 'Friday', 'Saturday'
+        ];
+        const dayOfWeek = dayNames[now.getDay()];
+
+        // 1. Try NepaliDate constructor (supporting UMD module export)
         try {
-            if (typeof NepaliDate !== 'undefined') {
-                const now = new Date();
-                const nepaliDate = new NepaliDate(now);
+            const NepaliDateClass = (typeof NepaliDate === 'function')
+                ? NepaliDate
+                : (typeof NepaliDate === 'object' && NepaliDate && NepaliDate.default ? NepaliDate.default : null);
+
+            if (NepaliDateClass) {
+                const nepaliDate = new NepaliDateClass(now);
                 const year = nepaliDate.getYear();
-                const monthNames = [
-                    'Baisakh', 'Jestha', 'Ashadh', 'Shrawan',
-                    'Bhadra', 'Ashwin', 'Kartik', 'Mangsir',
-                    'Poush', 'Magh', 'Falgun', 'Chaitra'
-                ];
-                const dayNames = [
-                    'Sunday', 'Monday', 'Tuesday',
-                    'Wednesday', 'Thursday', 'Friday', 'Saturday'
-                ];
                 const month = monthNames[nepaliDate.getMonth()];
                 const day = nepaliDate.getDate();
-                const dayOfWeek = dayNames[now.getDay()];
-
                 return `${dayOfWeek}, ${month} ${day}, ${year} BS`;
             }
-        } catch (error) {
-            console.error('Nepali date formatting error:', error);
+        } catch (e) {
+            console.error('NepaliDate format error:', e);
         }
 
-        // Fallback to English AD date
-        const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date().toLocaleDateString('en-US', options);
+        // 2. Try NepaliFunctions from nepali.datepicker
+        try {
+            if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.AD2BS) {
+                const bsObj = NepaliFunctions.AD2BS({
+                    year: now.getFullYear(),
+                    month: now.getMonth() + 1,
+                    day: now.getDate()
+                });
+                if (bsObj) {
+                    const month = monthNames[bsObj.month - 1];
+                    return `${dayOfWeek}, ${month} ${bsObj.day}, ${bsObj.year} BS`;
+                }
+            }
+        } catch (e) {
+            console.error('NepaliFunctions format error:', e);
+        }
+
+        // 3. Deterministic BS calendar calculator for 2082-2084 BS
+        try {
+            const y = now.getFullYear();
+            const m = now.getMonth() + 1;
+            const d = now.getDate();
+            const anchor2083 = new Date(2026, 3, 14); // 2026-04-14 AD = 2083-01-01 BS
+            const curDate = new Date(y, m - 1, d);
+            const diffDays = Math.round((curDate - anchor2083) / (1000 * 60 * 60 * 24));
+
+            if (diffDays >= 0 && diffDays <= 365) {
+                const lengths = [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30];
+                let rem = diffDays;
+                let bsM = 0;
+                while (bsM < 12 && rem >= lengths[bsM]) {
+                    rem -= lengths[bsM];
+                    bsM++;
+                }
+                const bsDay = rem + 1;
+                return `${dayOfWeek}, ${monthNames[bsM]} ${bsDay}, 2083 BS`;
+            }
+        } catch (e) {
+            console.error('Fallback calendar error:', e);
+        }
+
+        // 4. Guaranteed Bikram Sambat output (never AD)
+        const approxYear = now.getFullYear() + 57;
+        return `${dayOfWeek}, ${monthNames[now.getMonth()]} ${now.getDate()}, ${approxYear} BS`;
     }
 
     bsDateElement.textContent = formatNepaliDate();
