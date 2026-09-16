@@ -444,6 +444,15 @@ public class AttendanceService {
                 LocalDate.now();
 
         // --------------------------------------------------------
+        // 2:00 PM CUTOFF FOR MANUAL CHECK-IN
+        // --------------------------------------------------------
+        if (LocalTime.now().isAfter(LocalTime.of(14, 0))) {
+            throw new IllegalStateException(
+                    "Manual check-in is not allowed after 02:00 PM. Please contact your administrator."
+            );
+        }
+
+        // --------------------------------------------------------
         // WORKING DAY
         // --------------------------------------------------------
 

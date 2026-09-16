@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,12 +99,16 @@ public class EmployeeAttendanceController {
                 attendanceService.getTodayWorkingHours(employee);
 
         // --------------------------------------------------------
-        // BUTTON STATES
+        // BUTTON STATES (CUTOFF AT 2:00 PM / 14:00)
         // --------------------------------------------------------
 
+        boolean isAfter2Pm =
+                LocalTime.now().isAfter(LocalTime.of(14, 0));
+
         boolean canCheckIn =
-                todayAttendance == null
-                        || todayAttendance.getCheckIn() == null;
+                (todayAttendance == null
+                        || todayAttendance.getCheckIn() == null)
+                        && !isAfter2Pm;
 
         boolean canCheckOut =
                 todayAttendance != null
@@ -271,6 +276,11 @@ public class EmployeeAttendanceController {
         model.addAttribute(
                 "canCheckIn",
                 canCheckIn
+        );
+
+        model.addAttribute(
+                "isAfter2Pm",
+                isAfter2Pm
         );
 
         model.addAttribute(

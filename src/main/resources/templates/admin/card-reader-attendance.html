@@ -1,0 +1,2795 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASLENIX | Card Reader Attendance</title>
+
+    <!-- CSRF -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <!-- NEPALI DATE CONVERTER -->
+    <script src="https://cdn.jsdelivr.net/npm/nepali-date-converter/dist/nepali-date-converter.umd.js"></script>
+
+    <!-- HTML5 QR CODE SCANNER -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <style>
+        /* =====================================================
+           RESET & DESIGN TOKENS
+        ===================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --as-indigo: #4f46e5;
+            --as-indigo-dark: #4338ca;
+            --as-indigo-light: #eef2ff;
+            --as-bg: #f6f8fc;
+            --as-text: #0f172a;
+            --as-muted: #64748b;
+            --as-border: #e2e8f0;
+            --as-card-border: #e2e8f0;
+            --as-emerald: #10b981;
+            --as-amber: #f59e0b;
+            --as-rose: #ef4444;
+            --as-purple: #8b5cf6;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at 88% 4%, rgba(79, 70, 229, 0.05), transparent 27%),
+                radial-gradient(circle at 5% 90%, rgba(99, 102, 241, 0.04), transparent 30%),
+                #f6f8fc;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button, input, select { font-family: inherit; }
+
+        /* =====================================================
+           LAYOUT
+        ===================================================== */
+        .app-layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .main-area {
+            width: calc(100% - 250px);
+            margin-left: 250px;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e8edf6;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            box-shadow: 2px 0 16px rgba(25, 35, 65, 0.045);
+        }
+
+        .sidebar-section-title {
+            padding: 22px 20px 10px;
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+            color: #8a96aa;
+        }
+
+        .sidebar-menu {
+            padding: 0 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #5a667d;
+            transition: all 0.2s ease;
+            position: relative;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .sidebar-link:hover {
+            color: #4f46e5;
+            background: #f8fafc;
+            transform: translateX(2px);
+        }
+
+        .sidebar-link.active {
+            color: #4f46e5;
+            background: #eef2ff;
+            font-weight: 750;
+        }
+
+        .sidebar-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3.5px;
+            border-radius: 0 4px 4px 0;
+            background: #4f46e5;
+        }
+
+        .sidebar-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            background: #f4f6fa;
+            color: #6b778d;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .sidebar-icon svg {
+            width: 17px;
+            height: 17px;
+            stroke-width: 1.8;
+            stroke: currentColor;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .sidebar-link:hover .sidebar-icon {
+            background: #ffffff;
+            color: #4f46e5;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+        }
+
+        .sidebar-link.active .sidebar-icon {
+            background: #ffffff;
+            color: #4f46e5;
+            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.2);
+        }
+
+        .sidebar-text {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
+        }
+
+        .sidebar-text strong {
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-text span {
+            font-size: 11px;
+            color: #8b97ac;
+            font-weight: 500;
+        }
+
+        .sidebar-bottom {
+            padding: 16px 14px 18px;
+            border-top: 1px solid #edf1f8;
+            background: #ffffff;
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .sidebar-user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: #ffffff;
+            display: grid;
+            place-items: center;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .sidebar-user-meta {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .sidebar-user-name {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-user-role {
+            font-size: 10.5px;
+            color: #8b97ac;
+            font-weight: 600;
+        }
+
+        /* =====================================================
+           TOP HEADER
+        ===================================================== */
+        .top-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid #e8edf6;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-block h2 {
+            font-size: 18px;
+            font-weight: 850;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+
+        .header-title-block p {
+            font-size: 11.5px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #43516d;
+            padding: 7px 12px;
+            border-radius: 10px;
+            background: #f0f4fa;
+            border: 1px solid #e3e8f2;
+            white-space: nowrap;
+        }
+
+        .header-date svg {
+            width: 15px;
+            height: 15px;
+            stroke: #4f46e5;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* =====================================================
+           MAIN TWO-COLUMN WORKSPACE
+        ===================================================== */
+        .reader-workspace {
+            padding: 30px 32px 80px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* LEFT CONTENT AREA */
+        .reader-main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        /* PAGE TITLE */
+        .page-header-block h1 {
+            font-size: 28px;
+            font-weight: 850;
+            color: #0f172a;
+            letter-spacing: -0.4px;
+        }
+
+        .page-header-block p {
+            font-size: 13.5px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* 1. DEVICE / CONFIGURATION BAR */
+        .device-bar-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        }
+
+        .device-inputs-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto auto;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-size: 11px;
+            font-weight: 750;
+            color: #64748b;
+            letter-spacing: 0.3px;
+        }
+
+        .device-input {
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 12.5px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .btn-check-reader {
+            height: 38px;
+            padding: 0 16px;
+            border-radius: 10px;
+            background: #4f46e5;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 750;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-check-reader:hover {
+            background: #4338ca;
+        }
+
+        .btn-check-reader svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .btn-disconnect {
+            height: 38px;
+            padding: 0 14px;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-disconnect:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* STATUS CHIPS */
+        .device-chips-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .status-chip {
+            background: #f8fafc;
+            border: 1px solid #edf2f7;
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .chip-label {
+            font-size: 9.5px;
+            font-weight: 800;
+            color: #94a3b8;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chip-label svg {
+            width: 12px;
+            height: 12px;
+            color: #64748b;
+        }
+
+        .chip-value {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot-online {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        /* 2. SCAN EMPLOYEE CARD BAR */
+        .scan-box-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        }
+
+        .scan-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .scan-box-title strong {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+            display: block;
+        }
+
+        .scan-box-title span {
+            font-size: 11.5px;
+            color: #94a3b8;
+        }
+
+        .badge-waiting {
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #fef3c7;
+            color: #b45309;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-ready {
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #15803d;
+            letter-spacing: 0.3px;
+        }
+
+        .scan-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scan-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .scan-input-wrapper svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 17px;
+            height: 17px;
+            color: #8b5cf6;
+        }
+
+        .scan-text-input {
+            width: 100%;
+            height: 44px;
+            padding: 0 16px 0 42px;
+            border-radius: 12px;
+            border: 1.5px solid #c4b5fd;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 13.5px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08);
+        }
+
+        .scan-text-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.16);
+        }
+
+        .btn-camera-scan {
+            height: 44px;
+            padding: 0 16px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 750;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-camera-scan:hover {
+            border-color: #8b5cf6;
+            color: #6d28d9;
+            background: #fdf4ff;
+        }
+
+        .btn-camera-scan svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .btn-process-scan {
+            height: 44px;
+            padding: 0 20px;
+            border-radius: 12px;
+            background: #4f46e5;
+            color: #ffffff;
+            border: none;
+            font-size: 13px;
+            font-weight: 750;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
+            transition: all 0.15s ease;
+        }
+
+        .btn-process-scan:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        /* 3. VERIFICATION ACTIVE BANNER */
+        .verification-banner {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+            border: 1px solid #bbf7d0;
+        }
+
+        .verification-banner.active {
+            display: flex;
+        }
+
+        .verif-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .verif-icon-box {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: #ffffff;
+            border: 1px solid #bbf7d0;
+            display: grid;
+            place-items: center;
+            color: #10b981;
+        }
+
+        .verif-icon-box svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .verif-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .verif-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-pill-verified {
+            font-size: 10px;
+            font-weight: 850;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #10b981;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .tag-pill-meta {
+            font-size: 11px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .verif-subtext {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .verif-right-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #0e7490;
+            background: #ffffff;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #cffafe;
+        }
+
+        .verif-right-badge svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        /* 4. DUAL PANELS (EMPLOYEE & ATTENDANCE) */
+        .identity-dual-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* EMPLOYEE CARD */
+        .employee-profile-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .emp-header-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .emp-avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .emp-avatar-circle {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #1e293b;
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+            font-weight: 850;
+            border: 2px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .emp-avatar-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #10b981;
+            color: #ffffff;
+            display: grid;
+            place-items: center;
+            border: 2px solid #ffffff;
+        }
+
+        .emp-avatar-badge svg {
+            width: 12px;
+            height: 12px;
+            stroke-width: 3;
+        }
+
+        .emp-name-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .emp-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .emp-name-text {
+            font-size: 19px;
+            font-weight: 850;
+            color: #0f172a;
+        }
+
+        .pill-verified {
+            font-size: 9.5px;
+            font-weight: 850;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #15803d;
+            text-transform: uppercase;
+        }
+
+        .emp-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .emp-detail-item {
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .emp-detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-label {
+            font-size: 9.5px;
+            font-weight: 800;
+            color: #94a3b8;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .detail-value.status-active {
+            color: #15803d;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .verif-card-footer {
+            margin-top: 20px;
+            padding-top: 14px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+
+        .verif-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 750;
+            color: #059669;
+        }
+
+        .verif-last-date {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* TODAY'S ATTENDANCE CARD */
+        .today-attendance-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .att-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .att-eyebrow {
+            font-size: 10.5px;
+            font-weight: 850;
+            color: #64748b;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .att-live-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 850;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: #ecfeff;
+            color: #0891b2;
+            text-transform: uppercase;
+        }
+
+        .att-main-status {
+            font-size: 24px;
+            font-weight: 850;
+            color: #0f172a;
+            margin-top: 6px;
+        }
+
+        .att-meta-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .att-meta-row {
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 8px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .att-meta-row .label {
+            font-size: 9px;
+            font-weight: 800;
+            color: #94a3b8;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .att-meta-row .val {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .att-boxes-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .att-time-box {
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .att-time-box .title {
+            font-size: 9px;
+            font-weight: 800;
+            color: #94a3b8;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .att-time-box .time {
+            font-size: 14px;
+            font-weight: 850;
+            color: #0f172a;
+        }
+
+        /* 5. ATTENDANCE ACTION CARDS */
+        .action-selector-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        }
+
+        .section-header-block {
+            margin-bottom: 16px;
+        }
+
+        .section-eyebrow {
+            font-size: 10.5px;
+            font-weight: 850;
+            color: #64748b;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 850;
+            color: #0f172a;
+            margin-top: 2px;
+        }
+
+        .actions-two-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .action-option-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 110px;
+        }
+
+        .action-option-card:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+        }
+
+        .action-option-card.selected {
+            border-color: #4f46e5;
+            background: linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14), 0 8px 24px rgba(79, 70, 229, 0.08);
+        }
+
+        .action-option-card.disabled-action {
+            opacity: 0.6;
+            cursor: not-allowed;
+            border-style: dashed;
+            background: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .action-option-card.disabled-action:hover {
+            transform: none !important;
+            box-shadow: none !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        .action-card-badge-disabled {
+            display: none;
+            font-size: 9px;
+            font-weight: 850;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: #fee2e2;
+            color: #b91c1c;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .action-option-card.disabled-action .action-card-badge-disabled {
+            display: inline-block;
+        }
+
+        .action-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .action-icon-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #64748b;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .action-option-card.selected .action-icon-circle.in {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .action-option-card.selected .action-icon-circle.out {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .action-icon-circle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .action-selected-check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            display: grid;
+            place-items: center;
+            color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .action-option-card.selected .action-selected-check {
+            border-color: #4f46e5;
+            background: #4f46e5;
+            color: #ffffff;
+        }
+
+        .action-selected-check svg {
+            width: 11px;
+            height: 11px;
+            stroke-width: 3;
+        }
+
+        .action-card-info {
+            margin-top: 12px;
+        }
+
+        .action-title-text {
+            font-size: 14px;
+            font-weight: 850;
+            color: #0f172a;
+            letter-spacing: 0.2px;
+        }
+
+        .action-subtitle-text {
+            font-size: 11.5px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .action-card-time {
+            font-size: 11px;
+            font-weight: 750;
+            color: #475569;
+            margin-top: 10px;
+        }
+
+        /* 6. FORCE OVERRIDE ROW */
+        .force-override-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .force-info-block {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .force-info-block strong {
+            font-size: 12.5px;
+            font-weight: 850;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .force-info-block span {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* TOGGLE SWITCH */
+        .force-toggle-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 12.5px;
+            font-weight: 750;
+            color: #334155;
+        }
+
+        .custom-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .custom-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #cbd5e1;
+            transition: .25s;
+            border-radius: 999px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .25s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .custom-toggle input:checked + .toggle-slider {
+            background-color: #4f46e5;
+        }
+
+        .custom-toggle input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* 7. PROCESSED BY CARD */
+        .processed-by-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        }
+
+        .processed-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .processed-item {
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .processed-item .label {
+            font-size: 9px;
+            font-weight: 800;
+            color: #94a3b8;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .processed-item .val {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .processed-footer {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11.5px;
+            font-weight: 750;
+            color: #475569;
+        }
+
+        /* 8. CONFIRMATION FOOTER */
+        .confirmation-bar {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+        }
+
+        .confirmation-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-action-cancel {
+            height: 40px;
+            padding: 0 16px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 12.5px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-action-cancel:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .btn-action-confirm {
+            height: 40px;
+            padding: 0 22px;
+            border-radius: 10px;
+            background: #4f46e5;
+            color: #ffffff;
+            border: none;
+            font-size: 12.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.3);
+            transition: all 0.15s ease;
+        }
+
+        .btn-action-confirm:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .btn-action-confirm:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-action-confirm svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        /* =====================================================
+           RIGHT SIDEBAR: AUDIT HISTORY
+        ===================================================== */
+        .audit-history-sidebar {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 20px;
+            position: sticky;
+            top: 90px;
+            max-height: calc(100vh - 110px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.02);
+        }
+
+        .audit-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .audit-title strong {
+            font-size: 15px;
+            font-weight: 850;
+            color: #0f172a;
+            display: block;
+        }
+
+        .audit-title span {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .btn-refresh-audit {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.15s ease;
+        }
+
+        .btn-refresh-audit:hover {
+            color: #4f46e5;
+            border-color: #c7d2fe;
+            background: #eef2ff;
+        }
+
+        .btn-refresh-audit.spinning svg {
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-refresh-audit svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .audit-feed-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+
+        .audit-feed-item {
+            background: #ffffff;
+            border: 1px solid #edf2f7;
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: border-color 0.15s ease;
+        }
+
+        .audit-feed-item:hover {
+            border-color: #cbd5e1;
+        }
+
+        .audit-feed-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .audit-emp-code {
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .audit-emp-time {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .audit-meta-row {
+            font-size: 10.5px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .audit-notes-row {
+            font-size: 11px;
+            color: #475569;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* =====================================================
+           CAMERA QR SCANNER MODAL
+        ===================================================== */
+        .camera-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(6px);
+            display: none;
+            place-items: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .camera-modal-backdrop.open {
+            display: grid;
+        }
+
+        .camera-modal-content {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            animation: modalPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .camera-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .camera-modal-header h3 {
+            font-size: 16px;
+            font-weight: 850;
+            color: #0f172a;
+        }
+
+        .camera-btn-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.15s ease;
+        }
+
+        .camera-btn-close:hover {
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fca5a5;
+        }
+
+        .camera-btn-close svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .camera-viewfinder-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #0f172a;
+            border-radius: 18px;
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+        }
+
+        #qrCameraReader {
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+        }
+
+        #qrCameraReader video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 18px;
+        }
+
+        /* RED SCANNING RETICLE OVERLAY */
+        .scan-reticle-overlay {
+            position: absolute;
+            width: 72%;
+            height: 72%;
+            pointer-events: none;
+            border: 1.5px dashed rgba(239, 68, 68, 0.6);
+            border-radius: 16px;
+            box-sizing: border-box;
+        }
+
+        .scan-reticle-overlay::before,
+        .scan-reticle-overlay::after {
+            content: '';
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-color: #ef4444;
+            border-style: solid;
+        }
+
+        .scan-reticle-overlay::before {
+            top: -3px;
+            left: -3px;
+            border-width: 4px 0 0 4px;
+            border-top-left-radius: 14px;
+        }
+
+        .scan-reticle-overlay::after {
+            bottom: -3px;
+            right: -3px;
+            border-width: 0 4px 4px 0;
+            border-bottom-right-radius: 14px;
+        }
+
+        .reticle-corner-tr {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 32px;
+            height: 32px;
+            border-top: 4px solid #ef4444;
+            border-right: 4px solid #ef4444;
+            border-top-right-radius: 14px;
+            pointer-events: none;
+        }
+
+        .reticle-corner-bl {
+            position: absolute;
+            bottom: -3px;
+            left: -3px;
+            width: 32px;
+            height: 32px;
+            border-bottom: 4px solid #ef4444;
+            border-left: 4px solid #ef4444;
+            border-bottom-left-radius: 14px;
+            pointer-events: none;
+        }
+
+        .camera-hint {
+            text-align: center;
+            font-size: 11.5px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* TOAST ALERT */
+        .as-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            opacity: 0;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 750;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10000;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .as-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .as-toast.error {
+            background: #ef4444;
+        }
+
+        .as-toast.success {
+            background: #10b981;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1150px) {
+            .reader-workspace {
+                grid-template-columns: 1fr;
+            }
+            .audit-history-sidebar {
+                position: static;
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .identity-dual-grid,
+            .actions-two-cards,
+            .device-inputs-row,
+            .device-chips-row,
+            .processed-grid {
+                grid-template-columns: 1fr;
+            }
+            .confirmation-bar {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+            .confirmation-buttons {
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- =========================================================
+         ADMIN SIDEBAR
+    ========================================================== -->
+    <aside class="sidebar">
+        <div class="sidebar-section-title">Administration</div>
+        <nav class="sidebar-menu">
+            <!-- 1. DASHBOARD -->
+            <a th:href="@{/admin/dashboard}" class="sidebar-link">
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+                </div>
+                <div class="sidebar-text">
+                    <strong>Dashboard</strong>
+                    <span>Admin overview</span>
+                </div>
+            </a>
+
+            <!-- 2. DIGITAL QR IDS -->
+            <a th:href="@{/admin/employees}" class="sidebar-link">
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="7" y="7" width="2" height="2"></rect><rect x="15" y="15" width="2" height="2"></rect></svg>
+                </div>
+                <div class="sidebar-text">
+                    <strong>Digital QR IDs</strong>
+                    <span>Employee directory</span>
+                </div>
+            </a>
+
+            <!-- 3. CARD READER ATTENDANCE (ACTIVE) -->
+            <a th:href="@{/admin/card-reader-attendance}" class="sidebar-link active">
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <circle cx="8" cy="12" r="2"></circle>
+                        <path d="M14 9h4"></path>
+                        <path d="M14 12h4"></path>
+                        <path d="M14 15h4"></path>
+                    </svg>
+                </div>
+                <div class="sidebar-text">
+                    <strong>Card Reader</strong>
+                    <span>Scan & Force actions</span>
+                </div>
+            </a>
+
+            <!-- 4. ATTENDANCE RECORDS -->
+            <a th:href="@{/admin/attendance}" class="sidebar-link">
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path><path d="m8 15 2 2 5-5"></path></svg>
+                </div>
+                <div class="sidebar-text">
+                    <strong>Attendance</strong>
+                    <span>Daily records</span>
+                </div>
+            </a>
+
+            <!-- 5. LEAVE REQUESTS -->
+            <a th:href="@{/admin/leaves}" class="sidebar-link">
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path><path d="M8 14h3"></path><path d="M8 18h6"></path></svg>
+                </div>
+                <div class="sidebar-text">
+                    <strong>Leave Requests</strong>
+                    <span>Review requests</span>
+                </div>
+            </a>
+
+            <!-- 6. ASSIGN TASKS -->
+            <a th:href="@{/admin/tasks}" class="sidebar-link">
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                </div>
+                <div class="sidebar-text">
+                    <strong>Assign Tasks</strong>
+                    <span>Manage tasks</span>
+                </div>
+            </a>
+
+            <!-- 7. REPORTS -->
+            <a th:href="@{/admin/reports}" class="sidebar-link">
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                </div>
+                <div class="sidebar-text">
+                    <strong>Reports</strong>
+                    <span>Attendance analytics</span>
+                </div>
+            </a>
+
+            <!-- 8. SETTINGS -->
+            <a th:href="@{/admin/settings}" class="sidebar-link">
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </div>
+                <div class="sidebar-text">
+                    <strong>Settings</strong>
+                    <span>Office configuration</span>
+                </div>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar">A</div>
+                <div class="sidebar-user-meta">
+                    <div class="sidebar-user-name" th:text="${adminName}">admin</div>
+                    <div class="sidebar-user-role" th:text="${adminRole}">Super Admin</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- =========================================================
+         MAIN AREA
+    ========================================================== -->
+    <div class="main-area">
+
+        <!-- TOP BAR -->
+        <header class="top-header">
+            <div class="header-brand">
+                <div class="header-title-block">
+                    <h2>Card Reader & QR Attendance</h2>
+                    <p>Live card verification, normal & force attendance override</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="header-date">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path></svg>
+                    <span id="headerBsDate">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN WORKSPACE -->
+        <main class="reader-workspace">
+
+            <!-- LEFT PANEL -->
+            <div class="reader-main-panel">
+
+                <!-- 1. PAGE HEADER -->
+                <div class="page-header-block">
+                    <h1 id="pageTitleText">Scan & Identify Employee</h1>
+                    <p id="pageSubtitleText">Scan employee card QR code or enter employee ID to process attendance.</p>
+                </div>
+
+                <!-- 2. DEVICE / CONFIG BAR -->
+                <div class="device-bar-card">
+                    <div class="device-inputs-row">
+                        <div class="input-group">
+                            <label>Reader / Device Name</label>
+                            <input type="text" id="readerDeviceName" class="device-input" value="Admin RFID/NFC Reader" readonly>
+                        </div>
+                        <div class="input-group">
+                            <label>Reader ID</label>
+                            <input type="text" id="readerId" class="device-input" value="ADMIN-READER-01" readonly>
+                        </div>
+                        <button type="button" class="btn-check-reader" id="btnCheckReader">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg>
+                            <span>Check Reader</span>
+                        </button>
+                        <button type="button" class="btn-disconnect" id="btnDisconnectReader">Disconnect</button>
+                    </div>
+
+                    <div class="device-chips-row">
+                        <div class="status-chip">
+                            <span class="chip-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg>
+                                Connection
+                            </span>
+                            <span class="chip-value" id="chipConnectionVal">
+                                <span class="dot-online"></span>
+                                Connected
+                            </span>
+                        </div>
+                        <div class="status-chip">
+                            <span class="chip-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+                                Device
+                            </span>
+                            <span class="chip-value" id="chipDeviceVal">Admin RFID/NFC Reader</span>
+                        </div>
+                        <div class="status-chip">
+                            <span class="chip-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                Reader ID
+                            </span>
+                            <span class="chip-value">ADMIN-READER-01</span>
+                        </div>
+                        <div class="status-chip">
+                            <span class="chip-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                Last Scanned Card
+                            </span>
+                            <span class="chip-value" id="chipLastCardVal">****825A</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. SCAN EMPLOYEE CARD BAR -->
+                <div class="scan-box-card">
+                    <div class="scan-box-header">
+                        <div class="scan-box-title">
+                            <strong>Scan Employee Card</strong>
+                            <span id="scanBoxSubtext">Waiting for employee card...</span>
+                        </div>
+                        <span class="badge-waiting" id="scanStatusBadge">Waiting for Card</span>
+                    </div>
+
+                    <div class="scan-input-group">
+                        <div class="scan-input-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text"
+                                   id="scanQueryInput"
+                                   class="scan-text-input"
+                                   placeholder="Waiting for employee card or enter ID..."
+                                   autocomplete="off"
+                                   autofocus>
+                        </div>
+                        <button type="button" class="btn-camera-scan" id="btnOpenCamera" title="Open camera to scan employee QR">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            <span>Camera</span>
+                        </button>
+                        <button type="button" class="btn-process-scan" id="btnProcessScan">
+                            <span>Process Scan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. VERIFICATION ACTIVE BANNER -->
+                <div class="verification-banner" id="verificationBanner">
+                    <div class="verif-left">
+                        <div class="verif-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                                <circle cx="9" cy="10" r="2"></circle>
+                                <path d="M15 8h2"></path>
+                                <path d="M15 12h2"></path>
+                                <path d="M7 16h10"></path>
+                            </svg>
+                        </div>
+                        <div class="verif-info">
+                            <div class="verif-tags">
+                                <span class="tag-pill-verified">Card Verified</span>
+                                <span class="tag-pill-meta" id="bannerCardMeta">Card: ****825A</span>
+                                <span class="tag-pill-meta">•</span>
+                                <span class="tag-pill-meta">Reader: Connected</span>
+                            </div>
+                            <span class="verif-subtext" id="bannerTimestamp">Secure scan completed at --</span>
+                        </div>
+                    </div>
+                    <div class="verif-right-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        <span>Verification active</span>
+                    </div>
+                </div>
+
+                <!-- 5. DUAL IDENTITY GRID -->
+                <div class="identity-dual-grid">
+
+                    <!-- EMPLOYEE PROFILE -->
+                    <div class="employee-profile-card">
+                        <div>
+                            <div class="emp-header-row">
+                                <div class="emp-avatar-wrapper">
+                                    <div class="emp-avatar-circle" id="empAvatarInitial">?</div>
+                                    <div class="emp-avatar-badge" id="empAvatarBadge" style="display: none;">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
+                                </div>
+                                <div class="emp-name-block">
+                                    <div class="emp-name-row">
+                                        <span class="emp-name-text" id="empFullName">Awaiting Scan</span>
+                                        <span class="pill-verified" id="empVerifiedPill" style="display: none;">Verified</span>
+                                    </div>
+                                    <span style="font-size: 12px; color: #64748b;" id="empSubRole">Scan card to identify</span>
+                                </div>
+                            </div>
+
+                            <div class="emp-details-grid">
+                                <div class="emp-detail-item">
+                                    <span class="detail-label">Employee ID</span>
+                                    <strong class="detail-value" id="empCodeVal">--</strong>
+                                </div>
+                                <div class="emp-detail-item">
+                                    <span class="detail-label">Role</span>
+                                    <strong class="detail-value" id="empRoleVal">--</strong>
+                                </div>
+                                <div class="emp-detail-item">
+                                    <span class="detail-label">Department</span>
+                                    <strong class="detail-value" id="empDeptVal">--</strong>
+                                </div>
+                                <div class="emp-detail-item">
+                                    <span class="detail-label">Join Date</span>
+                                    <strong class="detail-value" id="empJoinDateVal">--</strong>
+                                </div>
+                                <div class="emp-detail-item full-width">
+                                    <span class="detail-label">Status</span>
+                                    <strong class="detail-value status-active" id="empStatusVal">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="verif-card-footer">
+                            <span class="verif-status-badge">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Verified by ASLENIX
+                            </span>
+                            <span class="verif-last-date" id="empLastVerifiedFooter">Last Verified: --</span>
+                        </div>
+                    </div>
+
+                    <!-- TODAY'S ATTENDANCE -->
+                    <div class="today-attendance-card">
+                        <div>
+                            <div class="att-top-row">
+                                <span class="att-eyebrow">Today's Attendance</span>
+                                <span class="att-live-pill">Live</span>
+                            </div>
+                            <div class="att-main-status" id="attMainStatus">Not Checked In</div>
+
+                            <div class="att-meta-list">
+                                <div class="att-meta-row">
+                                    <span class="label">Date</span>
+                                    <span class="val" id="attDateVal" th:text="${todayDate}">16 Sep 2026</span>
+                                </div>
+                                <div class="att-meta-row">
+                                    <span class="label">Scheduled</span>
+                                    <span class="val" id="attScheduledVal" th:text="${scheduledHours}">09:00 AM - 06:00 PM</span>
+                                </div>
+                                <div class="att-meta-row">
+                                    <span class="label">Current Status</span>
+                                    <span class="val" id="attCurrentStatusVal">Not Checked In</span>
+                                </div>
+                                <div class="att-meta-row">
+                                    <span class="label">Previous Attendance</span>
+                                    <span class="val" id="attPrevVal">No records today</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="att-boxes-row">
+                            <div class="att-time-box">
+                                <span class="title">Check-In</span>
+                                <strong class="time" id="attCheckInVal">--:--</strong>
+                            </div>
+                            <div class="att-time-box">
+                                <span class="title">Check-Out</span>
+                                <strong class="time" id="attCheckOutVal">-</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. ATTENDANCE ACTION SELECTOR -->
+                <div class="action-selector-card">
+                    <div class="section-header-block">
+                        <span class="section-eyebrow">Attendance Action</span>
+                        <h3 class="section-title">Choose how today's attendance should be processed.</h3>
+                    </div>
+
+                    <div class="actions-two-cards">
+                        <!-- CHECK IN CARD -->
+                        <div class="action-option-card selected" id="actionCardCheckIn" data-action="CHECK_IN">
+                            <div class="action-card-top">
+                                <div class="action-icon-circle in">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="action-card-badge-disabled" id="checkInDisabledBadge">Already Checked In</span>
+                                    <div class="action-selected-check">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="action-card-info">
+                                <div class="action-title-text">CHECK IN</div>
+                                <div class="action-subtitle-text">Mark today's attendance</div>
+                                <div class="action-card-time live-action-time" th:text="${currentTime}">12:23 PM</div>
+                            </div>
+                        </div>
+
+                        <!-- CHECK OUT CARD -->
+                        <div class="action-option-card" id="actionCardCheckOut" data-action="CHECK_OUT">
+                            <div class="action-card-top">
+                                <div class="action-icon-circle out">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                </div>
+                                <div class="action-selected-check">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </div>
+                            </div>
+                            <div class="action-card-info">
+                                <div class="action-title-text">CHECK OUT</div>
+                                <div class="action-subtitle-text">Complete today's attendance</div>
+                                <div class="action-card-time live-action-time" th:text="${currentTime}">12:23 PM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. FORCE ATTENDANCE OVERRIDE -->
+                <div class="force-override-card">
+                    <div class="force-info-block">
+                        <strong id="forceSectionTitle">Force Check-In</strong>
+                        <span id="forceSectionDesc">Use force check-in only when normal attendance processing is unavailable.</span>
+                    </div>
+                    <label class="force-toggle-label">
+                        <span id="forceToggleText">Enable Force Check-In</span>
+                        <div class="custom-toggle">
+                            <input type="checkbox" id="forceToggleCheckbox">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- 8. PROCESSED BY -->
+                <div class="processed-by-card">
+                    <span class="section-eyebrow">Processed By</span>
+                    <div class="processed-grid">
+                        <div class="processed-item">
+                            <span class="label">Admin Name</span>
+                            <strong class="val" th:text="${adminName}">admin</strong>
+                        </div>
+                        <div class="processed-item">
+                            <span class="label">Admin Role</span>
+                            <strong class="val" th:text="${adminRole}">Super Admin</strong>
+                        </div>
+                        <div class="processed-item">
+                            <span class="label">Processed At</span>
+                            <strong class="val" id="processedAtTimestamp" th:text="${todayDate + ' at ' + currentTime}">16 Sep 2026 at 12:23 PM</strong>
+                        </div>
+                    </div>
+                    <div class="processed-footer">
+                        <span class="dot-online"></span>
+                        <span>Reader Status: Connected</span>
+                    </div>
+                </div>
+
+                <!-- 9. CONFIRMATION BAR -->
+                <div class="confirmation-bar">
+                    <span class="confirmation-text" id="confirmationSummaryText">Please scan an employee card to proceed.</span>
+                    <div class="confirmation-buttons">
+                        <button type="button" class="btn-action-cancel" id="btnCancelScan">Cancel</button>
+                        <button type="button" class="btn-action-confirm" id="btnConfirmAction" disabled>
+                            <span id="confirmBtnLabel">Confirm Check-In</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT AUDIT HISTORY SIDEBAR -->
+            <aside class="audit-history-sidebar">
+                <div class="audit-header">
+                    <div class="audit-title">
+                        <strong>Audit History</strong>
+                        <span>Admin card reader attendance log</span>
+                    </div>
+                    <button type="button" class="btn-refresh-audit" id="btnRefreshAudit" title="Refresh audit log">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 4v6h-6"></path>
+                            <path d="M1 20v-6h6"></path>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="audit-feed-list" id="auditFeedList">
+                    <!-- Dynamic Thymeleaf or JS -->
+                    <div class="audit-feed-item" th:each="log : ${auditLogs}">
+                        <div class="audit-feed-top">
+                            <span class="audit-emp-code" th:text="${(log.employeeCode ?: 'Unknown') + ' | ' + (log.employeeName ?: 'Unknown')}">ASL-01019 | Samip</span>
+                            <span class="audit-emp-time" th:text="${log.timestamp != null ? #temporals.format(log.timestamp, 'hh:mm a') : ''}">10:45 AM</span>
+                        </div>
+                        <div class="audit-meta-row" th:text="${(log.actionType ?: 'Scan') + ' | Admin Card Reader | Admin: ' + (log.adminUsername ?: 'admin')}">Register Card | Admin Card Reader | Admin: admin</div>
+                        <div class="audit-notes-row" th:text="${log.notes ?: 'Verified'}">Employee missed normal attendance</div>
+                    </div>
+                </div>
+            </aside>
+
+        </main>
+    </div>
+</div>
+
+<!-- =========================================================
+     CAMERA QR SCANNER MODAL (VIEWFINDER + RED RETICLE)
+========================================================== -->
+<div class="camera-modal-backdrop" id="cameraModal">
+    <div class="camera-modal-content">
+        <div class="camera-modal-header">
+            <h3>Scan Employee QR Code</h3>
+            <button type="button" class="camera-btn-close" id="btnCloseCamera" aria-label="Close Camera">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="camera-viewfinder-box">
+            <div id="qrCameraReader"></div>
+            <!-- RED CORNER RETICLE -->
+            <div class="scan-reticle-overlay">
+                <div class="reticle-corner-tr"></div>
+                <div class="reticle-corner-bl"></div>
+            </div>
+        </div>
+
+        <p class="camera-hint">Point camera at employee digital QR ID card to scan automatically.</p>
+    </div>
+</div>
+
+<!-- FLOATING TOAST -->
+<div class="as-toast" id="asToast">Notification message</div>
+
+<!-- =========================================================
+     LIVE SCRIPTS: SCAN, CAMERA, ATTENDANCE & AUDIT LOGS
+========================================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // CSRF Tokens
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+
+    // State
+    let currentEmployee = null;
+    let selectedAction = 'CHECK_IN';
+    let forceEnabled = false;
+    let html5QrCodeScanner = null;
+
+    // Elements
+    const scanQueryInput = document.getElementById('scanQueryInput');
+    const btnProcessScan = document.getElementById('btnProcessScan');
+    const btnOpenCamera = document.getElementById('btnOpenCamera');
+    const btnCloseCamera = document.getElementById('btnCloseCamera');
+    const cameraModal = document.getElementById('cameraModal');
+    const btnCancelScan = document.getElementById('btnCancelScan');
+    const btnConfirmAction = document.getElementById('btnConfirmAction');
+    const confirmBtnLabel = document.getElementById('confirmBtnLabel');
+    const confirmationSummaryText = document.getElementById('confirmationSummaryText');
+
+    const actionCardCheckIn = document.getElementById('actionCardCheckIn');
+    const actionCardCheckOut = document.getElementById('actionCardCheckOut');
+    const forceToggleCheckbox = document.getElementById('forceToggleCheckbox');
+    const forceSectionTitle = document.getElementById('forceSectionTitle');
+    const forceSectionDesc = document.getElementById('forceSectionDesc');
+    const forceToggleText = document.getElementById('forceToggleText');
+
+    const verificationBanner = document.getElementById('verificationBanner');
+    const bannerCardMeta = document.getElementById('bannerCardMeta');
+    const bannerTimestamp = document.getElementById('bannerTimestamp');
+    const chipLastCardVal = document.getElementById('chipLastCardVal');
+    const scanStatusBadge = document.getElementById('scanStatusBadge');
+    const scanBoxSubtext = document.getElementById('scanBoxSubtext');
+    const pageTitleText = document.getElementById('pageTitleText');
+    const pageSubtitleText = document.getElementById('pageSubtitleText');
+
+    // Profile elements
+    const empAvatarInitial = document.getElementById('empAvatarInitial');
+    const empAvatarBadge = document.getElementById('empAvatarBadge');
+    const empFullName = document.getElementById('empFullName');
+    const empVerifiedPill = document.getElementById('empVerifiedPill');
+    const empSubRole = document.getElementById('empSubRole');
+    const empCodeVal = document.getElementById('empCodeVal');
+    const empRoleVal = document.getElementById('empRoleVal');
+    const empDeptVal = document.getElementById('empDeptVal');
+    const empJoinDateVal = document.getElementById('empJoinDateVal');
+    const empStatusVal = document.getElementById('empStatusVal');
+    const empLastVerifiedFooter = document.getElementById('empLastVerifiedFooter');
+
+    // Attendance elements
+    const attMainStatus = document.getElementById('attMainStatus');
+    const attCurrentStatusVal = document.getElementById('attCurrentStatusVal');
+    const attPrevVal = document.getElementById('attPrevVal');
+    const attCheckInVal = document.getElementById('attCheckInVal');
+    const attCheckOutVal = document.getElementById('attCheckOutVal');
+
+    // Toast
+    const asToast = document.getElementById('asToast');
+    function showToast(msg, type = 'info') {
+        if (!asToast) return;
+        asToast.textContent = msg;
+        asToast.className = 'as-toast ' + type + ' show';
+        setTimeout(() => {
+            asToast.className = 'as-toast';
+        }, 3800);
+    }
+
+    // Audio Beep Feedback
+    function playBeep() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.value = 880;
+            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.12);
+        } catch (e) {
+            // Audio not allowed or unsupported
+        }
+    }
+
+    // Update Action Selection
+    function setAction(action) {
+        selectedAction = action;
+        if (action === 'CHECK_IN') {
+            actionCardCheckIn.classList.add('selected');
+            actionCardCheckOut.classList.remove('selected');
+            forceSectionTitle.textContent = 'Force Check-In';
+            forceSectionDesc.textContent = 'Use force check-in only when normal attendance processing is unavailable.';
+            forceToggleText.textContent = 'Enable Force Check-In';
+        } else {
+            actionCardCheckOut.classList.add('selected');
+            actionCardCheckIn.classList.remove('selected');
+            forceSectionTitle.textContent = 'Force Check-Out';
+            forceSectionDesc.textContent = 'Use force check-out only when normal attendance processing is unavailable.';
+            forceToggleText.textContent = 'Enable Force Check-Out';
+        }
+        updateConfirmButton();
+    }
+
+    actionCardCheckIn.addEventListener('click', () => {
+        if (currentEmployee && (currentEmployee.hasCheckedIn || actionCardCheckIn.classList.contains('disabled-action'))) {
+            showToast((currentEmployee.fullName || 'Employee') + ' has already checked in today. Check-in cannot be performed again.', 'error');
+            return;
+        }
+        setAction('CHECK_IN');
+    });
+    actionCardCheckOut.addEventListener('click', () => setAction('CHECK_OUT'));
+
+    // Force Toggle
+    forceToggleCheckbox.addEventListener('change', function () {
+        forceEnabled = this.checked;
+        updateConfirmButton();
+    });
+
+    function updateConfirmButton() {
+        if (!currentEmployee) {
+            btnConfirmAction.disabled = true;
+            confirmationSummaryText.textContent = 'Please scan an employee card to proceed.';
+            confirmBtnLabel.textContent = selectedAction === 'CHECK_IN' ? 'Confirm Check-In' : 'Confirm Check-Out';
+            return;
+        }
+
+        const empName = currentEmployee.fullName || currentEmployee.employeeCode;
+        const alreadyCheckedIn = currentEmployee.hasCheckedIn || actionCardCheckIn.classList.contains('disabled-action');
+
+        if (alreadyCheckedIn && selectedAction === 'CHECK_IN') {
+            btnConfirmAction.disabled = true;
+            confirmationSummaryText.textContent = empName + ' has already checked in today. Please select Check-Out.';
+            confirmBtnLabel.textContent = 'Already Checked In';
+            return;
+        }
+
+        btnConfirmAction.disabled = false;
+        const actionWord = selectedAction === 'CHECK_IN' ? 'Check-In' : 'Check-Out';
+
+        if (forceEnabled) {
+            confirmBtnLabel.textContent = 'Confirm Force ' + actionWord;
+            confirmationSummaryText.textContent = 'Force ' + actionWord + ' enabled for ' + empName + '.';
+        } else {
+            confirmBtnLabel.textContent = 'Confirm ' + actionWord;
+            confirmationSummaryText.textContent = actionWord + ' selected for ' + empName + '.';
+        }
+    }
+
+    // Scan Employee Function
+    async function processScan(query) {
+        if (!query || !query.trim()) {
+            showToast('Please enter or scan an employee card or ID.', 'error');
+            return;
+        }
+
+        btnProcessScan.disabled = true;
+        btnProcessScan.textContent = 'Scanning...';
+
+        try {
+            const resp = await fetch('/admin/card-reader-attendance/scan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({ query: query.trim() })
+            });
+
+            const data = await resp.json();
+
+            if (!data.success) {
+                showToast(data.message || 'Employee not recognized.', 'error');
+                scanStatusBadge.textContent = 'Card Unknown';
+                scanStatusBadge.className = 'badge-waiting';
+                if (data.auditLogs) renderAuditFeed(data.auditLogs);
+                return;
+            }
+
+            playBeep();
+            showToast('Card scanned & verified for ' + data.employee.fullName, 'success');
+
+            // Populate UI with employee data
+            currentEmployee = data.employee;
+
+            pageTitleText.textContent = 'Employee Identified';
+            pageSubtitleText.textContent = 'ID card scanned successfully and employee verified.';
+
+            scanStatusBadge.textContent = 'Card Verified';
+            scanStatusBadge.className = 'badge-ready';
+            scanBoxSubtext.textContent = 'Employee card active and verified.';
+
+            chipLastCardVal.textContent = data.employee.maskedCard;
+
+            // Verification banner
+            verificationBanner.classList.add('active');
+            bannerCardMeta.textContent = 'Card: ' + data.employee.maskedCard;
+            bannerTimestamp.textContent = 'Secure scan completed at ' + data.employee.lastVerifiedAt;
+
+            // Employee Card
+            empAvatarInitial.textContent = data.employee.avatar;
+            empAvatarBadge.style.display = 'grid';
+            empFullName.textContent = data.employee.fullName;
+            empVerifiedPill.style.display = 'inline-block';
+            empSubRole.textContent = data.employee.role + ' • ' + data.employee.department;
+            empCodeVal.textContent = data.employee.employeeCode;
+            empRoleVal.textContent = data.employee.role;
+            empDeptVal.textContent = data.employee.department;
+            empJoinDateVal.textContent = data.employee.joinDate;
+            empStatusVal.textContent = '● ' + data.employee.status;
+            empLastVerifiedFooter.textContent = 'Last Verified: ' + data.employee.lastVerifiedAt;
+
+            // Attendance Card
+            if (data.attendance) {
+                attMainStatus.textContent = data.attendance.status;
+                attCurrentStatusVal.textContent = data.attendance.status;
+                attPrevVal.textContent = data.attendance.previousAttendance;
+                attCheckInVal.textContent = data.attendance.checkIn;
+                attCheckOutVal.textContent = data.attendance.checkOut;
+
+                const alreadyCheckedIn = Boolean(
+                    (data.employee && data.employee.hasCheckedIn) ||
+                    (data.attendance && data.attendance.hasCheckedIn) ||
+                    (data.attendance.checkIn && data.attendance.checkIn !== '--:--')
+                );
+
+                if (alreadyCheckedIn) {
+                    currentEmployee.hasCheckedIn = true;
+                    actionCardCheckIn.classList.add('disabled-action');
+                    actionCardCheckIn.title = 'Employee has already checked in today';
+                    setAction('CHECK_OUT');
+                } else {
+                    currentEmployee.hasCheckedIn = false;
+                    actionCardCheckIn.classList.remove('disabled-action');
+                    actionCardCheckIn.title = '';
+                    if (data.attendance.recommendedAction) {
+                        setAction(data.attendance.recommendedAction);
+                    } else {
+                        setAction('CHECK_IN');
+                    }
+                }
+            }
+
+            // Update Audit Feed
+            if (data.auditLogs) renderAuditFeed(data.auditLogs);
+
+            updateConfirmButton();
+
+        } catch (e) {
+            console.error(e);
+            showToast('Failed to process card scan.', 'error');
+        } finally {
+            btnProcessScan.disabled = false;
+            btnProcessScan.textContent = 'Process Scan';
+        }
+    }
+
+    // Process scan on button click or Enter key
+    btnProcessScan.addEventListener('click', () => {
+        processScan(scanQueryInput.value);
+    });
+
+    scanQueryInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            processScan(scanQueryInput.value);
+        }
+    });
+
+    // Reset Scan / Cancel
+    btnCancelScan.addEventListener('click', () => {
+        currentEmployee = null;
+        scanQueryInput.value = '';
+        scanQueryInput.focus();
+
+        pageTitleText.textContent = 'Scan & Identify Employee';
+        pageSubtitleText.textContent = 'Scan employee card QR code or enter employee ID to process attendance.';
+        scanStatusBadge.textContent = 'Waiting for Card';
+        scanStatusBadge.className = 'badge-waiting';
+        scanBoxSubtext.textContent = 'Waiting for employee card...';
+
+        verificationBanner.classList.remove('active');
+
+        empAvatarInitial.textContent = '?';
+        empAvatarBadge.style.display = 'none';
+        empFullName.textContent = 'Awaiting Scan';
+        empVerifiedPill.style.display = 'none';
+        empSubRole.textContent = 'Scan card to identify';
+        empCodeVal.textContent = '--';
+        empRoleVal.textContent = '--';
+        empDeptVal.textContent = '--';
+        empJoinDateVal.textContent = '--';
+        empStatusVal.textContent = '--';
+        empLastVerifiedFooter.textContent = 'Last Verified: --';
+
+        attMainStatus.textContent = 'Not Checked In';
+        attCurrentStatusVal.textContent = 'Not Checked In';
+        attPrevVal.textContent = 'No records today';
+        attCheckInVal.textContent = '--:--';
+        attCheckOutVal.textContent = '-';
+
+        forceToggleCheckbox.checked = false;
+        forceEnabled = false;
+
+        actionCardCheckIn.classList.remove('disabled-action');
+        actionCardCheckIn.title = '';
+
+        setAction('CHECK_IN');
+        updateConfirmButton();
+    });
+
+    // Execute Check In / Check Out / Force Override
+    btnConfirmAction.addEventListener('click', async () => {
+        if (!currentEmployee) return;
+
+        if (selectedAction === 'CHECK_IN' && (currentEmployee.hasCheckedIn || actionCardCheckIn.classList.contains('disabled-action'))) {
+            showToast(currentEmployee.fullName + ' has already checked in today. Check-in cannot be performed again.', 'error');
+            return;
+        }
+
+        btnConfirmAction.disabled = true;
+        btnConfirmAction.innerHTML = '<span>Processing...</span>';
+
+        try {
+            const resp = await fetch('/admin/card-reader-attendance/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    employeeCode: currentEmployee.employeeCode,
+                    action: selectedAction,
+                    force: forceEnabled
+                })
+            });
+
+            const data = await resp.json();
+
+            if (!data.success) {
+                showToast(data.message || 'Operation could not be completed.', 'error');
+                return;
+            }
+
+            playBeep();
+            showToast(data.message, 'success');
+
+            // Update attendance card with new state
+            if (data.attendance) {
+                attMainStatus.textContent = data.attendance.status;
+                attCurrentStatusVal.textContent = data.attendance.status;
+                attPrevVal.textContent = data.attendance.previousAttendance;
+                attCheckInVal.textContent = data.attendance.checkIn;
+                attCheckOutVal.textContent = data.attendance.checkOut;
+
+                currentEmployee.hasCheckedIn = true;
+                actionCardCheckIn.classList.add('disabled-action');
+                actionCardCheckIn.title = 'Employee has already checked in today';
+                setAction('CHECK_OUT');
+            }
+
+            // Update Audit Feed
+            if (data.auditLogs) renderAuditFeed(data.auditLogs);
+
+            // Reset force toggle
+            forceToggleCheckbox.checked = false;
+            forceEnabled = false;
+            updateConfirmButton();
+
+        } catch (e) {
+            console.error(e);
+            showToast('Failed to record attendance.', 'error');
+        } finally {
+            btnConfirmAction.disabled = false;
+            updateConfirmButton();
+        }
+    });
+
+    // =========================================================
+    // CAMERA QR SCANNER
+    // =========================================================
+    function startCameraScanner() {
+        cameraModal.classList.add('open');
+
+        if (!html5QrCodeScanner) {
+            html5QrCodeScanner = new Html5Qrcode('qrCameraReader');
+        }
+
+        const config = {
+            fps: 15,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0
+        };
+
+        html5QrCodeScanner.start(
+            { facingMode: 'environment' },
+            config,
+            (decodedText) => {
+                // QR Decoded successfully!
+                stopCameraScanner();
+                scanQueryInput.value = decodedText;
+                processScan(decodedText);
+            },
+            () => {
+                // Scanning frame callback (silent)
+            }
+        ).catch(err => {
+            console.error('Camera open failed:', err);
+            showToast('Could not access camera. Please allow camera permissions.', 'error');
+            stopCameraScanner();
+        });
+    }
+
+    function stopCameraScanner() {
+        if (html5QrCodeScanner) {
+            try {
+                html5QrCodeScanner.stop().then(() => {
+                    cameraModal.classList.remove('open');
+                }).catch(() => {
+                    cameraModal.classList.remove('open');
+                });
+            } catch (e) {
+                cameraModal.classList.remove('open');
+            }
+        } else {
+            cameraModal.classList.remove('open');
+        }
+    }
+
+    btnOpenCamera.addEventListener('click', startCameraScanner);
+    btnCloseCamera.addEventListener('click', stopCameraScanner);
+    cameraModal.addEventListener('click', (e) => {
+        if (e.target === cameraModal) stopCameraScanner();
+    });
+
+    // =========================================================
+    // AUDIT LOG FEED & REFRESH
+    // =========================================================
+    const auditFeedList = document.getElementById('auditFeedList');
+    const btnRefreshAudit = document.getElementById('btnRefreshAudit');
+
+    function renderAuditFeed(logs) {
+        if (!auditFeedList || !logs) return;
+        auditFeedList.innerHTML = logs.map(item => `
+            <div class="audit-feed-item">
+                <div class="audit-feed-top">
+                    <span class="audit-emp-code">${item.employeeCode || 'Unknown'} | ${item.employeeName || 'Unknown'}</span>
+                    <span class="audit-emp-time">${item.time || ''}</span>
+                </div>
+                <div class="audit-meta-row">${item.actionType || 'Scan'} | Admin Card Reader | Admin: ${item.adminUsername || 'admin'}</div>
+                <div class="audit-notes-row">${item.notes || ''}</div>
+            </div>
+        `).join('');
+    }
+
+    async function refreshAuditLogs() {
+        if (btnRefreshAudit) btnRefreshAudit.classList.add('spinning');
+        try {
+            const resp = await fetch('/admin/card-reader-attendance/logs');
+            if (resp.ok) {
+                const logs = await resp.json();
+                renderAuditFeed(logs);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            if (btnRefreshAudit) {
+                setTimeout(() => btnRefreshAudit.classList.remove('spinning'), 500);
+            }
+        }
+    }
+
+    if (btnRefreshAudit) {
+        btnRefreshAudit.addEventListener('click', refreshAuditLogs);
+    }
+
+    // Check Reader button simulation
+    const btnCheckReader = document.getElementById('btnCheckReader');
+    if (btnCheckReader) {
+        btnCheckReader.addEventListener('click', () => {
+            showToast('Admin RFID/NFC Reader & Camera status: OK (Online)', 'success');
+        });
+    }
+
+    // Disconnect button
+    const btnDisconnectReader = document.getElementById('btnDisconnectReader');
+    const chipConnectionVal = document.getElementById('chipConnectionVal');
+    let isConnected = true;
+    if (btnDisconnectReader) {
+        btnDisconnectReader.addEventListener('click', () => {
+            isConnected = !isConnected;
+            if (isConnected) {
+                btnDisconnectReader.textContent = 'Disconnect';
+                chipConnectionVal.innerHTML = '<span class="dot-online"></span> Connected';
+                showToast('Reader connected.', 'success');
+            } else {
+                btnDisconnectReader.textContent = 'Connect';
+                chipConnectionVal.innerHTML = '<span class="dot-online" style="background: #94a3b8;"></span> Disconnected';
+                showToast('Reader disconnected.', 'info');
+            }
+        });
+    }
+
+    // =========================================================
+    // LIVE NEPALI BIKRAM SAMBAT DATE
+    // =========================================================
+    const bsDateEl = document.getElementById('headerBsDate');
+    if (bsDateEl) {
+        function formatNepaliDate() {
+            const now = new Date();
+            const monthNames = ['Baisakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin', 'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'];
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayOfWeek = dayNames[now.getDay()];
+
+            try {
+                const NepaliDateClass = (typeof NepaliDate === 'function') ? NepaliDate : (typeof NepaliDate === 'object' && NepaliDate?.default ? NepaliDate.default : null);
+                if (NepaliDateClass) {
+                    const nepaliDate = new NepaliDateClass(now);
+                    return `${dayOfWeek}, ${monthNames[nepaliDate.getMonth()]} ${nepaliDate.getDate()}, ${nepaliDate.getYear()} BS`;
+                }
+            } catch (e) {}
+
+            try {
+                if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.AD2BS) {
+                    const bsObj = NepaliFunctions.AD2BS({ year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() });
+                    if (bsObj) return `${dayOfWeek}, ${monthNames[bsObj.month - 1]} ${bsObj.day}, ${bsObj.year} BS`;
+                }
+            } catch (e) {}
+
+            const approxYear = now.getFullYear() + 57;
+            return `${dayOfWeek}, ${monthNames[now.getMonth()]} ${now.getDate()}, ${approxYear} BS`;
+        }
+        bsDateEl.textContent = formatNepaliDate();
+    }
+});
+</script>
+
+</body>
+</html>
