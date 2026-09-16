@@ -1365,19 +1365,21 @@
                 </div>
             </a>
 
-            <!-- 2. EMPLOYEES (ACTIVE) -->
+            <!-- 2. DIGITAL QR IDS (ACTIVE) -->
             <a th:href="@{/admin/employees}" class="sidebar-link active">
                 <div class="sidebar-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                        <rect x="7" y="7" width="2" height="2"></rect>
+                        <rect x="15" y="15" width="2" height="2"></rect>
                     </svg>
                 </div>
                 <div class="sidebar-text">
-                    <strong>Employees</strong>
-                    <span>Manage employees</span>
+                    <strong>Digital QR IDs</strong>
+                    <span>Employee directory</span>
                 </div>
             </a>
 
@@ -1572,141 +1574,203 @@
             </div>
         </header>
 
-        <!-- MAIN EMPLOYEES CONTENT -->
+        <!-- MAIN EMPLOYEES CONTENT: DIGITAL QR IDS -->
         <main>
-            <!-- PAGE HEADER -->
-            <section class="page-header">
-                <div>
-                    <p class="eyebrow">EMPLOYEE MANAGEMENT</p>
-                    <h1>Employees</h1>
-                    <p class="subtitle">Manage employee accounts, workplace roles, status, and directory profiles.</p>
+            <!-- PAGE HEADER & CONTROLS -->
+            <section class="qr-page-header">
+                <div class="qr-header-title">
+                    <h1>Digital QR IDs</h1>
+                    <p class="qr-subtitle">
+                        <span id="employeeCountDisplay" th:text="${employees != null ? #lists.size(employees) : 0}">0</span> employee cards
+                    </p>
                 </div>
-                <div class="employee-count-box">
-                    Total employees:
-                    <strong th:text="${employees != null ? #lists.size(employees) : 0}">0</strong>
-                </div>
-            </section>
 
-            <!-- EMPLOYEE PANEL -->
-            <section class="panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>Employee Directory</h2>
-                        <span>View, filter, and manage staff members</span>
+                <!-- CONTROLS BAR: SEARCH + FILTERS + ADD BUTTON -->
+                <div class="qr-controls-bar">
+                    <div class="qr-search-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="employeeSearchInput" placeholder="Search name, email, ID..." autocomplete="off">
                     </div>
-                    <a th:href="@{/admin/employees/add}" class="add-btn">
-                        + Add Employee
-                    </a>
-                </div>
 
-                <div class="table-container">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Position</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <!-- EMPLOYEE ROW -->
-                        <tr th:each="employee : ${employees}">
-                            <td>
-                                <span class="employee-code" th:text="${employee.employeeCode}">
-                                    ASL-0000
-                                </span>
-                            </td>
-                            <td>
-                                <div class="employee-name-cell">
-                                    <div class="employee-avatar-circle">
-                                        <span th:if="${employee.firstName != null and !employee.firstName.isEmpty()}"
-                                              th:text="${#strings.substring(employee.firstName, 0, 1).toUpperCase()}">
-                                            E
-                                        </span>
-                                        <span th:unless="${employee.firstName != null and !employee.firstName.isEmpty()}">
-                                            E
-                                        </span>
-                                    </div>
-                                    <div class="employee-fullname">
-                                        <span th:text="${employee.firstName}">Employee</span>
-                                        <span th:if="${employee.lastName != null and !employee.lastName.isEmpty()}"
-                                              th:text="${' ' + employee.lastName}"></span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span th:text="${employee.phone != null && !employee.phone.isEmpty() ? employee.phone : 'Not provided'}">
-                                    Not provided
-                                </span>
-                            </td>
-                            <td>
-                                <span class="position-badge"
-                                      th:text="${employee.position != null && !employee.position.isEmpty() ? employee.position : 'Not assigned'}">
-                                    Not assigned
-                                </span>
-                            </td>
-                            <td>
-                                <span th:if="${employee.enabled}" class="status-pill active">
-                                    Active
-                                </span>
-                                <span th:unless="${employee.enabled}" class="status-pill disabled">
-                                    Disabled
-                                </span>
-                            </td>
-                            <td>
-                                <div class="actions-group">
-                                    <!-- EDIT -->
-                                    <a th:href="@{/admin/employees/edit/{id}(id=${employee.id})}" class="btn-action-edit">
-                                        Edit
-                                    </a>
+                    <div class="qr-filter-group">
+                        <div class="select-wrapper">
+                            <select id="departmentFilter">
+                                <option value="ALL">All Departments</option>
+                                <option th:each="dept : ${departments}" th:value="${dept.name}" th:text="${dept.name}"></option>
+                            </select>
+                            <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
 
-                                    <!-- DISABLE -->
-                                    <form th:if="${employee.enabled}"
-                                          th:action="@{/admin/employees/disable/{id}(id=${employee.id})}"
-                                          method="post"
-                                          class="action-form">
-                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                                        <button class="btn-action-disable" type="submit">
-                                            Disable
-                                        </button>
-                                    </form>
+                        <div class="select-wrapper">
+                            <select id="statusFilter">
+                                <option value="ALL">All Status</option>
+                                <option value="ACTIVE">Active</option>
+                                <option value="DISABLED">Disabled</option>
+                            </select>
+                            <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
 
-                                    <!-- ENABLE -->
-                                    <form th:unless="${employee.enabled}"
-                                          th:action="@{/admin/employees/enable/{id}(id=${employee.id})}"
-                                          method="post"
-                                          class="action-form">
-                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                                        <button class="btn-action-enable" type="submit">
-                                            Enable
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- EMPTY STATE -->
-                        <tr th:if="${employees == null || #lists.isEmpty(employees)}">
-                            <td colspan="6">
-                                <div class="empty-state">
-                                    <div class="empty-icon">
-                                        <svg viewBox="0 0 24 24">
-                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="9" cy="7" r="4"></circle>
-                                        </svg>
-                                    </div>
-                                    <div class="empty-title">No employees found</div>
-                                    <div class="empty-text">There are currently no employee accounts registered in the system.</div>
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                        <a th:href="@{/admin/employees/add}" class="btn-add-employee">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            <span>Add Employee</span>
+                        </a>
+                    </div>
                 </div>
             </section>
+
+            <!-- QR CARDS CONTAINER GRID -->
+            <div class="qr-cards-grid" id="qrCardsGrid">
+                <!-- CARD FOR EACH EMPLOYEE -->
+                <div class="qr-id-card"
+                     th:each="employee : ${employees}"
+                     th:data-name="${(employee.firstName ?: '') + ' ' + (employee.lastName ?: '')}"
+                     th:data-code="${employee.employeeCode ?: ''}"
+                     th:data-email="${employee.email ?: ''}"
+                     th:data-dept="${employee.department != null ? employee.department.name : ''}"
+                     th:data-status="${employee.enabled ? 'ACTIVE' : 'DISABLED'}">
+
+                    <!-- CARD TOP ROW -->
+                    <div class="qr-card-top">
+                        <div class="qr-card-brand">
+                            <div class="aslenix-mark">
+                                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M14 3L25 22H3L14 3Z" stroke="url(#aslenixGrad)" stroke-width="3" stroke-linejoin="round"/>
+                                    <path d="M14 10L20 20H8L14 10Z" fill="url(#aslenixGrad)"/>
+                                    <defs>
+                                        <linearGradient id="aslenixGrad" x1="3" y1="3" x2="25" y2="22" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#ec4899"/>
+                                            <stop offset="0.5" stop-color="#8b5cf6"/>
+                                            <stop offset="1" stop-color="#06b6d4"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="qr-card-brand-text">
+                                <strong>ASLENIX</strong>
+                                <span>TECH & SOLUTION</span>
+                            </div>
+                        </div>
+
+                        <div class="qr-card-status">
+                            <span th:if="${employee.enabled}" class="qr-badge-active">ACTIVE</span>
+                            <span th:unless="${employee.enabled}" class="qr-badge-disabled">DISABLED</span>
+                        </div>
+                    </div>
+
+                    <!-- EMPLOYEE IDENTITY ROW -->
+                    <div class="qr-card-identity">
+                        <div class="qr-avatar-circle">
+                            <span th:text="${(employee.firstName != null and !employee.firstName.isEmpty() ? #strings.substring(employee.firstName, 0, 1).toUpperCase() : 'E') + (employee.lastName != null and !employee.lastName.isEmpty() ? #strings.substring(employee.lastName, 0, 1).toUpperCase() : '')}">AA</span>
+                        </div>
+                        <div class="qr-info-meta">
+                            <h3 class="qr-employee-name" th:text="${(employee.firstName ?: '') + ' ' + (employee.lastName ?: '')}">Employee Name</h3>
+                            <p class="qr-employee-position" th:text="${employee.position != null && !employee.position.isEmpty() ? employee.position : 'Team Member'}">Position</p>
+                            <p class="qr-employee-dept" th:text="${employee.department != null ? employee.department.name : 'General'}">Department</p>
+                        </div>
+                    </div>
+
+                    <!-- DETAILS + QR CODE ROW -->
+                    <div class="qr-card-middle">
+                        <div class="qr-details-col">
+                            <div class="qr-detail-block">
+                                <span class="qr-detail-label">EMPLOYEE ID</span>
+                                <strong class="qr-detail-value qr-code-text" th:text="${employee.employeeCode}">ASL-0000</strong>
+                            </div>
+                            <div class="qr-detail-block" style="margin-top: 14px;">
+                                <span class="qr-detail-label">EMAIL</span>
+                                <span class="qr-detail-value qr-email-text" th:text="${employee.email ?: 'Not provided'}" th:title="${employee.email}">email@aslenix.com</span>
+                            </div>
+                        </div>
+
+                        <div class="qr-code-box" title="Scan or download QR ID">
+                            <img th:src="@{/admin/employees/{id}/qr(id=${employee.id})}"
+                                 alt="Employee QR Code"
+                                 class="qr-img"
+                                 loading="lazy">
+                        </div>
+                    </div>
+
+                    <!-- CARD FOOTER WATERMARK -->
+                    <div class="qr-card-footer">
+                        <span>ASLENIX • DIGITAL EMPLOYEE ID</span>
+                    </div>
+
+                    <!-- ADMIN ACTIONS -->
+                    <div class="qr-card-actions">
+                        <!-- EDIT -->
+                        <a th:href="@{/admin/employees/edit/{id}(id=${employee.id})}" class="qr-btn-edit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            <span>Edit</span>
+                        </a>
+
+                        <!-- DISABLE -->
+                        <form th:if="${employee.enabled}"
+                              th:action="@{/admin/employees/disable/{id}(id=${employee.id})}"
+                              method="post"
+                              class="action-inline-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="qr-btn-disable" title="Disable employee account">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                                </svg>
+                                <span>Disable</span>
+                            </button>
+                        </form>
+
+                        <!-- ENABLE -->
+                        <form th:unless="${employee.enabled}"
+                              th:action="@{/admin/employees/enable/{id}(id=${employee.id})}"
+                              method="post"
+                              class="action-inline-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="qr-btn-enable" title="Enable employee account">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                <span>Enable</span>
+                            </button>
+                        </form>
+
+                        <!-- OPEN/DOWNLOAD QR -->
+                        <a th:href="@{/admin/employees/{id}/qr(id=${employee.id})}"
+                           target="_blank"
+                           class="qr-btn-download"
+                           title="Open QR Code in new tab">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- EMPTY STATE -->
+                <div class="qr-empty-cards" id="qrEmptyState" th:style="${employees == null || #lists.isEmpty(employees)} ? 'display: block;' : 'display: none;'">
+                    <div class="qr-empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="qr-empty-title">No employees found</div>
+                    <div class="qr-empty-desc">No employee accounts match the selected filters or search query.</div>
+                </div>
+            </div>
         </main>
     </div>
 </div>
@@ -1962,6 +2026,63 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     bsDateElement.textContent = formatNepaliDate();
+});
+</script>
+
+<!-- LIVE DIGITAL QR IDS FILTER SCRIPT -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('employeeSearchInput');
+    const deptFilter = document.getElementById('departmentFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const cards = document.querySelectorAll('.qr-id-card');
+    const emptyState = document.getElementById('qrEmptyState');
+    const countDisplay = document.getElementById('employeeCountDisplay');
+
+    function filterCards() {
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        const selectedDept = deptFilter ? deptFilter.value.trim().toUpperCase() : 'ALL';
+        const selectedStatus = statusFilter ? statusFilter.value.trim().toUpperCase() : 'ALL';
+
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const name = (card.dataset.name || '').toLowerCase();
+            const code = (card.dataset.code || '').toLowerCase();
+            const email = (card.dataset.email || '').toLowerCase();
+            const dept = (card.dataset.dept || '').trim().toUpperCase();
+            const status = (card.dataset.status || '').trim().toUpperCase();
+
+            const matchesQuery = !query || name.includes(query) || code.includes(query) || email.includes(query);
+            const matchesDept = selectedDept === 'ALL' || dept === selectedDept;
+            const matchesStatus = selectedStatus === 'ALL' || status === selectedStatus;
+
+            if (matchesQuery && matchesDept && matchesStatus) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (countDisplay) {
+            countDisplay.textContent = visibleCount;
+        }
+
+        if (emptyState) {
+            emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', filterCards);
+    }
+    if (deptFilter) {
+        deptFilter.addEventListener('change', filterCards);
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterCards);
+    }
 });
 </script>
 
