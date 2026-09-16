@@ -1289,12 +1289,7 @@ button {
 }
 
 .profile-arrow {
-    width: 14px;
-    height: 14px;
-
-    margin-left: 4px;
-
-    color: #8b95a8;
+    display: none !important;
 }
 
 
@@ -3867,18 +3862,6 @@ tbody tr:last-child td {
 
                 </div>
 
-                <svg
-                    class="profile-arrow"
-                    id="profileArrow"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2">
-
-                    <path d="m6 9 6 6 6-6"></path>
-
-                </svg>
-
             </button>
 
 
@@ -4593,37 +4576,6 @@ tbody tr:last-child td {
                 <!-- Event List Container -->
                 <div class="gov-event-list" id="govEventList">
                     <!-- Events populated dynamically by JS engine -->
-                </div>
-
-                <!-- Admin Event Controls / Add Event Form -->
-                <div class="gov-controls-box">
-                    <div class="gov-controls-label">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                        Admin event controls
-                    </div>
-
-                    <div class="gov-form-group">
-                        <label class="gov-input-label">BS date</label>
-                        <div class="gov-input-with-icon">
-                            <input type="text" id="eventBsDateInput" class="gov-input" placeholder="2083-05-14" value="2083-05-14">
-                            <span class="gov-input-icon">📅</span>
-                        </div>
-                    </div>
-
-                    <div class="gov-form-group">
-                        <label class="gov-input-label">Event name</label>
-                        <input type="text" id="eventNameInput" class="gov-input" placeholder="Government event name">
-                    </div>
-
-                    <div class="gov-form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                        <input type="checkbox" id="eventIsHolidayInput" style="cursor: pointer;">
-                        <label for="eventIsHolidayInput" style="font-size: 11.5px; font-weight: 700; color: #64748b; cursor: pointer;">Public / Official Holiday</label>
-                    </div>
-
-                    <button type="button" class="btn-add-event" id="btnAddEvent">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        Add event
-                    </button>
                 </div>
 
             </div>
@@ -7092,29 +7044,11 @@ document.addEventListener(
                         <div class="gov-event-title" title="${ev.title}">${ev.title}</div>
                         <div class="gov-event-date">${ev.bsDate} BS ${ev.holiday ? '• Official Holiday' : ''}</div>
                     </div>
-                    <div class="gov-event-actions">
-                        ${ev.id ? `
-                        <button type="button" class="gov-action-btn btn-delete-event" data-id="${ev.id}" title="Delete event">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>` : ''}
-                    </div>
                 </div>
             `;
         });
 
         listEl.innerHTML = html;
-
-        // Attach delete listeners
-        listEl.querySelectorAll('.btn-delete-event').forEach(function (btn) {
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const id = this.getAttribute('data-id');
-                if (!id) return;
-                if (confirm('Delete this event?')) {
-                    deleteCalendarEvent(id);
-                }
-            });
-        });
     }
 
     function showDayDetails(dayNum) {

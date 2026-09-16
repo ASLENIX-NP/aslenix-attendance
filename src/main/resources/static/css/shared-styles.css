@@ -542,12 +542,7 @@
         }
 
         .profile-arrow {
-            width: 14px;
-            height: 14px;
-
-            margin-left: 4px;
-
-            color: #8b95a8;
+            display: none !important;
         }
 
 

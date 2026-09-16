@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tasks")
@@ -41,18 +45,30 @@ public class Task {
     private String description;
 
     // ============================================================
-    // ASSIGNED EMPLOYEE
+    // ASSIGNED PRIMARY EMPLOYEE (Retained for backwards compatibility)
     // ============================================================
 
     @ManyToOne(
             fetch = FetchType.LAZY,
-            optional = false
+            optional = true
     )
     @JoinColumn(
             name = "employee_id",
-            nullable = false
+            nullable = true
     )
     private Employee employee;
+
+    // ============================================================
+    // MULTIPLE ASSIGNEES / TEAM LEADS
+    // ============================================================
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "task_assignees",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
+    )
+    private Set<Employee> assignees = new HashSet<>();
 
     // ============================================================
     // PRIORITY
@@ -65,14 +81,24 @@ public class Task {
     private String priority = "MEDIUM";
 
     // ============================================================
+    // COMPLEXITY (SMALL, MEDIUM, LARGE, EPIC)
+    // ============================================================
+
+    @Column(
+            nullable = false,
+            length = 30
+    )
+    private String complexity = "MEDIUM";
+
+    // ============================================================
     // STATUS
     // ============================================================
 
     /*
      * TODO
      * IN_PROGRESS
-     * READY_FOR_REVIEW
-     * APPROVED
+     * READY_FOR_REVIEW / UNDER_REVIEW
+     * APPROVED / COMPLETED
      */
 
     @Column(
@@ -91,7 +117,7 @@ public class Task {
     private Integer progress = 0;
 
     // ============================================================
-    // DUE DATE
+    // DUE DATE & DEADLINES
     // ============================================================
 
     @Column(
@@ -99,14 +125,55 @@ public class Task {
     )
     private LocalDate dueDate;
 
-    // ============================================================
-    // DEADLINE
-    // ============================================================
-
     @Column(
             name = "deadline"
     )
     private LocalDate deadline;
+
+    @Column(
+            name = "deadline_bs",
+            length = 50
+    )
+    private String deadlineBs;
+
+    @Column(
+            name = "deadline_time",
+            length = 20
+    )
+    private String deadlineTime;
+
+    // ============================================================
+    // TAGS (comma-separated, e.g. "frontend, urgent")
+    // ============================================================
+
+    @Column(
+            length = 255
+    )
+    private String tags;
+
+    // ============================================================
+    // SUB-TASKS / WORK ASSIGNMENTS
+    // ============================================================
+
+    @OneToMany(
+            mappedBy = "task",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("id ASC")
+    private List<TaskAssignment> assignments = new ArrayList<>();
+
+    // ============================================================
+    // DISCUSSION COMMENTS
+    // ============================================================
+
+    @OneToMany(
+            mappedBy = "task",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("createdAt ASC")
+    private List<TaskComment> comments = new ArrayList<>();
 
     // ============================================================
     // EMPLOYEE COMPLETION NOTE
@@ -186,14 +253,13 @@ public class Task {
     // ============================================================
 
     public Task() {
-
         LocalDateTime now = LocalDateTime.now();
-
         this.createdAt = now;
         this.updatedAt = now;
         this.status = "TODO";
         this.progress = 0;
         this.priority = "MEDIUM";
+        this.complexity = "MEDIUM";
     }
 
     // ============================================================
@@ -202,21 +268,16 @@ public class Task {
 
     @PreUpdate
     public void preUpdate() {
-
         this.updatedAt = LocalDateTime.now();
     }
 
     // ============================================================
-    // ID
+    // GETTERS & SETTERS
     // ============================================================
 
     public Long getId() {
         return id;
     }
-
-    // ============================================================
-    // TASK CODE
-    // ============================================================
 
     public String getTaskCode() {
         return taskCode;
@@ -226,10 +287,6 @@ public class Task {
         this.taskCode = taskCode;
     }
 
-    // ============================================================
-    // TITLE
-    // ============================================================
-
     public String getTitle() {
         return title;
     }
@@ -237,10 +294,6 @@ public class Task {
     public void setTitle(String title) {
         this.title = title;
     }
-
-    // ============================================================
-    // DESCRIPTION
-    // ============================================================
 
     public String getDescription() {
         return description;
@@ -250,21 +303,56 @@ public class Task {
         this.description = description;
     }
 
-    // ============================================================
-    // EMPLOYEE
-    // ============================================================
-
     public Employee getEmployee() {
+        if (employee == null && assignees != null && !assignees.isEmpty()) {
+            return assignees.iterator().next();
+        }
         return employee;
     }
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
+        if (employee != null) {
+            if (this.assignees == null) {
+                this.assignees = new HashSet<>();
+            }
+            this.assignees.add(employee);
+        }
     }
 
-    // ============================================================
-    // PRIORITY
-    // ============================================================
+    public Set<Employee> getAssignees() {
+        return assignees;
+    }
+
+    public void setAssignees(Set<Employee> assignees) {
+        this.assignees = assignees;
+        if (assignees != null && !assignees.isEmpty()) {
+            if (this.employee == null || !assignees.contains(this.employee)) {
+                this.employee = assignees.iterator().next();
+            }
+        }
+    }
+
+    public void addAssignee(Employee employee) {
+        if (employee != null) {
+            if (this.assignees == null) {
+                this.assignees = new HashSet<>();
+            }
+            this.assignees.add(employee);
+            if (this.employee == null) {
+                this.employee = employee;
+            }
+        }
+    }
+
+    public void removeAssignee(Employee employee) {
+        if (employee != null && this.assignees != null) {
+            this.assignees.remove(employee);
+            if (this.employee != null && this.employee.getId().equals(employee.getId())) {
+                this.employee = this.assignees.isEmpty() ? null : this.assignees.iterator().next();
+            }
+        }
+    }
 
     public String getPriority() {
         return priority;
@@ -274,9 +362,13 @@ public class Task {
         this.priority = priority;
     }
 
-    // ============================================================
-    // STATUS
-    // ============================================================
+    public String getComplexity() {
+        return complexity;
+    }
+
+    public void setComplexity(String complexity) {
+        this.complexity = complexity;
+    }
 
     public String getStatus() {
         return status;
@@ -286,10 +378,6 @@ public class Task {
         this.status = status;
     }
 
-    // ============================================================
-    // PROGRESS
-    // ============================================================
-
     public Integer getProgress() {
         return progress;
     }
@@ -297,10 +385,6 @@ public class Task {
     public void setProgress(Integer progress) {
         this.progress = progress;
     }
-
-    // ============================================================
-    // DUE DATE
-    // ============================================================
 
     public LocalDate getDueDate() {
         return dueDate;
@@ -310,10 +394,6 @@ public class Task {
         this.dueDate = dueDate;
     }
 
-    // ============================================================
-    // DEADLINE
-    // ============================================================
-
     public LocalDate getDeadline() {
         return deadline;
     }
@@ -322,9 +402,72 @@ public class Task {
         this.deadline = deadline;
     }
 
-    // ============================================================
-    // COMPLETION NOTE
-    // ============================================================
+    public String getDeadlineBs() {
+        return deadlineBs;
+    }
+
+    public void setDeadlineBs(String deadlineBs) {
+        this.deadlineBs = deadlineBs;
+    }
+
+    public String getDeadlineTime() {
+        return deadlineTime;
+    }
+
+    public void setDeadlineTime(String deadlineTime) {
+        this.deadlineTime = deadlineTime;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public List<TaskAssignment> getAssignments() {
+        return assignments;
+    }
+
+    public void setAssignments(List<TaskAssignment> assignments) {
+        this.assignments = assignments;
+    }
+
+    public void addAssignment(TaskAssignment assignment) {
+        if (assignment != null) {
+            assignment.setTask(this);
+            if (this.assignments == null) {
+                this.assignments = new ArrayList<>();
+            }
+            this.assignments.add(assignment);
+        }
+    }
+
+    public void removeAssignment(TaskAssignment assignment) {
+        if (assignment != null && this.assignments != null) {
+            this.assignments.remove(assignment);
+            assignment.setTask(null);
+        }
+    }
+
+    public List<TaskComment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<TaskComment> comments) {
+        this.comments = comments;
+    }
+
+    public void addComment(TaskComment comment) {
+        if (comment != null) {
+            comment.setTask(this);
+            if (this.comments == null) {
+                this.comments = new ArrayList<>();
+            }
+            this.comments.add(comment);
+        }
+    }
 
     public String getCompletionNote() {
         return completionNote;
@@ -334,10 +477,6 @@ public class Task {
         this.completionNote = completionNote;
     }
 
-    // ============================================================
-    // COMPLETED AT
-    // ============================================================
-
     public LocalDateTime getCompletedAt() {
         return completedAt;
     }
@@ -345,10 +484,6 @@ public class Task {
     public void setCompletedAt(LocalDateTime completedAt) {
         this.completedAt = completedAt;
     }
-
-    // ============================================================
-    // REVIEW COMMENT
-    // ============================================================
 
     public String getReviewComment() {
         return reviewComment;
@@ -358,10 +493,6 @@ public class Task {
         this.reviewComment = reviewComment;
     }
 
-    // ============================================================
-    // REVIEW NOTE
-    // ============================================================
-
     public String getReviewNote() {
         return reviewNote;
     }
@@ -369,10 +500,6 @@ public class Task {
     public void setReviewNote(String reviewNote) {
         this.reviewNote = reviewNote;
     }
-
-    // ============================================================
-    // REVIEWED AT
-    // ============================================================
 
     public LocalDateTime getReviewedAt() {
         return reviewedAt;
@@ -382,10 +509,6 @@ public class Task {
         this.reviewedAt = reviewedAt;
     }
 
-    // ============================================================
-    // APPROVED AT
-    // ============================================================
-
     public LocalDateTime getApprovedAt() {
         return approvedAt;
     }
@@ -394,10 +517,6 @@ public class Task {
         this.approvedAt = approvedAt;
     }
 
-    // ============================================================
-    // CREATED AT
-    // ============================================================
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -405,10 +524,6 @@ public class Task {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-    // ============================================================
-    // UPDATED AT
-    // ============================================================
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
