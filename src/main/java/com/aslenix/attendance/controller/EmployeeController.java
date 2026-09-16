@@ -7,6 +7,9 @@ import com.aslenix.attendance.entity.User;
 import com.aslenix.attendance.repository.DepartmentRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.repository.UserRepository;
+import com.aslenix.attendance.service.QrCodeService;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,17 +26,20 @@ public class EmployeeController {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final QrCodeService qrCodeService;
 
     public EmployeeController(
             EmployeeRepository employeeRepository,
             UserRepository userRepository,
             DepartmentRepository departmentRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            QrCodeService qrCodeService) {
 
         this.employeeRepository = employeeRepository;
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.passwordEncoder = passwordEncoder;
+        this.qrCodeService = qrCodeService;
     }
 
     // =========================
@@ -48,7 +54,40 @@ public class EmployeeController {
                 employeeRepository.findAll()
         );
 
+        model.addAttribute(
+                "departments",
+                departmentRepository.findAll()
+        );
+
         return "admin/employees";
+    }
+
+    // =========================
+    // EMPLOYEE QR IMAGE
+    // =========================
+
+    @GetMapping("/{id}/qr")
+    @ResponseBody
+    public ResponseEntity<byte[]> employeeQrImage(@PathVariable Long id) {
+
+        Employee employee = employeeRepository.findById(id).orElse(null);
+
+        if (employee == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String qrToken = qrCodeService.ensureQrToken(employee);
+
+        byte[] qrImage = qrCodeService.generateQrImage(
+                qrToken,
+                300,
+                300
+        );
+
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(qrImage);
     }
 
     // =========================

@@ -12,8 +12,10 @@
 
 <title>ASLENIX | Attendance</title>
 
-<!-- Nepali BS Date Converter -->
+<!-- Nepali BS Date Converter & Utilities -->
 <script src="https://cdn.jsdelivr.net/npm/nepali-date-converter/dist/nepali-date-converter.umd.js"></script>
+<script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js"></script>
+<script src="/js/nepali-date-utils.js"></script>
 
 <style>
 
@@ -41,7 +43,7 @@ body {
         Helvetica,
         sans-serif;
 
-    color: #17213d;
+    color: #0f172a;
 
     background:
         radial-gradient(
@@ -51,10 +53,10 @@ body {
         ),
         radial-gradient(
             circle at 5% 90%,
-            rgba(236, 72, 153, 0.055),
+            rgba(79, 70, 229, 0.045),
             transparent 28%
         ),
-        #f7faff;
+        #f6f8fc;
 }
 
 a {
@@ -241,7 +243,7 @@ button {
 .sidebar-link:hover {
     background: #f7f8fc;
 
-    color: #4656d9;
+    color: #4f46e5;
 
     transform: translateX(2px);
 }
@@ -252,15 +254,10 @@ button {
 ===================================================== */
 
 .sidebar-link.active {
-    color: #3f4fd0;
+    color: #4338ca;
 
     background:
-        linear-gradient(
-            90deg,
-            #ededff 0%,
-            #f3f4ff 60%,
-            #f8f9ff 100%
-        );
+        #eef2ff;
 
     box-shadow:
         0 2px 10px rgba(83, 101, 223, 0.09);
@@ -289,12 +286,7 @@ button {
     border-radius: 0 6px 6px 0;
 
     background:
-        linear-gradient(
-            180deg,
-            #ef2ba8,
-            #9b3df0,
-            #168ff5
-        );
+        linear-gradient(180deg, #4f46e5, #6366f1, #8b5cf6);
 
     box-shadow:
         0 2px 10px rgba(104, 69, 220, 0.28);
@@ -351,7 +343,7 @@ button {
             #eaf1ff
         );
 
-    color: #5365df;
+    color: #4f46e5;
 
     box-shadow:
         0 3px 8px rgba(83, 101, 223, 0.08);
@@ -416,7 +408,7 @@ button {
 ===================================================== */
 
 .sidebar-link.active .sidebar-text strong {
-    color: #3f4fd0;
+    color: #4338ca;
 }
 
 .sidebar-link.active .sidebar-text span {
@@ -476,7 +468,7 @@ button {
 }
 
 .sidebar-brand-title {
-    color: #17213d;
+    color: #0f172a;
 
     font-size: 12px;
 
@@ -523,12 +515,7 @@ button {
     border-radius: 99px;
 
     background:
-        linear-gradient(
-            90deg,
-            #ef2ba8,
-            #9b3df0,
-            #168ff5
-        );
+        linear-gradient(90deg, #4f46e5, #6366f1, #8b5cf6);
 }
 
 
@@ -627,7 +614,7 @@ button {
 }
 
 .notification-button:hover {
-    color: #5365df;
+    color: #4f46e5;
     border-color: #d8def0;
     background: #fbfbfe;
     transform: translateY(-1px);
@@ -666,7 +653,7 @@ button {
 
     border-radius: 99px;
 
-    background: #ef2ba8;
+    background: #ef4444;
 
     border: 2px solid #ffffff;
 
@@ -679,7 +666,7 @@ button {
     line-height: 1;
 
     box-shadow:
-        0 2px 7px rgba(239,43,168,.25);
+        0 2px 7px rgba(239, 68, 68, 0.25);
 }
 
 .notification-dot.has-count {
@@ -818,7 +805,7 @@ button {
 
     background: transparent;
 
-    color: #5365df;
+    color: #4f46e5;
 
     font-size: 9px;
 
@@ -932,12 +919,7 @@ button {
     border-radius: 0 4px 4px 0;
 
     background:
-        linear-gradient(
-            180deg,
-            #ef2ba8,
-            #8242ed,
-            #168ff5
-        );
+        linear-gradient(180deg, #4f46e5, #6366f1, #8b5cf6);
 }
 
 
@@ -959,7 +941,7 @@ button {
 
     background: #eef1ff;
 
-    color: #5365df;
+    color: #4f46e5;
 }
 
 .notification-item-icon svg {
@@ -1039,7 +1021,7 @@ button {
 }
 
 .notification-item.unread .notification-item-title {
-    color: #17213d;
+    color: #0f172a;
 }
 
 .notification-item-time {
@@ -1186,7 +1168,7 @@ button {
 
     border: 2px solid #e5e8f0;
 
-    border-top-color: #5365df;
+    border-top-color: #4f46e5;
 
     border-radius: 50%;
 
@@ -1233,7 +1215,7 @@ button {
 
     background: #f1f3ff;
 
-    color: #5365df;
+    color: #4f46e5;
 
     font-size: 8px;
 
@@ -1425,7 +1407,7 @@ button {
 .profile-dropdown-item:hover {
     background: #f5f7fb;
 
-    color: #5365df;
+    color: #4f46e5;
 }
 
 .profile-dropdown-item svg {
@@ -1624,7 +1606,7 @@ main {
 .page-hero h1 {
     margin-top: 5px;
 
-    color: #17213d;
+    color: #0f172a;
 
     font-size: 27px;
 
@@ -1678,12 +1660,7 @@ main {
     border-radius: 99px;
 
     background:
-        linear-gradient(
-            90deg,
-            #ef2ba8,
-            #8242ed,
-            #168ff5
-        );
+        linear-gradient(90deg, #4f46e5, #6366f1, #8b5cf6);
 }
 
 
@@ -1957,7 +1934,7 @@ main {
 .status-time-icon {
     background: #e9edff;
 
-    color: #5365df;
+    color: #4f46e5;
 }
 
 .attendance-time-card span {
@@ -2164,7 +2141,7 @@ main {
 .card-value {
     margin-top: 9px;
 
-    color: #17213d;
+    color: #0f172a;
 
     font-size: 25px;
 
@@ -2241,7 +2218,7 @@ main {
 }
 
 .record-count-box strong {
-    color: #5365df;
+    color: #4f46e5;
 }
 
 
@@ -2834,11 +2811,616 @@ tbody tr:last-child td {
 
     .notification-dropdown {
         width: calc(100vw - 26px);
-
         right: -5px;
     }
 }
 
+/* =====================================================
+   NEPALI CALENDAR & GOVERNMENT EVENTS (DUAL PANEL)
+===================================================== */
+.nepali-calendar-wrapper {
+    display: grid;
+    grid-template-columns: 1.58fr 1fr;
+    gap: 22px;
+    margin-bottom: 26px;
+    align-items: start;
+}
+
+.nepali-calendar-card,
+.gov-events-card {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 28px;
+    padding: 26px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+/* --- LEFT CARD: CALENDAR HEADER --- */
+.cal-top-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cal-badge-nepali {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 2px;
+}
+
+.cal-month-heading {
+    font-size: 27px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    margin: 2px 0 4px;
+}
+
+.cal-sub-dates {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.cal-ad-range {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.cal-nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.cal-circle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cal-circle-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+    transform: scale(1.06);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* --- STATS SUMMARY ROW (3 CARDS) --- */
+.cal-stats-row {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0 22px;
+}
+
+.cal-stat-card {
+    flex: 1;
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+    border-radius: 16px;
+    padding: 12px 10px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.cal-stat-card:hover {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.cal-stat-num {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 2px;
+}
+
+.cal-stat-num.num-blue { color: #3b82f6; }
+.cal-stat-num.num-amber { color: #f59e0b; }
+.cal-stat-num.num-purple { color: #ef4444; }
+
+.cal-stat-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+/* --- CALENDAR 7-COLUMN GRID --- */
+.cal-modern-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.cal-grid-col-head {
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #94a3b8;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 6px 0;
+    letter-spacing: 0.5px;
+}
+
+.cal-grid-col-head.col-sat {
+    color: #6366f1;
+}
+
+.cal-cell {
+    border-radius: 18px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 6px 4px;
+}
+
+.cal-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.08);
+    border-color: #cbd5e1;
+}
+
+.cal-cell.cell-empty {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+}
+
+.cal-cell-bs {
+    font-size: 17px;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.cal-cell-ad {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-top: 3px;
+    line-height: 1;
+}
+
+.cal-cell-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 6px;
+    display: block;
+}
+
+/* Saturday / Weekly Off Cell */
+.cal-cell.cell-saturday {
+    background: #f1f0fd;
+    border: 1.5px solid #d8d3fd;
+}
+.cal-cell.cell-saturday .cal-cell-bs { color: #4338ca; }
+.cal-cell.cell-saturday .cal-cell-ad { color: #6366f1; }
+.cal-cell.cell-saturday .cal-cell-dot { background: #6366f1; }
+
+/* Government Event / Holiday Cell */
+.cal-cell.cell-event {
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+}
+.cal-cell.cell-event .cal-cell-bs { color: #b45309; }
+.cal-cell.cell-event .cal-cell-dot { background: #f59e0b; }
+
+/* Today's Cell - Iridescent pastel glow gradient */
+.cal-cell.cell-today {
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.45) 0%, rgba(244, 114, 182, 0.35) 50%, rgba(96, 165, 250, 0.45) 100%);
+    border: 1.5px solid rgba(168, 85, 247, 0.4);
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.25);
+}
+.cal-cell.cell-today .cal-cell-bs { color: #312e81; font-weight: 900; }
+.cal-cell.cell-today .cal-cell-ad { color: #4338ca; font-weight: 800; }
+
+/* Selected Cell */
+.cal-cell.is-selected {
+    box-shadow: 0 0 0 2.5px #6366f1, 0 6px 16px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Attendance Status Dot Colors */
+.dot-present { background: #10b981 !important; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
+.dot-late { background: #f59e0b !important; box-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }
+.dot-holiday { background: #ef4444 !important; box-shadow: 0 0 6px rgba(239, 68, 68, 0.6); }
+.dot-absent { background: #94a3b8 !important; }
+.dot-leave { background: #3b82f6 !important; box-shadow: 0 0 6px rgba(59, 130, 246, 0.6); }
+.dot-purple { background: #6366f1 !important; }
+
+/* --- RIGHT CARD: GOVERNMENT CALENDAR EVENTS --- */
+.gov-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.gov-header-tag {
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.5px;
+}
+
+.gov-sparkle-orb {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+
+.gov-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 8px 0 4px;
+}
+
+.gov-subtitle {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+.gov-counter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.gov-btn-refresh {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    transition: all 0.2s;
+}
+
+.gov-btn-refresh:hover {
+    color: #4f46e5;
+}
+
+.gov-event-list {
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 2px;
+    margin-bottom: 16px;
+}
+
+.gov-event-list::-webkit-scrollbar {
+    width: 5px;
+}
+.gov-event-list::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 4px;
+}
+
+.gov-event-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    transition: all 0.15s ease;
+    gap: 10px;
+}
+
+.gov-event-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.gov-pill-badge {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.gov-pill-bs {
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.gov-pill-num {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+    margin-top: 1px;
+}
+
+.gov-event-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.gov-event-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gov-event-date {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.gov-event-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.gov-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    color: #94a3b8;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gov-action-btn:hover {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+/* Admin event controls */
+.gov-controls-box {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.gov-controls-label {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gov-form-group {
+    margin-bottom: 10px;
+}
+
+.gov-input-label {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gov-input {
+    width: 100%;
+    padding: 9px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.15s;
+}
+
+.gov-input:focus {
+    border-color: #6366f1;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.gov-input-with-icon {
+    position: relative;
+}
+
+.gov-input-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.btn-add-event {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ede9fe, #fce7f3);
+    color: #4338ca;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-add-event:hover {
+    background: linear-gradient(135deg, #ddd6fe, #fbcfe8);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Detail Card below calendar */
+.cal-detail-card {
+    margin-top: 18px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.cal-detail-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cal-detail-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+.cal-detail-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.cal-detail-sub {
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+.cal-detail-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.cal-detail-item {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.cal-detail-item strong {
+    color: #1e293b;
+    font-weight: 750;
+    margin-left: 4px;
+}
+
+@media (max-width: 1024px) {
+    .nepali-calendar-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .cal-modern-grid {
+        gap: 4px;
+    }
+    .cal-cell {
+        min-height: 64px;
+        padding: 4px 2px;
+        border-radius: 14px;
+    }
+    .cal-cell-bs {
+        font-size: 14px;
+    }
+    .cal-cell-ad {
+        font-size: 9px;
+    }
+    .cal-stats-row {
+        gap: 6px;
+    }
+    .cal-stat-card {
+        padding: 8px 4px;
+        border-radius: 12px;
+    }
+    .cal-stat-num {
+        font-size: 17px;
+    }
+}
 </style>
 
 </head>
@@ -3905,6 +4487,145 @@ tbody tr:last-child td {
 
                     0
 
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             NEPALI BIKRAM SAMBAT (BS) CALENDAR & GOVERNMENT EVENTS
+        ================================================== -->
+        <section id="attendanceCalendarSection" class="nepali-calendar-wrapper">
+
+            <!-- LEFT CARD: NEPALI CALENDAR -->
+            <div class="nepali-calendar-card">
+
+                <!-- Header Row -->
+                <div class="cal-top-header">
+                    <div class="cal-header-info">
+                        <span class="cal-badge-nepali">Nepali Calendar</span>
+                        <h2 class="cal-month-heading" id="calMonthTitle">Bhadra 2083 BS</h2>
+                        <div class="cal-sub-dates">
+                            <span id="calHeaderBsToday">2083 Bhadra 31 BS | Sep 16, 2026 AD</span>
+                        </div>
+                        <div class="cal-ad-range" id="calHeaderAdRange">Aug 17 - Sep 16, 2026 AD</div>
+                    </div>
+
+                    <!-- Circular Navigation Controls -->
+                    <div class="cal-nav-controls">
+                        <button type="button" class="cal-circle-btn" id="calPrevBtn" title="Previous Month">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <button type="button" class="cal-circle-btn" id="calTodayBtn" title="Current Month (Today)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </button>
+                        <button type="button" class="cal-circle-btn" id="calNextBtn" title="Next Month">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Summary Row (3 Cards from reference image) -->
+                <div class="cal-stats-row">
+                    <div class="cal-stat-card">
+                        <span class="cal-stat-num num-blue" id="calStatDays">31</span>
+                        <span class="cal-stat-label">DAYS</span>
+                    </div>
+                    <div class="cal-stat-card">
+                        <span class="cal-stat-num num-amber" id="calStatHolidays">2</span>
+                        <span class="cal-stat-label">HOLIDAYS</span>
+                    </div>
+                    <div class="cal-stat-card">
+                        <span class="cal-stat-num num-purple" id="calStatWeeklyOff">4</span>
+                        <span class="cal-stat-label">WEEKLY OFF</span>
+                    </div>
+                </div>
+
+                <!-- 7-Column Day Grid -->
+                <div class="cal-modern-grid" id="calendarGrid">
+                    <!-- Weekday headers & day cells rendered by JS engine -->
+                </div>
+
+                <!-- Day Detail Card -->
+                <div id="calDetailCard" class="cal-detail-card" style="display: none;">
+                    <div class="cal-detail-left">
+                        <div class="cal-detail-icon" id="calDetailIcon">📅</div>
+                        <div>
+                            <div class="cal-detail-title" id="calDetailTitle">Date Details</div>
+                            <div class="cal-detail-sub" id="calDetailSub">Click any day to view details</div>
+                        </div>
+                    </div>
+                    <div class="cal-detail-right" id="calDetailRight">
+                        <div class="cal-detail-item">Status: <strong id="calDetailStatus">--</strong></div>
+                        <div class="cal-detail-item">Check-in: <strong id="calDetailCheckIn">--:--</strong></div>
+                        <div class="cal-detail-item">Check-out: <strong id="calDetailCheckOut">--:--</strong></div>
+                        <div class="cal-detail-item">Duration: <strong id="calDetailHours">--</strong></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT CARD: UPCOMING DAYS / GOVERNMENT CALENDAR EVENTS -->
+            <div class="gov-events-card">
+
+                <!-- Header Row with Sparkle Orb -->
+                <div class="gov-header-row">
+                    <div class="gov-header-tag">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        UPCOMING DAYS
+                    </div>
+                    <div class="gov-sparkle-orb" title="Government calendar highlights">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>
+                    </div>
+                </div>
+
+                <h3 class="gov-title">Government calendar events</h3>
+                <p class="gov-subtitle">Events only. These do not mark holidays on the calendar.</p>
+
+                <div class="gov-counter-row">
+                    <span id="govEventCount">3 shared events</span>
+                    <button type="button" class="gov-btn-refresh" id="btnRefreshEvents">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        Refresh
+                    </button>
+                </div>
+
+                <!-- Event List Container -->
+                <div class="gov-event-list" id="govEventList">
+                    <!-- Events populated dynamically by JS engine -->
+                </div>
+
+                <!-- Admin Event Controls / Add Event Form -->
+                <div class="gov-controls-box">
+                    <div class="gov-controls-label">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        Admin event controls
+                    </div>
+
+                    <div class="gov-form-group">
+                        <label class="gov-input-label">BS date</label>
+                        <div class="gov-input-with-icon">
+                            <input type="text" id="eventBsDateInput" class="gov-input" placeholder="2083-05-14" value="2083-05-14">
+                            <span class="gov-input-icon">📅</span>
+                        </div>
+                    </div>
+
+                    <div class="gov-form-group">
+                        <label class="gov-input-label">Event name</label>
+                        <input type="text" id="eventNameInput" class="gov-input" placeholder="Government event name">
+                    </div>
+
+                    <div class="gov-form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <input type="checkbox" id="eventIsHolidayInput" style="cursor: pointer;">
+                        <label for="eventIsHolidayInput" style="font-size: 11.5px; font-weight: 700; color: #64748b; cursor: pointer;">Public / Official Holiday</label>
+                    </div>
+
+                    <button type="button" class="btn-add-event" id="btnAddEvent">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Add event
+                    </button>
                 </div>
 
             </div>
@@ -5687,126 +6408,73 @@ document.addEventListener(
         );
 
 
-        navigator.geolocation.getCurrentPosition(
+        function onLocationSuccess(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
 
-            function (position) {
-
-                const latitude =
-                    position.coords.latitude;
-
-                const longitude =
-                    position.coords.longitude;
-
-
-                if (
-                    !Number.isFinite(latitude) ||
-                    !Number.isFinite(longitude)
-                ) {
-
-                    showMessage(
-                        'Your browser returned an invalid location. Please try again.'
-                    );
-
-                    restoreButton(
-                        button
-                    );
-
-                    return;
-
-                }
-
-
-                const latitudeElement =
-                    document.getElementById(
-                        latitudeId
-                    );
-
-                const longitudeElement =
-                    document.getElementById(
-                        longitudeId
-                    );
-
-
-                if (
-                    !latitudeElement ||
-                    !longitudeElement
-                ) {
-
-                    showMessage(
-                        'Attendance location fields could not be found. Please refresh the page and try again.'
-                    );
-
-                    restoreButton(
-                        button
-                    );
-
-                    return;
-
-                }
-
-
-                latitudeElement.value =
-                    latitude;
-
-                longitudeElement.value =
-                    longitude;
-
-
-                showMessage(
-                    'Location received. Checking your location and recording ' +
-                    actionName +
-                    '...'
-                );
-
-
-                form.submit();
-
-            },
-
-
-            function (error) {
-
-                let message =
-                    'Unable to get your location.';
-
-
-                if (error.code === 1) {
-
-                    message =
-                        'Location permission was denied. Please allow location access for this site and try again.';
-
-                } else if (error.code === 2) {
-
-                    message =
-                        'Your current location could not be determined. Please make sure GPS/location services are enabled and try again.';
-
-                } else if (error.code === 3) {
-
-                    message =
-                        'Location request timed out. Please try again.';
-
-                }
-
-
-                showMessage(
-                    message
-                );
-
-                restoreButton(
-                    button
-                );
-
-            },
-
-
-            {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 0
+            if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                showMessage('Your browser returned an invalid location. Please try again.');
+                restoreButton(button);
+                return;
             }
 
-        );
+            const latitudeElement = document.getElementById(latitudeId);
+            const longitudeElement = document.getElementById(longitudeId);
 
+            if (!latitudeElement || !longitudeElement) {
+                showMessage('Attendance location fields could not be found. Please refresh the page and try again.');
+                restoreButton(button);
+                return;
+            }
+
+            latitudeElement.value = latitude;
+            longitudeElement.value = longitude;
+
+            showMessage('Location received. Checking your location and recording ' + actionName + '...');
+            form.submit();
+        }
+
+        function onLocationFailure(error) {
+            let message = 'Unable to get your location.';
+
+            if (error.code === 1) {
+                message = 'Location permission was denied. Please allow location access for this site in your browser (click the lock/tune icon next to the address bar) and try again.';
+            } else if (error.code === 2) {
+                message = 'Your current location could not be determined. Please make sure Location services are enabled in Windows Settings > Privacy & security > Location.';
+            } else if (error.code === 3) {
+                message = 'Location request timed out. Please check that Windows Location Services are turned ON in Windows Settings, or try using Chrome/Edge on a mobile device with GPS.';
+            }
+
+            showMessage(message);
+            restoreButton(button);
+        }
+
+        // Phase 1: Try high accuracy (7s timeout, allows recent cached location up to 60s)
+        navigator.geolocation.getCurrentPosition(
+            onLocationSuccess,
+            function (err) {
+                // If high accuracy times out or is unavailable, immediately fall back to standard network accuracy
+                if (err.code === 3 || err.code === 2) {
+                    console.warn('High accuracy location timed out or unavailable; falling back to standard accuracy...');
+                    navigator.geolocation.getCurrentPosition(
+                        onLocationSuccess,
+                        onLocationFailure,
+                        {
+                            enableHighAccuracy: false,
+                            timeout: 15000,
+                            maximumAge: 120000
+                        }
+                    );
+                } else {
+                    onLocationFailure(err);
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 7000,
+                maximumAge: 60000
+            }
+        );
     }
 
 
@@ -5943,148 +6611,764 @@ document.addEventListener(
 
 
 /* =========================================================
-   BS DATE CONVERSION
+   BS DATE CONVERSION (SAFE & ROBUST)
 ========================================================= */
 
 document.addEventListener(
     'DOMContentLoaded',
     function () {
 
+        const BS_MONTH_NAMES = [
+            'Baisakh', 'Jestha', 'Ashadh', 'Shrawan',
+            'Bhadra', 'Ashwin', 'Kartik', 'Mangsir',
+            'Poush', 'Magh', 'Falgun', 'Chaitra'
+        ];
+
+        const BS_MONTH_SHORT = [
+            'Bai', 'Jes', 'Ash', 'Shr',
+            'Bha', 'Ash', 'Kar', 'Man',
+            'Pou', 'Mag', 'Fal', 'Cha'
+        ];
+
+        const WEEKDAYS_FULL = [
+            'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+            'Thursday', 'Friday', 'Saturday'
+        ];
+
+        function getSafeNepaliClass() {
+            try {
+                if (typeof NepaliDate === 'function') return NepaliDate;
+                if (typeof NepaliDate === 'object' && NepaliDate && typeof NepaliDate.default === 'function') return NepaliDate.default;
+                if (typeof window !== 'undefined') {
+                    if (typeof window.NepaliDate === 'function') return window.NepaliDate;
+                    if (typeof window.NepaliDate === 'object' && window.NepaliDate && typeof window.NepaliDate.default === 'function') return window.NepaliDate.default;
+                }
+            } catch (e) {}
+            return null;
+        }
+
         /* ---------------------------------------------
            HEADER CURRENT BS DATE
         --------------------------------------------- */
-
-        const headerDate =
-            document.getElementById(
-                'headerBsDate'
-            );
-
-
-        if (
-            headerDate &&
-            typeof NepaliDate !== 'undefined'
-        ) {
-
+        const headerDate = document.getElementById('headerBsDate');
+        if (headerDate) {
             try {
+                const now = new Date();
+                const dayName = WEEKDAYS_FULL[now.getDay()];
 
-                const now =
-                    new Date();
+                let formatted = false;
+                if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.AD2BS) {
+                    const bsObj = NepaliFunctions.AD2BS({
+                        year: now.getFullYear(),
+                        month: now.getMonth() + 1,
+                        day: now.getDate()
+                    });
+                    if (bsObj && bsObj.year) {
+                        const mName = BS_MONTH_NAMES[bsObj.month - 1];
+                        headerDate.textContent = `${dayName}, ${mName} ${bsObj.day}, ${bsObj.year} BS`;
+                        formatted = true;
+                    }
+                }
 
-                const nepaliDate =
-                    new NepaliDate(
-                        now
-                    );
-
-                headerDate.textContent =
-                    nepaliDate.format(
-                        'DD MMM YYYY'
-                    );
-
+                if (!formatted) {
+                    const NDC = getSafeNepaliClass();
+                    if (NDC) {
+                        const nd = new NDC(now);
+                        const mName = BS_MONTH_NAMES[nd.getMonth()];
+                        headerDate.textContent = `${dayName}, ${mName} ${nd.getDate()}, ${nd.getYear()} BS`;
+                        formatted = true;
+                    }
+                }
             } catch (error) {
-
-                headerDate.textContent =
-                    'Attendance';
-
+                console.error('Header BS date conversion error:', error);
             }
-
         }
-
 
         /* ---------------------------------------------
            TABLE ATTENDANCE DATES
         --------------------------------------------- */
+        const dateElements = document.querySelectorAll('.bs-date');
+        dateElements.forEach(function (element) {
+            const adDate = element.dataset.adDate;
+            if (!adDate) return;
 
-        const dateElements =
-            document.querySelectorAll(
-                '.bs-date'
-            );
+            try {
+                const parts = adDate.split('-');
+                if (parts.length !== 3) return;
 
+                const year = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10);
+                const day = parseInt(parts[2], 10);
 
-        dateElements.forEach(
-            function (element) {
+                if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.AD2BS) {
+                    const bsObj = NepaliFunctions.AD2BS({ year: year, month: month, day: day });
+                    if (bsObj && bsObj.year) {
+                        const mShort = BS_MONTH_SHORT[bsObj.month - 1];
+                        const dayPadded = String(bsObj.day).padStart(2, '0');
+                        element.textContent = `${dayPadded} ${mShort} ${bsObj.year}`;
+                        return;
+                    }
+                }
 
-                const adDate =
-                    element.dataset.adDate;
-
-
-                if (!adDate) {
+                const NDC = getSafeNepaliClass();
+                if (NDC) {
+                    const jsDate = new Date(year, month - 1, day);
+                    const nd = new NDC(jsDate);
+                    element.textContent = nd.format(element.dataset.bsFormat || 'DD MMM YYYY');
                     return;
                 }
 
-
-                try {
-
-                    const parts =
-                        adDate.split('-');
-
-
-                    if (
-                        parts.length !== 3
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    const year =
-                        parseInt(
-                            parts[0],
-                            10
-                        );
-
-                    const month =
-                        parseInt(
-                            parts[1],
-                            10
-                        ) - 1;
-
-                    const day =
-                        parseInt(
-                            parts[2],
-                            10
-                        );
-
-
-                    const javascriptDate =
-                        new Date(
-                            year,
-                            month,
-                            day
-                        );
-
-
-                    const nepaliDate =
-                        new NepaliDate(
-                            javascriptDate
-                        );
-
-
-                    element.textContent =
-                        nepaliDate.format(
-                            element.dataset.bsFormat ||
-                            'DD MMM YYYY'
-                        );
-
-                } catch (error) {
-
-                    /*
-                     * If conversion fails, retain the
-                     * original AD date rather than leaving
-                     * the field empty.
-                     */
-
-                    element.textContent =
-                        adDate;
-
-                }
-
+                element.textContent = adDate;
+            } catch (error) {
+                element.textContent = adDate;
             }
-        );
+        });
 
     }
 );
 
+</script>
+
+<!-- =========================================================
+     NEPALI CALENDAR & GOVERNMENT EVENTS ENGINE
+========================================================= -->
+<script th:inline="javascript">
+/*<![CDATA[*/
+(function () {
+    'use strict';
+
+    // Inlined backend data
+    window.attendanceJsonData = /*[[${attendanceJsonList}]]*/ [];
+    window.approvedLeavesData = /*[[${approvedLeavesList}]]*/ [];
+    window.calendarEventsData = /*[[${calendarEvents}]]*/ [];
+    window.officeWorkingDays = {
+        sunday: /*[[${settings != null ? settings.isSunday() : false}]]*/ false,
+        monday: /*[[${settings != null ? settings.isMonday() : true}]]*/ true,
+        tuesday: /*[[${settings != null ? settings.isTuesday() : true}]]*/ true,
+        wednesday: /*[[${settings != null ? settings.isWednesday() : true}]]*/ true,
+        thursday: /*[[${settings != null ? settings.isThursday() : true}]]*/ true,
+        friday: /*[[${settings != null ? settings.isFriday() : true}]]*/ true,
+        saturday: /*[[${settings != null ? settings.isSaturday() : false}]]*/ false
+    };
+
+    const BS_MONTHS = [
+        'Baisakh', 'Jestha', 'Ashadh', 'Shrawan',
+        'Bhadra', 'Ashwin', 'Kartik', 'Mangsir',
+        'Poush', 'Magh', 'Falgun', 'Chaitra'
+    ];
+
+    const BS_MONTHS_SHORT = [
+        'Bai', 'Jes', 'Ash', 'Shr',
+        'Bha', 'Ash', 'Kar', 'Man',
+        'Pou', 'Mag', 'Fal', 'Cha'
+    ];
+
+    const WEEKDAYS_SHORT = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const WEEKDAYS_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+    const BS_MONTH_DAYS = {
+        2080: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+        2081: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+        2082: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+        2083: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+        2084: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+        2085: [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30]
+    };
+
+    const BS_ANCHORS = {
+        2080: new Date(2023, 3, 14),
+        2081: new Date(2024, 3, 13),
+        2082: new Date(2025, 3, 14),
+        2083: new Date(2026, 3, 14),
+        2084: new Date(2027, 3, 14),
+        2085: new Date(2028, 3, 13)
+    };
+
+    function getSafeNepaliClass() {
+        try {
+            if (typeof NepaliDate === 'function') return NepaliDate;
+            if (typeof NepaliDate === 'object' && NepaliDate && typeof NepaliDate.default === 'function') return NepaliDate.default;
+            if (typeof window !== 'undefined') {
+                if (typeof window.NepaliDate === 'function') return window.NepaliDate;
+                if (typeof window.NepaliDate === 'object' && window.NepaliDate && typeof window.NepaliDate.default === 'function') return window.NepaliDate.default;
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function getCurrentBsDate() {
+        const now = new Date();
+        if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.AD2BS) {
+            try {
+                const res = NepaliFunctions.AD2BS({
+                    year: now.getFullYear(),
+                    month: now.getMonth() + 1,
+                    day: now.getDate()
+                });
+                if (res && res.year) return res;
+            } catch (e) {}
+        }
+        const NDC = getSafeNepaliClass();
+        if (NDC) {
+            try {
+                const nd = new NDC(now);
+                return { year: nd.getYear(), month: nd.getMonth() + 1, day: nd.getDate() };
+            } catch (e) {}
+        }
+        const anchor = new Date(2026, 3, 14);
+        const curDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diffDays = Math.round((curDate - anchor) / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0 && diffDays <= 365) {
+            const mDays = BS_MONTH_DAYS[2083];
+            let rem = diffDays;
+            let m = 0;
+            while (m < 12 && rem >= mDays[m]) {
+                rem -= mDays[m];
+                m++;
+            }
+            return { year: 2083, month: m + 1, day: rem + 1 };
+        }
+        return { year: 2083, month: 5, day: 31 };
+    }
+
+    function getDaysInBsMonth(year, month) {
+        if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.GetDaysInBsMonth) {
+            try {
+                const days = NepaliFunctions.GetDaysInBsMonth(year, month);
+                if (days && days >= 28 && days <= 32) return days;
+            } catch (e) {}
+        }
+        if (BS_MONTH_DAYS[year] && BS_MONTH_DAYS[year][month - 1]) {
+            return BS_MONTH_DAYS[year][month - 1];
+        }
+        return 30;
+    }
+
+    function bsToAdDate(year, month, day) {
+        if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.BS2AD) {
+            try {
+                const res = NepaliFunctions.BS2AD({ year: year, month: month, day: day });
+                if (res && res.year) {
+                    return new Date(res.year, res.month - 1, res.day);
+                }
+            } catch (e) {}
+        }
+        const NDC = getSafeNepaliClass();
+        if (NDC) {
+            try {
+                const nd = new NDC(year, month - 1, day);
+                if (typeof nd.toJsDate === 'function') {
+                    return nd.toJsDate();
+                }
+            } catch (e) {}
+        }
+        if (BS_ANCHORS[year] && BS_MONTH_DAYS[year]) {
+            let offset = 0;
+            for (let m = 0; m < month - 1; m++) {
+                offset += BS_MONTH_DAYS[year][m];
+            }
+            offset += (day - 1);
+            const d = new Date(BS_ANCHORS[year].getTime());
+            d.setDate(d.getDate() + offset);
+            return d;
+        }
+        return null;
+    }
+
+    function formatYmd(d) {
+        if (!d || isNaN(d.getTime())) return '';
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    // Active calendar state
+    const todayBs = getCurrentBsDate();
+    let selectedBsYear = todayBs.year;
+    let selectedBsMonth = todayBs.month; // 1 to 12
+    let activeSelectedDay = todayBs.day;
+
+    function renderCalendar() {
+        const titleEl = document.getElementById('calMonthTitle');
+        const gridEl = document.getElementById('calendarGrid');
+        const headerRangeEl = document.getElementById('calHeaderAdRange');
+        const headerTodayEl = document.getElementById('calHeaderBsToday');
+        const statDaysEl = document.getElementById('calStatDays');
+        const statHolidaysEl = document.getElementById('calStatHolidays');
+        const statWeeklyOffEl = document.getElementById('calStatWeeklyOff');
+
+        if (!titleEl || !gridEl) return;
+
+        // 1. Header Month Title
+        titleEl.textContent = `${BS_MONTHS[selectedBsMonth - 1]} ${selectedBsYear} BS`;
+
+        // 2. Today string in header
+        const now = new Date();
+        const todayYmd = formatYmd(now);
+        const todayAdFormatted = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        if (headerTodayEl) {
+            headerTodayEl.textContent = `${todayBs.year} ${BS_MONTHS[todayBs.month - 1]} ${todayBs.day} BS | ${todayAdFormatted} AD`;
+        }
+
+        // 3. Days in month & First/Last day AD range
+        const totalDays = getDaysInBsMonth(selectedBsYear, selectedBsMonth);
+        const firstDayAd = bsToAdDate(selectedBsYear, selectedBsMonth, 1);
+        const lastDayAd = bsToAdDate(selectedBsYear, selectedBsMonth, totalDays);
+        const startDayOfWeek = firstDayAd ? firstDayAd.getDay() : 0; // 0 = Sunday
+
+        if (headerRangeEl && firstDayAd && lastDayAd) {
+            const firstStr = firstDayAd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const lastStr = lastDayAd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            headerRangeEl.textContent = `${firstStr} - ${lastStr} AD`;
+        }
+
+        // 4. Calculate Stats (Days, Holidays, Weekly Off)
+        let weeklyOffCount = 0;
+        let holidaysCount = 0;
+
+        // Events for current BS month
+        const monthEvents = (window.calendarEventsData || []).filter(function (e) {
+            return e.bsYear === selectedBsYear && e.bsMonth === selectedBsMonth;
+        });
+
+        for (let d = 1; d <= totalDays; d++) {
+            const ad = bsToAdDate(selectedBsYear, selectedBsMonth, d);
+            const dow = ad ? ad.getDay() : 0;
+            const isNonWorking = window.officeWorkingDays && (window.officeWorkingDays[DAY_KEYS[dow]] === false);
+            if (isNonWorking) {
+                weeklyOffCount++;
+            }
+
+            // Check if any event on this day is a holiday
+            const dayEvents = monthEvents.filter(e => e.bsDay === d);
+            const hasHolidayEvent = dayEvents.some(e => e.holiday === true);
+            if (hasHolidayEvent) {
+                holidaysCount++;
+            }
+        }
+
+        if (statDaysEl) statDaysEl.textContent = totalDays;
+        if (statHolidaysEl) statHolidaysEl.textContent = holidaysCount;
+        if (statWeeklyOffEl) statWeeklyOffEl.textContent = weeklyOffCount;
+
+        // 5. Build Grid HTML
+        let html = '';
+
+        // Weekday header row
+        WEEKDAYS_SHORT.forEach(function (name, idx) {
+            const isSat = (idx === 6);
+            html += `<div class="cal-grid-col-head ${isSat ? 'col-sat' : ''}">${name}</div>`;
+        });
+
+        // Empty padding cells for start of month
+        for (let i = 0; i < startDayOfWeek; i++) {
+            html += '<div class="cal-cell cell-empty"></div>';
+        }
+
+        // Render each day cell
+        for (let d = 1; d <= totalDays; d++) {
+            const adDate = bsToAdDate(selectedBsYear, selectedBsMonth, d);
+            const adStr = formatYmd(adDate);
+            const adDayNum = adDate ? adDate.getDate() : '';
+            const isToday = (adStr === todayYmd);
+            const isFuture = (adStr > todayYmd);
+            const dayOfWeek = adDate ? adDate.getDay() : 0;
+            const isSaturday = (dayOfWeek === 6);
+            const isNonWorking = window.officeWorkingDays && (window.officeWorkingDays[DAY_KEYS[dayOfWeek]] === false);
+
+            // Events on this day
+            const dayEvents = monthEvents.filter(e => e.bsDay === d);
+            const hasEvent = dayEvents.length > 0;
+            const hasHolidayEvent = dayEvents.some(e => e.holiday === true);
+
+            // Find matching employee attendance record
+            const attRecord = (window.attendanceJsonData || []).find(item => item.date === adStr);
+            const leaveRecord = (window.approvedLeavesData || []).find(l => adStr >= l.startDate && adStr <= l.endDate);
+
+            // Determine Dot Class
+            let dotClass = '';
+            if (attRecord) {
+                if (attRecord.late) {
+                    dotClass = 'dot-late';
+                } else if (attRecord.status === 'ABSENT') {
+                    dotClass = 'dot-absent';
+                } else {
+                    dotClass = 'dot-present';
+                }
+            } else if (leaveRecord) {
+                dotClass = 'dot-leave';
+            } else if (hasHolidayEvent) {
+                dotClass = 'dot-holiday';
+            } else if (isSaturday || isNonWorking) {
+                dotClass = 'dot-purple';
+            } else if (hasEvent) {
+                dotClass = 'dot-late';
+            } else if (!isFuture && !isToday) {
+                // Past working day without attendance -> absent
+                dotClass = 'dot-absent';
+            }
+
+            const isSelected = (d === activeSelectedDay);
+
+            let cellClasses = 'cal-cell';
+            if (isToday) cellClasses += ' cell-today';
+            else if (hasEvent || hasHolidayEvent) cellClasses += ' cell-event';
+            else if (isSaturday) cellClasses += ' cell-saturday';
+            if (isSelected) cellClasses += ' is-selected';
+
+            html += `
+                <div class="${cellClasses}"
+                     data-bs-day="${d}"
+                     data-ad-date="${adStr}"
+                     title="${d} ${BS_MONTHS[selectedBsMonth - 1]} ${selectedBsYear} BS">
+                    <span class="cal-cell-bs">${d}</span>
+                    <span class="cal-cell-ad">${adDayNum}</span>
+                    <span class="cal-cell-dot ${dotClass}"></span>
+                </div>
+            `;
+        }
+
+        gridEl.innerHTML = html;
+
+        // Attach click listeners to all day cells
+        const dayCells = gridEl.querySelectorAll('.cal-cell:not(.cell-empty)');
+        dayCells.forEach(function (cell) {
+            cell.addEventListener('click', function () {
+                const dayNum = parseInt(this.getAttribute('data-bs-day'), 10);
+                activeSelectedDay = dayNum;
+                dayCells.forEach(c => c.classList.remove('is-selected'));
+                this.classList.add('is-selected');
+
+                // Pre-fill the event input date with clicked date
+                const dateInput = document.getElementById('eventBsDateInput');
+                if (dateInput) {
+                    dateInput.value = `${selectedBsYear}-${String(selectedBsMonth).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+                }
+
+                showDayDetails(dayNum);
+            });
+        });
+
+        // Show details for selected or today
+        if (activeSelectedDay) {
+            showDayDetails(activeSelectedDay);
+        }
+
+        // Render the Government events in the right card
+        renderGovernmentEvents(monthEvents);
+    }
+
+    function renderGovernmentEvents(events) {
+        const listEl = document.getElementById('govEventList');
+        const countEl = document.getElementById('govEventCount');
+        if (!listEl) return;
+
+        if (countEl) {
+            countEl.textContent = `${events.length} shared event${events.length === 1 ? '' : 's'}`;
+        }
+
+        if (events.length === 0) {
+            listEl.innerHTML = `
+                <div style="padding: 24px 12px; text-align: center; color: #94a3b8; font-size: 13px; font-weight: 600;">
+                    No government events recorded for ${BS_MONTHS[selectedBsMonth - 1]} ${selectedBsYear}.
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        events.forEach(function (ev) {
+            html += `
+                <div class="gov-event-item" data-event-id="${ev.id || ''}">
+                    <div class="gov-pill-badge">
+                        <span class="gov-pill-bs">BS</span>
+                        <span class="gov-pill-num">${ev.bsDay}</span>
+                    </div>
+                    <div class="gov-event-text">
+                        <div class="gov-event-title" title="${ev.title}">${ev.title}</div>
+                        <div class="gov-event-date">${ev.bsDate} BS ${ev.holiday ? '• Official Holiday' : ''}</div>
+                    </div>
+                    <div class="gov-event-actions">
+                        ${ev.id ? `
+                        <button type="button" class="gov-action-btn btn-delete-event" data-id="${ev.id}" title="Delete event">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        listEl.innerHTML = html;
+
+        // Attach delete listeners
+        listEl.querySelectorAll('.btn-delete-event').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const id = this.getAttribute('data-id');
+                if (!id) return;
+                if (confirm('Delete this event?')) {
+                    deleteCalendarEvent(id);
+                }
+            });
+        });
+    }
+
+    function showDayDetails(dayNum) {
+        const card = document.getElementById('calDetailCard');
+        if (!card) return;
+
+        const adDate = bsToAdDate(selectedBsYear, selectedBsMonth, dayNum);
+        const adStr = formatYmd(adDate);
+        const now = new Date();
+        const todayYmd = formatYmd(now);
+        const isToday = (adStr === todayYmd);
+        const isFuture = (adStr > todayYmd);
+        const dayOfWeek = adDate ? adDate.getDay() : 0;
+        const dayName = WEEKDAYS_FULL[dayOfWeek];
+
+        const isWorking = (window.officeWorkingDays && window.officeWorkingDays[DAY_KEYS[dayOfWeek]] !== undefined)
+            ? window.officeWorkingDays[DAY_KEYS[dayOfWeek]]
+            : (dayOfWeek !== 6);
+
+        const attRecord = (window.attendanceJsonData || []).find(item => item.date === adStr);
+        const leaveRecord = (window.approvedLeavesData || []).find(l => adStr >= l.startDate && adStr <= l.endDate);
+        const dayEvents = (window.calendarEventsData || []).filter(e => e.bsYear === selectedBsYear && e.bsMonth === selectedBsMonth && e.bsDay === dayNum);
+
+        const titleEl = document.getElementById('calDetailTitle');
+        const subEl = document.getElementById('calDetailSub');
+        const iconEl = document.getElementById('calDetailIcon');
+        const statusEl = document.getElementById('calDetailStatus');
+        const checkInEl = document.getElementById('calDetailCheckIn');
+        const checkOutEl = document.getElementById('calDetailCheckOut');
+        const hoursEl = document.getElementById('calDetailHours');
+
+        if (titleEl) {
+            titleEl.textContent = `${BS_MONTHS[selectedBsMonth - 1]} ${dayNum}, ${selectedBsYear} BS (${dayName})`;
+        }
+        if (subEl) {
+            const adFormatted = adDate ? adDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : adStr;
+            let eventText = dayEvents.length > 0 ? ` • ${dayEvents.map(e => e.title).join(', ')}` : '';
+            subEl.textContent = `${adFormatted} AD ${isToday ? '• Today' : ''}${eventText}`;
+        }
+
+        if (attRecord) {
+            if (attRecord.late) {
+                iconEl.textContent = '⏰';
+                statusEl.innerHTML = '<span style="color: #b45309; font-weight: 800;">🟡 Late Check-in</span>';
+            } else if (attRecord.status === 'ABSENT') {
+                iconEl.textContent = '❌';
+                statusEl.innerHTML = '<span style="color: #64748b; font-weight: 800;">🔘 Absent</span>';
+            } else {
+                iconEl.textContent = '✅';
+                statusEl.innerHTML = '<span style="color: #047857; font-weight: 800;">🟢 Present (On-time)</span>';
+            }
+            checkInEl.textContent = attRecord.checkInTime || '--:--';
+            checkOutEl.textContent = attRecord.checkOutTime || '--:--';
+            hoursEl.textContent = attRecord.workingHours || '--';
+        } else if (leaveRecord) {
+            iconEl.textContent = '🌴';
+            statusEl.innerHTML = `<span style="color: #4338ca; font-weight: 800;">🔵 Approved Leave (${leaveRecord.leaveType || 'Leave'})</span>`;
+            checkInEl.textContent = '--:--';
+            checkOutEl.textContent = '--:--';
+            hoursEl.textContent = '--';
+        } else if (dayEvents.some(e => e.holiday)) {
+            iconEl.textContent = '🏖️';
+            statusEl.innerHTML = `<span style="color: #dc2626; font-weight: 800;">🔴 Public Holiday (${dayEvents[0].title})</span>`;
+            checkInEl.textContent = '--:--';
+            checkOutEl.textContent = '--:--';
+            hoursEl.textContent = '--';
+        } else if (!isWorking) {
+            iconEl.textContent = '🏖️';
+            statusEl.innerHTML = '<span style="color: #6366f1; font-weight: 800;">🟣 Weekly Off (Saturday)</span>';
+            checkInEl.textContent = '--:--';
+            checkOutEl.textContent = '--:--';
+            hoursEl.textContent = '--';
+        } else if (dayEvents.length > 0) {
+            iconEl.textContent = '✨';
+            statusEl.innerHTML = `<span style="color: #b45309; font-weight: 800;">🟡 Event: ${dayEvents[0].title}</span>`;
+            checkInEl.textContent = '--:--';
+            checkOutEl.textContent = '--:--';
+            hoursEl.textContent = '--';
+        } else if (isFuture) {
+            iconEl.textContent = '📅';
+            statusEl.innerHTML = '<span style="color: #64748b; font-weight: 700;">Upcoming Working Day</span>';
+            checkInEl.textContent = '--:--';
+            checkOutEl.textContent = '--:--';
+            hoursEl.textContent = '--';
+        } else if (isToday) {
+            iconEl.textContent = '⏳';
+            statusEl.innerHTML = '<span style="color: #4338ca; font-weight: 800;">Today (Pending Check-in)</span>';
+            checkInEl.textContent = '--:--';
+            checkOutEl.textContent = '--:--';
+            hoursEl.textContent = '--';
+        } else {
+            iconEl.textContent = '❌';
+            statusEl.innerHTML = '<span style="color: #64748b; font-weight: 800;">🔘 Absent (No Record)</span>';
+            checkInEl.textContent = '--:--';
+            checkOutEl.textContent = '--:--';
+            hoursEl.textContent = '--';
+        }
+
+        card.style.display = 'flex';
+    }
+
+    // Server API calls for Calendar Events
+    function refreshCalendarEvents() {
+        const btn = document.getElementById('btnRefreshEvents');
+        if (btn) btn.style.opacity = '0.5';
+
+        fetch(`/employee/attendance/calendar-events?year=${selectedBsYear}&month=${selectedBsMonth}`)
+            .then(res => res.json())
+            .then(events => {
+                if (Array.isArray(events)) {
+                    window.calendarEventsData = (window.calendarEventsData || []).filter(e => !(e.bsYear === selectedBsYear && e.bsMonth === selectedBsMonth));
+                    events.forEach(e => window.calendarEventsData.push(e));
+                }
+                renderCalendar();
+            })
+            .catch(err => console.error('Error refreshing calendar events:', err))
+            .finally(() => {
+                if (btn) btn.style.opacity = '1';
+            });
+    }
+
+    function addCalendarEvent() {
+        const dateInput = document.getElementById('eventBsDateInput');
+        const nameInput = document.getElementById('eventNameInput');
+        const holidayInput = document.getElementById('eventIsHolidayInput');
+
+        if (!dateInput || !nameInput) return;
+        const title = nameInput.value.trim();
+        const bsDate = dateInput.value.trim();
+        const isHoliday = holidayInput ? holidayInput.checked : false;
+
+        if (!title) {
+            alert('Please enter an event name.');
+            nameInput.focus();
+            return;
+        }
+        if (!bsDate || bsDate.split('-').length < 3) {
+            alert('Please enter a valid BS date (e.g. 2083-05-14).');
+            dateInput.focus();
+            return;
+        }
+
+        const payload = {
+            title: title,
+            bsDate: bsDate,
+            holiday: isHoliday,
+            category: 'GOVERNMENT'
+        };
+
+        const addBtn = document.getElementById('btnAddEvent');
+        if (addBtn) {
+            addBtn.disabled = true;
+            addBtn.textContent = 'Adding...';
+        }
+
+        fetch('/employee/attendance/calendar-events', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to save event');
+                return res.json();
+            })
+            .then(savedEvent => {
+                window.calendarEventsData = window.calendarEventsData || [];
+                window.calendarEventsData.push(savedEvent);
+                nameInput.value = '';
+                if (holidayInput) holidayInput.checked = false;
+                renderCalendar();
+            })
+            .catch(err => {
+                console.error('Add event error:', err);
+                alert('Could not save event. Please check inputs.');
+            })
+            .finally(() => {
+                if (addBtn) {
+                    addBtn.disabled = false;
+                    addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add event';
+                }
+            });
+    }
+
+    function deleteCalendarEvent(id) {
+        fetch(`/employee/attendance/calendar-events/${id}`, {
+            method: 'DELETE'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to delete');
+                window.calendarEventsData = (window.calendarEventsData || []).filter(e => e.id !== parseInt(id, 10) && e.id !== id);
+                renderCalendar();
+            })
+            .catch(err => {
+                console.error('Delete error:', err);
+                alert('Could not delete event.');
+            });
+    }
+
+    // DOM Ready Listener
+    document.addEventListener('DOMContentLoaded', function () {
+        const prevBtn = document.getElementById('calPrevBtn');
+        const nextBtn = document.getElementById('calNextBtn');
+        const todayBtn = document.getElementById('calTodayBtn');
+        const refreshBtn = document.getElementById('btnRefreshEvents');
+        const addBtn = document.getElementById('btnAddEvent');
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () {
+                selectedBsMonth--;
+                if (selectedBsMonth < 1) {
+                    selectedBsMonth = 12;
+                    selectedBsYear--;
+                }
+                activeSelectedDay = 1;
+                renderCalendar();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                selectedBsMonth++;
+                if (selectedBsMonth > 12) {
+                    selectedBsMonth = 1;
+                    selectedBsYear++;
+                }
+                activeSelectedDay = 1;
+                renderCalendar();
+            });
+        }
+
+        if (todayBtn) {
+            todayBtn.addEventListener('click', function () {
+                const cur = getCurrentBsDate();
+                selectedBsYear = cur.year;
+                selectedBsMonth = cur.month;
+                activeSelectedDay = cur.day;
+                renderCalendar();
+            });
+        }
+
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', refreshCalendarEvents);
+        }
+
+        if (addBtn) {
+            addBtn.addEventListener('click', addCalendarEvent);
+        }
+
+        // Initialize view
+        renderCalendar();
+    });
+
+})();
+/*]]>*/
 </script>
 
 </body>

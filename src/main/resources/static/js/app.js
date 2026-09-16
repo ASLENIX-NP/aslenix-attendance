@@ -857,108 +857,59 @@ function requestLocation() {
             }
 
 
-            navigator.geolocation.getCurrentPosition(
+            function onGpsSuccess(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
 
-                function (position) {
+                console.log("Latitude:", latitude);
+                console.log("Longitude:", longitude);
+                console.log("GPS accuracy:", position.coords.accuracy, "meters");
 
-                    const latitude =
-                        position.coords.latitude;
+                resolve({
+                    latitude: latitude,
+                    longitude: longitude,
+                    accuracy: position.coords.accuracy
+                });
+            }
 
-                    const longitude =
-                        position.coords.longitude;
+            function onGpsFailure(error) {
+                console.error("Location error:", error);
+                let message = "Unable to get your location.";
 
-
-                    console.log(
-                        "Latitude:",
-                        latitude
-                    );
-
-                    console.log(
-                        "Longitude:",
-                        longitude
-                    );
-
-                    console.log(
-                        "GPS accuracy:",
-                        position.coords.accuracy,
-                        "meters"
-                    );
-
-
-                    resolve({
-
-                        latitude:
-                            latitude,
-
-                        longitude:
-                            longitude,
-
-                        accuracy:
-                            position.coords.accuracy
-
-                    });
-
-                },
-
-                function (error) {
-
-                    console.error(
-                        "Location error:",
-                        error
-                    );
-
-
-                    let message =
-                        "Unable to get your location.";
-
-
-                    if (
-                        error.code ===
-                        error.PERMISSION_DENIED
-                    ) {
-
-                        message =
-                            "Location permission was denied. Please allow location access and try again.";
-
-                    } else if (
-                        error.code ===
-                        error.POSITION_UNAVAILABLE
-                    ) {
-
-                        message =
-                            "Your location is currently unavailable.";
-
-                    } else if (
-                        error.code ===
-                        error.TIMEOUT
-                    ) {
-
-                        message =
-                            "Location request timed out. Please try again.";
-                    }
-
-
-                    reject(
-                        new Error(
-                            message
-                        )
-                    );
-
-                },
-
-                {
-
-                    enableHighAccuracy:
-                        true,
-
-                    timeout:
-                        15000,
-
-                    maximumAge:
-                        0
-
+                if (error.code === error.PERMISSION_DENIED) {
+                    message = "Location permission was denied. Please allow location access and try again.";
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    message = "Your location is currently unavailable. Please make sure Location services are enabled in Windows/device settings.";
+                } else if (error.code === error.TIMEOUT) {
+                    message = "Location request timed out. Please ensure Location services are turned ON in your system settings.";
                 }
 
+                reject(new Error(message));
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                onGpsSuccess,
+                function (err) {
+                    if (err.code === 3 || err.code === 2) {
+                        console.warn("High accuracy GPS timed out or unavailable, trying standard network location...");
+                        navigator.geolocation.getCurrentPosition(
+                            onGpsSuccess,
+                            onGpsFailure,
+                            {
+                                enableHighAccuracy: false,
+                                timeout: 15000,
+                                maximumAge: 120000
+                            }
+                        );
+                    } else {
+                        onGpsFailure(err);
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 7000,
+                    maximumAge: 60000
+                }
             );
 
         }

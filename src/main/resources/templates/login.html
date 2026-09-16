@@ -6,6 +6,10 @@
 
     <title>ASLENIX | Login</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -13,93 +17,154 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --background: #f6f8fc;
+            --foreground: #0f172a;
+            --card: #ffffff;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --border: #e2e8f0;
+            --muted: #64748b;
+        }
+
         body {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+            background:
+                radial-gradient(circle at 88% 12%, rgba(79, 70, 229, 0.08), transparent 32%),
+                radial-gradient(circle at 12% 88%, rgba(99, 102, 241, 0.06), transparent 35%),
+                var(--background);
+            color: var(--foreground);
+            -webkit-font-smoothing: antialiased;
+            padding: 20px;
         }
 
         .login-container {
-            width: 380px;
-            padding: 35px;
-            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 36px;
+            background: var(--card);
+            border: 1px solid var(--border);
             border-radius: 18px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
         }
 
         .logo {
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 30px;
-            font-weight: 800;
-            color: #1e3a8a;
+            font-size: 28px;
+            font-weight: 850;
+            letter-spacing: 0.8px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .logo::after {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: inline-block;
+            margin-bottom: -12px;
         }
 
         .subtitle {
             text-align: center;
-            color: #64748b;
-            margin-bottom: 30px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+            margin-bottom: 28px;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 7px;
-            font-weight: 600;
-            color: #334155;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
         }
 
         input {
             width: 100%;
-            padding: 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 9px;
-            font-size: 15px;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            background: #f8fafc;
+            color: #0f172a;
             outline: none;
+            transition: all 0.2s ease;
         }
 
         input:focus {
-            border-color: #2563eb;
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.12);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
         }
 
         button {
             width: 100%;
             padding: 13px;
             border: none;
-            border-radius: 9px;
-            background: #2563eb;
+            border-radius: 10px;
+            background: var(--primary);
             color: white;
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 750;
             cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+            margin-top: 6px;
         }
 
         button:hover {
-            background: #1d4ed8;
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.32);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         .message {
-            margin-bottom: 18px;
-            padding: 10px;
-            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 11px 14px;
+            border-radius: 10px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .error {
-            background: #fee2e2;
-            color: #b91c1c;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
 
         .logout {
-            background: #dcfce7;
-            color: #15803d;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
         }
     </style>
 </head>

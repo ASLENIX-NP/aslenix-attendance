@@ -1,12 +1,17 @@
 package com.aslenix.attendance.controller;
 
 import com.aslenix.attendance.entity.Attendance;
+import com.aslenix.attendance.entity.CalendarEvent;
 import com.aslenix.attendance.entity.Employee;
+import com.aslenix.attendance.entity.LeaveRequest;
 import com.aslenix.attendance.entity.OfficeSettings;
 import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.service.AttendanceService;
+import com.aslenix.attendance.service.CalendarEventService;
+import com.aslenix.attendance.service.LeaveRequestService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +19,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/employee/attendance")
@@ -23,15 +32,21 @@ public class EmployeeAttendanceController {
     private final EmployeeRepository employeeRepository;
     private final AttendanceRepository attendanceRepository;
     private final AttendanceService attendanceService;
+    private final LeaveRequestService leaveRequestService;
+    private final CalendarEventService calendarEventService;
 
     public EmployeeAttendanceController(
             EmployeeRepository employeeRepository,
             AttendanceRepository attendanceRepository,
-            AttendanceService attendanceService) {
+            AttendanceService attendanceService,
+            LeaveRequestService leaveRequestService,
+            CalendarEventService calendarEventService) {
 
         this.employeeRepository = employeeRepository;
         this.attendanceRepository = attendanceRepository;
         this.attendanceService = attendanceService;
+        this.leaveRequestService = leaveRequestService;
+        this.calendarEventService = calendarEventService;
     }
 
     // ============================================================
@@ -298,7 +313,168 @@ public class EmployeeAttendanceController {
                 officeEndTime
         );
 
+        model.addAttribute(
+                "settings",
+                settings
+        );
+
+        // Attendance data list for interactive calendar
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
+        List<Map<String, Object>> attendanceJsonList = new ArrayList<>();
+        for (Attendance a : attendanceRecords) {
+            if (a.getAttendanceDate() == null) continue;
+            Map<String, Object> item = new HashMap<>();
+            item.put("date", a.getAttendanceDate().toString());
+            item.put("status", a.getStatus() != null ? a.getStatus() : "");
+            item.put("late", a.isLate());
+            item.put("earlyLeave", a.isEarlyLeave());
+            item.put("halfDay", a.isHalfDay());
+            if (a.getCheckIn() != null) {
+                item.put("checkInTime", a.getCheckIn().toLocalTime().format(timeFormatter));
+            }
+            if (a.getCheckOut() != null) {
+                item.put("checkOutTime", a.getCheckOut().toLocalTime().format(timeFormatter));
+            }
+            if (a.getCheckIn() != null && a.getCheckOut() != null) {
+                Duration dur = Duration.between(a.getCheckIn(), a.getCheckOut());
+                long hrs = dur.toHours();
+                long mins = dur.toMinutes() % 60;
+                item.put("workingHours", hrs + "h " + String.format("%02dm", mins));
+            }
+            attendanceJsonList.add(item);
+        }
+        model.addAttribute("attendanceJsonList", attendanceJsonList);
+
+        // Approved leaves for calendar
+        List<LeaveRequest> allLeaves = leaveRequestService.getEmployeeRequests(employee);
+        List<Map<String, Object>> approvedLeavesList = new ArrayList<>();
+        if (allLeaves != null) {
+            for (LeaveRequest lr : allLeaves) {
+                if ("APPROVED".equalsIgnoreCase(lr.getStatus()) && lr.getStartDate() != null && lr.getEndDate() != null) {
+                    Map<String, Object> lMap = new HashMap<>();
+                    lMap.put("startDate", lr.getStartDate().toString());
+                    lMap.put("endDate", lr.getEndDate().toString());
+                    lMap.put("leaveType", lr.getLeaveType() != null ? lr.getLeaveType().toString() : "Leave");
+                    approvedLeavesList.add(lMap);
+                }
+            }
+        }
+        model.addAttribute("approvedLeavesList", approvedLeavesList);
+
+        // All calendar events (government, holidays, custom)
+        model.addAttribute("calendarEvents", calendarEventService.getAllEvents());
+
         return "employee/attendance";
+    }
+
+    // ============================================================
+    // CALENDAR DATA API
+    // ============================================================
+
+    @GetMapping("/calendar-data")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getCalendarData(Authentication authentication) {
+        Employee employee = getLoggedInEmployee(authentication);
+        if (employee == null) {
+            return ResponseEntity.status(401).build();
+        }
+        OfficeSettings settings = attendanceService.getOfficeSettings();
+        List<Attendance> attendanceRecords = attendanceRepository.findByEmployeeOrderByAttendanceDateDesc(employee);
+
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
+        List<Map<String, Object>> recordsList = new ArrayList<>();
+        for (Attendance a : attendanceRecords) {
+            if (a.getAttendanceDate() == null) continue;
+            Map<String, Object> item = new HashMap<>();
+            item.put("date", a.getAttendanceDate().toString());
+            item.put("status", a.getStatus() != null ? a.getStatus() : "");
+            item.put("late", a.isLate());
+            item.put("earlyLeave", a.isEarlyLeave());
+            item.put("halfDay", a.isHalfDay());
+            if (a.getCheckIn() != null) {
+                item.put("checkInTime", a.getCheckIn().toLocalTime().format(timeFormatter));
+            }
+            if (a.getCheckOut() != null) {
+                item.put("checkOutTime", a.getCheckOut().toLocalTime().format(timeFormatter));
+            }
+            if (a.getCheckIn() != null && a.getCheckOut() != null) {
+                Duration dur = Duration.between(a.getCheckIn(), a.getCheckOut());
+                long hrs = dur.toHours();
+                long mins = dur.toMinutes() % 60;
+                item.put("workingHours", hrs + "h " + String.format("%02dm", mins));
+            }
+            recordsList.add(item);
+        }
+
+        List<LeaveRequest> allLeaves = leaveRequestService.getEmployeeRequests(employee);
+        List<Map<String, Object>> leavesList = new ArrayList<>();
+        if (allLeaves != null) {
+            for (LeaveRequest lr : allLeaves) {
+                if ("APPROVED".equalsIgnoreCase(lr.getStatus()) && lr.getStartDate() != null && lr.getEndDate() != null) {
+                    Map<String, Object> lMap = new HashMap<>();
+                    lMap.put("startDate", lr.getStartDate().toString());
+                    lMap.put("endDate", lr.getEndDate().toString());
+                    lMap.put("leaveType", lr.getLeaveType() != null ? lr.getLeaveType().toString() : "Leave");
+                    leavesList.add(lMap);
+                }
+            }
+        }
+
+        Map<String, Object> workingDays = new HashMap<>();
+        workingDays.put("sunday", settings.isSunday());
+        workingDays.put("monday", settings.isMonday());
+        workingDays.put("tuesday", settings.isTuesday());
+        workingDays.put("wednesday", settings.isWednesday());
+        workingDays.put("thursday", settings.isThursday());
+        workingDays.put("friday", settings.isFriday());
+        workingDays.put("saturday", settings.isSaturday());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("attendance", recordsList);
+        response.put("leaves", leavesList);
+        response.put("workingDays", workingDays);
+        return ResponseEntity.ok(response);
+    }
+
+    // ============================================================
+    // CALENDAR EVENTS API
+    // ============================================================
+
+    @GetMapping("/calendar-events")
+    @ResponseBody
+    public ResponseEntity<List<CalendarEvent>> getCalendarEvents(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        if (year != null && month != null) {
+            return ResponseEntity.ok(calendarEventService.getEventsForBsMonth(year, month));
+        }
+        return ResponseEntity.ok(calendarEventService.getAllEvents());
+    }
+
+    @PostMapping("/calendar-events")
+    @ResponseBody
+    public ResponseEntity<?> addCalendarEvent(@RequestBody Map<String, Object> payload) {
+        try {
+            String title = (String) payload.get("title");
+            String bsDate = (String) payload.get("bsDate");
+            boolean isHoliday = Boolean.TRUE.equals(payload.get("holiday")) || Boolean.TRUE.equals(payload.get("isHoliday"));
+            String category = payload.get("category") != null ? (String) payload.get("category") : "GOVERNMENT";
+
+            CalendarEvent event = calendarEventService.addEvent(title, bsDate, isHoliday, category);
+            return ResponseEntity.ok(event);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage() != null ? e.getMessage() : "Error saving event"));
+        }
+    }
+
+    @DeleteMapping("/calendar-events/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteCalendarEvent(@PathVariable Long id) {
+        boolean deleted = calendarEventService.deleteEvent(id);
+        if (deleted) {
+            return ResponseEntity.ok(Map.of("success", true));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     // ============================================================
