@@ -836,7 +836,7 @@
 
         /* =====================================================
            MODAL - TASK EDIT / DETAILS / CREATE
-           (Based directly on user reference screenshot)
+           (Centered popup modal with backdrop blur)
         ===================================================== */
         .modal-backdrop {
             position: fixed;
@@ -844,36 +844,41 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(15, 23, 42, 0.55);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: none;
-            place-items: center;
-            z-index: 2000;
-            padding: 20px;
-            overflow-y: auto;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.22s ease;
+            overflow: hidden;
         }
 
         .modal-backdrop.active {
-            display: grid;
+            display: flex;
+            opacity: 1;
         }
 
         .modal-dialog {
             background: #ffffff;
             width: 100%;
-            max-width: 740px;
+            max-width: 780px;
+            max-height: 90vh;
             border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.45), 0 0 0 1px rgba(226, 232, 240, 0.8);
             display: flex;
             flex-direction: column;
-            max-height: 90vh;
-            animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
+            transform: scale(0.94) translateY(12px);
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
+            margin: auto;
         }
 
-        @keyframes modalPopIn {
-            from { opacity: 0; transform: scale(0.96) translateY(8px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+        .modal-backdrop.active .modal-dialog {
+            transform: scale(1) translateY(0);
         }
 
         /* Modal Header */
@@ -955,6 +960,7 @@
         .modal-body {
             padding: 24px 28px;
             overflow-y: auto;
+            max-height: calc(90vh - 145px);
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -1081,23 +1087,64 @@
             line-height: 1.4;
         }
 
-        /* Total Progress Section */
-        .total-progress-wrap {
+        /* Total Progress Management Section */
+        .progress-mgmt-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px 18px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 10px;
         }
 
-        .total-progress-header {
+        .progress-mgmt-top {
             display: flex;
+            align-items: center;
             justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .progress-stat-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-title-label {
             font-size: 12.5px;
             font-weight: 750;
-            color: #1e293b;
+            color: #334155;
+        }
+
+        .progress-num-badge {
+            font-size: 13.5px;
+            font-weight: 850;
+            color: #4f46e5;
+            background: #eef2ff;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .progress-status-pill {
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 2.5px 8px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #475569;
+            text-transform: uppercase;
+        }
+
+        .progress-sync-mode {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
         }
 
         .total-progress-track {
-            height: 8px;
+            height: 9px;
             background: #e2e8f0;
             border-radius: 999px;
             overflow: hidden;
@@ -1105,14 +1152,68 @@
 
         .total-progress-fill {
             height: 100%;
-            background: #4f46e5;
+            background: linear-gradient(90deg, #6366f1, #3b82f6);
             border-radius: 999px;
-            transition: width 0.3s ease;
+            transition: width 0.25s ease, background 0.25s ease;
         }
 
-        .total-progress-hint {
-            font-size: 11px;
-            color: #8a96aa;
+        .total-progress-fill.complete {
+            background: #10b981;
+        }
+
+        .progress-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .progress-range-slider {
+            flex: 1;
+            height: 6px;
+            accent-color: #4f46e5;
+            cursor: pointer;
+        }
+
+        .btn-quick-save-progress {
+            padding: 5px 12px;
+            background: #4f46e5;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-quick-save-progress:hover {
+            background: #4338ca;
+        }
+
+        .progress-milestones {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-milestone {
+            padding: 3px 9px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-milestone:hover {
+            background: #eef2ff;
+            color: #4f46e5;
+            border-color: #c7d2fe;
         }
 
         /* Input with icon */
@@ -1573,6 +1674,43 @@
             background: #f1f5f9;
         }
 
+        .btn-approve-task-modal {
+            padding: 9px 18px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            font-size: 12.5px;
+            font-weight: 750;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-approve-task-modal:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+        }
+
+        .task-approved-banner {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 10px;
+            color: #065f46;
+            font-size: 12.5px;
+            font-weight: 750;
+            margin-bottom: 12px;
+        }
+
+        .task-approved-banner.show { display: flex; }
+
         .btn-save-modal {
             padding: 9px 22px;
             border-radius: 10px;
@@ -1885,10 +2023,10 @@
                         <span class="column-count" id="count-READY_FOR_REVIEW">0</span>
                     </div>
                     <div class="cards-container" data-drop-status="READY_FOR_REVIEW">
-                        <th:block th:each="task : ${tasks}" th:if="${task.status == 'READY_FOR_REVIEW'}">
+                        <th:block th:each="task : ${tasks}" th:if="${task.status == 'READY_FOR_REVIEW' or task.status == 'UNDER_REVIEW'}">
                             <div th:replace="~{:: taskCardFragment(task=${task})}"></div>
                         </th:block>
-                        <div class="empty-column-state" th:if="${#lists.isEmpty(tasks.?[status == 'READY_FOR_REVIEW'])}">No tasks under review</div>
+                        <div class="empty-column-state" th:if="${#lists.isEmpty(tasks.?[status == 'READY_FOR_REVIEW' or status == 'UNDER_REVIEW'])}">No tasks under review</div>
                     </div>
                 </div>
 
@@ -1902,10 +2040,10 @@
                         <span class="column-count" id="count-APPROVED">0</span>
                     </div>
                     <div class="cards-container" data-drop-status="APPROVED">
-                        <th:block th:each="task : ${tasks}" th:if="${task.status == 'APPROVED'}">
+                        <th:block th:each="task : ${tasks}" th:if="${task.status == 'APPROVED' or task.status == 'COMPLETED'}">
                             <div th:replace="~{:: taskCardFragment(task=${task})}"></div>
                         </th:block>
-                        <div class="empty-column-state" th:if="${#lists.isEmpty(tasks.?[status == 'APPROVED'])}">No completed tasks</div>
+                        <div class="empty-column-state" th:if="${#lists.isEmpty(tasks.?[status == 'APPROVED' or status == 'COMPLETED'])}">No completed tasks</div>
                     </div>
                 </div>
 
@@ -1917,50 +2055,51 @@
 <!-- =====================================================
      REUSABLE TASK CARD FRAGMENT
 ====================================================== -->
-<th:block th:fragment="taskCardFragment(task)">
+<th:block th:fragment="taskCardFragment(task)" th:if="${task != null}">
     <div class="task-card"
          draggable="true"
-         th:attr="data-task-id=${task.id}, data-status=${task.status}, data-priority=${task.priority}, data-complexity=${task.complexity}"
-         th:onclick="'openEditTaskModal(' + ${task.id} + ')'">
+         style="cursor: pointer;"
+         th:attr="data-task-id=${task?.id}, data-status=${task?.status == 'UNDER_REVIEW' ? 'READY_FOR_REVIEW' : (task?.status == 'COMPLETED' ? 'APPROVED' : task?.status)}, data-priority=${task?.priority}, data-complexity=${task?.complexity}"
+         th:onclick="'openEditTaskModal(' + ${task?.id} + ')'">
 
         <!-- Top Badges -->
         <div class="task-card-top">
-            <span class="task-code-badge" th:text="${task.taskCode}">TASK-001</span>
+            <span class="task-code-badge" th:text="${task?.taskCode}">TASK-001</span>
             <div class="badge-group">
                 <span class="complexity-badge"
-                      th:classappend="${task.complexity == 'SMALL' ? 'comp-small' : (task.complexity == 'LARGE' ? 'comp-large' : (task.complexity == 'EPIC' ? 'comp-epic' : 'comp-medium'))}"
-                      th:text="${task.complexity}">MEDIUM</span>
+                      th:classappend="${task?.complexity == 'SMALL' ? 'comp-small' : (task?.complexity == 'LARGE' ? 'comp-large' : (task?.complexity == 'EPIC' ? 'comp-epic' : 'comp-medium'))}"
+                      th:text="${task?.complexity}">MEDIUM</span>
                 <span class="priority-badge"
-                      th:classappend="${task.priority == 'LOW' ? 'priority-low' : (task.priority == 'HIGH' ? 'priority-high' : (task.priority == 'URGENT' ? 'priority-urgent' : 'priority-medium'))}"
-                      th:text="${task.priority}">MEDIUM</span>
+                      th:classappend="${task?.priority == 'LOW' ? 'priority-low' : (task?.priority == 'HIGH' ? 'priority-high' : (task?.priority == 'URGENT' ? 'priority-urgent' : 'priority-medium'))}"
+                      th:text="${task?.priority}">MEDIUM</span>
             </div>
         </div>
 
         <!-- Title & Desc -->
-        <div class="task-card-title" th:text="${task.title}">Task Title</div>
-        <p class="task-card-desc" th:if="${task.description != null && !#strings.isEmpty(task.description)}" th:text="${task.description}">Description</p>
+        <div class="task-card-title" th:text="${task?.title}">Task Title</div>
+        <p class="task-card-desc" th:if="${task?.description != null && !#strings.isEmpty(task?.description)}" th:text="${task?.description}">Description</p>
 
         <!-- Tags -->
-        <div class="task-tags-row" th:if="${task.tags != null && !#strings.isEmpty(task.tags)}">
-            <span class="tag-pill" th:each="tag : ${#strings.arraySplit(task.tags, ',')}" th:text="${#strings.trim(tag)}">tag</span>
+        <div class="task-tags-row" th:if="${task?.tags != null && !#strings.isEmpty(task?.tags)}">
+            <span class="tag-pill" th:each="tag : ${#strings.arraySplit(task?.tags, ',')}" th:text="${#strings.trim(tag)}">tag</span>
         </div>
 
         <!-- Progress -->
         <div class="card-progress-bar-wrap">
             <div class="card-progress-label">
                 <span>Progress</span>
-                <span th:text="${(task.progress != null ? task.progress : 0) + '%'}">0%</span>
+                <span th:text="${(task?.progress != null ? task.progress : 0) + '%'}">0%</span>
             </div>
             <div class="card-progress-track">
                 <div class="card-progress-fill"
-                     th:classappend="${task.progress != null && task.progress >= 100} ? ' complete' : ''"
-                     th:style="'width: ' + ${(task.progress != null ? task.progress : 0)} + '%;'"></div>
+                     th:classappend="${task?.progress != null && task.progress >= 100} ? ' complete' : ''"
+                     th:style="'width: ' + ${(task?.progress != null ? task.progress : 0)} + '%;'"></div>
             </div>
         </div>
 
         <!-- Footer Meta (Assignees & Deadline) -->
         <div class="task-card-footer">
-            <div class="assignees-stack" th:if="${task.assignees != null && !task.assignees.isEmpty()}">
+            <div class="assignees-stack" th:if="${task?.assignees != null && !task.assignees.isEmpty()}">
                 <th:block th:each="emp, iter : ${task.assignees}">
                     <div class="assignee-avatar"
                          th:if="${iter.index < 3}"
@@ -1971,18 +2110,18 @@
                      th:if="${#lists.size(task.assignees) > 3}"
                      th:text="'+' + (${#lists.size(task.assignees)} - 3)">+1</div>
             </div>
-            <div class="assignees-stack" th:if="${(task.assignees == null || task.assignees.isEmpty()) && task.employee != null}">
+            <div class="assignees-stack" th:if="${(task?.assignees == null || task.assignees.isEmpty()) && task?.employee != null}">
                 <div class="assignee-avatar"
-                     th:title="${task.employee.firstName + ' ' + task.employee.lastName}"
-                     th:text="${#strings.substring(task.employee.firstName, 0, 1).toUpperCase()}">E</div>
+                         th:title="${task.employee.firstName + ' ' + task.employee.lastName}"
+                         th:text="${#strings.substring(task.employee.firstName, 0, 1).toUpperCase()}">E</div>
             </div>
 
-            <div class="card-meta-deadline" th:if="${task.deadlineBs != null || task.dueDate != null}">
+            <div class="card-meta-deadline" th:if="${task?.deadlineBs != null || task?.dueDate != null}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <span th:text="${task.deadlineBs != null ? (task.deadlineBs + ' BS') : task.dueDate}">Date</span>
+                <span th:text="${task?.deadlineBs != null ? (task.deadlineBs + ' BS') : task.dueDate}">Date</span>
             </div>
 
-            <div class="card-assignments-count" th:if="${task.assignments != null && !task.assignments.isEmpty()}">
+            <div class="card-assignments-count" th:if="${task?.assignments != null && !task.assignments.isEmpty()}">
                 <span>📋</span>
                 <span th:text="${#lists.size(task.assignments)}">0</span>
             </div>
@@ -1993,7 +2132,7 @@
 <!-- =====================================================
      EDIT / CREATE TASK MODAL (EXACT REFERENCE DESIGN)
 ====================================================== -->
-<div class="modal-backdrop" id="taskModalBackdrop">
+<div class="modal-backdrop" id="taskModalBackdrop" onclick="handleBackdropClick(event)">
     <div class="modal-dialog" id="taskModalDialog">
 
         <!-- HEADER -->
@@ -2006,7 +2145,6 @@
         <!-- TABS -->
         <div class="modal-tabs">
             <button type="button" class="modal-tab-btn active" data-tab="tabDetails" onclick="switchModalTab('tabDetails')">Details</button>
-            <button type="button" class="modal-tab-btn" data-tab="tabDiscussion" onclick="switchModalTab('tabDiscussion')">Discussion</button>
             <button type="button" class="modal-tab-btn" data-tab="tabActivity" onclick="switchModalTab('tabActivity')">Activity Timeline</button>
         </div>
 
@@ -2016,6 +2154,12 @@
             <!-- TAB 1: DETAILS -->
             <div id="tabDetails" class="tab-content active">
                 <input type="hidden" id="modalTaskId" value="">
+
+                <!-- APPROVED STATUS BANNER -->
+                <div class="task-approved-banner" id="taskApprovedBanner">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>This task has been approved and marked as completed.</span>
+                </div>
 
                 <!-- TITLE -->
                 <div class="form-group">
@@ -2099,15 +2243,40 @@
                     </div>
                 </div>
 
-                <!-- TOTAL PROGRESS -->
-                <div class="total-progress-wrap">
-                    <div class="total-progress-header">
-                        <span>Total Progress: <strong id="modalProgressNumber">0%</strong></span>
+                <!-- TOTAL PROGRESS MANAGEMENT -->
+                <div class="progress-mgmt-box">
+                    <div class="progress-mgmt-top">
+                        <div class="progress-stat-left">
+                            <span class="progress-title-label">Task Progress:</span>
+                            <span class="progress-num-badge" id="modalProgressNumber">0%</span>
+                            <span class="progress-status-pill" id="modalProgressStatusPill">To Do</span>
+                        </div>
+                        <div class="progress-sync-mode" id="progressSyncHint">
+                            <span>⚡ Live Progress Control</span>
+                        </div>
                     </div>
+
+                    <!-- Visual Progress Bar -->
                     <div class="total-progress-track">
                         <div class="total-progress-fill" id="modalProgressFill" style="width: 0%;"></div>
                     </div>
-                    <span class="total-progress-hint">Task progress is calculated automatically based on completed work assignments.</span>
+
+                    <!-- Interactive Slider & Quick Save -->
+                    <div class="progress-slider-row">
+                        <input type="range" class="progress-range-slider" id="modalProgressSlider" min="0" max="100" value="0" oninput="onProgressSliderChange(this.value)">
+                        <button type="button" class="btn-quick-save-progress" id="btnQuickSaveProgress" onclick="saveAdminProgressDirectly()" title="Save progress percentage">
+                            Save %
+                        </button>
+                    </div>
+
+                    <!-- Quick Preset Milestone Chips -->
+                    <div class="progress-milestones">
+                        <button type="button" class="btn-milestone" onclick="setMilestone(0)">0% (To Do)</button>
+                        <button type="button" class="btn-milestone" onclick="setMilestone(25)">25%</button>
+                        <button type="button" class="btn-milestone" onclick="setMilestone(50)">50% (Halfway)</button>
+                        <button type="button" class="btn-milestone" onclick="setMilestone(75)">75%</button>
+                        <button type="button" class="btn-milestone" onclick="setMilestone(100)">100% (Done)</button>
+                    </div>
                 </div>
 
                 <!-- DEADLINE (BS) & TIME & TAGS -->
@@ -2273,22 +2442,7 @@
 
             </div>
 
-            <!-- TAB 2: DISCUSSION -->
-            <div id="tabDiscussion" class="tab-content">
-                <div class="comments-feed" id="modalCommentsFeed">
-                    <!-- Injected by JS -->
-                </div>
-
-                <div class="form-group" style="margin-top: 14px;">
-                    <label class="form-label" for="newCommentInput">Post a message / comment</label>
-                    <textarea id="newCommentInput" class="form-textarea" placeholder="Type a note or instructions for the team..."></textarea>
-                    <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
-                        <button type="button" class="btn-add-assignment" onclick="submitTaskComment()">Post Comment</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 3: ACTIVITY TIMELINE -->
+            <!-- TAB 2: ACTIVITY TIMELINE -->
             <div id="tabActivity" class="tab-content">
                 <div class="comments-feed" id="modalActivityFeed">
                     <!-- Injected by JS -->
@@ -2304,6 +2458,10 @@
                 Delete
             </button>
             <div class="footer-right-actions">
+                <button type="button" class="btn-approve-task-modal" id="btnModalApproveTask" onclick="approveCurrentModalTask()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Approve Task
+                </button>
                 <button type="button" class="btn-cancel-modal" onclick="closeTaskModal()">Cancel</button>
                 <button type="button" class="btn-save-modal" id="btnModalSaveTask" onclick="saveCurrentModalTask()">Save changes</button>
             </div>
@@ -2319,9 +2477,25 @@
      SCRIPTS
 ====================================================== -->
 <script>
-    // CSRF Configuration
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content");
+    // CSRF Configuration & Helper Functions
+    function getCsrfToken() {
+        return document.querySelector('meta[name="_csrf"]')?.getAttribute("content")
+            || document.querySelector('input[name="_csrf"]')?.value
+            || "";
+    }
+
+    function getCsrfHeader() {
+        return document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content")
+            || "X-CSRF-TOKEN";
+    }
+
+    const csrfToken = getCsrfToken();
+    const csrfHeader = getCsrfHeader();
+
+    // Drag and Drop Global State
+    let draggedCard = null;
+    let isDragging = false;
+    let dragJustEnded = false;
 
     // Modal & Current Task State
     let currentTaskData = null;
@@ -2364,6 +2538,12 @@
 
         document.getElementById("modalProgressNumber").textContent = "0%";
         document.getElementById("modalProgressFill").style.width = "0%";
+        document.getElementById("modalProgressFill").classList.remove("complete");
+        document.getElementById("modalProgressSlider").value = 0;
+        document.getElementById("modalProgressStatusPill").textContent = "To Do";
+
+        document.getElementById("taskApprovedBanner").classList.remove("show");
+        document.getElementById("btnModalApproveTask").style.display = "none";
 
         renderAssigneeChips();
         renderSprintSummaryMetrics({ totalAssignments: 0, completedAssignments: 0, inProgressAssignments: 0, underReviewAssignments: 0, blockedAssignments: 0, verifiedAssignments: 0, waitingAssignments: 0, weightedProgress: 0 });
@@ -2376,12 +2556,42 @@
         document.getElementById("taskModalBackdrop").classList.add("active");
     }
 
+    function openTaskModal(taskId) {
+        return openEditTaskModal(taskId);
+    }
+
     async function openEditTaskModal(taskId) {
+        if (isDragging || dragJustEnded) return;
         isCreateMode = false;
         document.getElementById("modalTaskId").value = taskId;
         document.getElementById("modalTaskTitleHeader").textContent = "Edit Task";
         document.getElementById("btnModalDeleteTask").style.display = "inline-flex";
         document.getElementById("btnModalSaveTask").textContent = "Save changes";
+
+        // Pre-fill from existing card in DOM for instantaneous visual response
+        const card = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+        if (card) {
+            const cardTitle = card.querySelector(".task-card-title")?.textContent;
+            if (cardTitle) document.getElementById("modalTitleInput").value = cardTitle.trim();
+            const cardDesc = card.querySelector(".task-card-desc")?.textContent;
+            if (cardDesc) document.getElementById("modalDescriptionInput").value = cardDesc.trim();
+            if (card.dataset.status) {
+                const mappedStatus = card.dataset.status === "UNDER_REVIEW" ? "READY_FOR_REVIEW" : card.dataset.status;
+                document.getElementById("modalStatusSelect").value = mappedStatus;
+            }
+            if (card.dataset.complexity) {
+                document.getElementById("modalComplexitySelect").value = card.dataset.complexity;
+                selectComplexityCard(card.dataset.complexity);
+            }
+            if (card.dataset.priority) {
+                document.getElementById("modalPrioritySelect").value = card.dataset.priority;
+                syncSprintPriorityPreview();
+            }
+        }
+
+        // Open modal instantly
+        switchModalTab("tabDetails");
+        document.getElementById("taskModalBackdrop").classList.add("active");
 
         try {
             const res = await fetch(`/admin/tasks/${taskId}/json`);
@@ -2389,7 +2599,7 @@
             const data = await res.json();
             currentTaskData = data;
 
-            // Fill inputs
+            // Fill inputs with full data
             document.getElementById("modalTitleInput").value = data.title || "";
             document.getElementById("modalDescriptionInput").value = data.description || "";
             document.getElementById("modalStatusSelect").value = data.status || "TODO";
@@ -2404,6 +2614,27 @@
             const progress = data.progress || 0;
             document.getElementById("modalProgressNumber").textContent = progress + "%";
             document.getElementById("modalProgressFill").style.width = progress + "%";
+            document.getElementById("modalProgressSlider").value = progress;
+
+            if (data.status === "APPROVED") {
+                document.getElementById("modalProgressFill").classList.add("complete");
+                document.getElementById("modalProgressStatusPill").textContent = "Completed";
+                document.getElementById("taskApprovedBanner").classList.add("show");
+                document.getElementById("btnModalApproveTask").style.display = "none";
+            } else {
+                document.getElementById("taskApprovedBanner").classList.remove("show");
+                document.getElementById("btnModalApproveTask").style.display = "inline-flex";
+                if (progress >= 100) {
+                    document.getElementById("modalProgressFill").classList.add("complete");
+                    document.getElementById("modalProgressStatusPill").textContent = "Under Review";
+                } else if (progress > 0) {
+                    document.getElementById("modalProgressFill").classList.remove("complete");
+                    document.getElementById("modalProgressStatusPill").textContent = "In Progress";
+                } else {
+                    document.getElementById("modalProgressFill").classList.remove("complete");
+                    document.getElementById("modalProgressStatusPill").textContent = "To Do";
+                }
+            }
 
             // Sync assignees
             selectedAssigneeIds.clear();
@@ -2422,12 +2653,8 @@
             renderCommentsFeed(data.comments);
             renderActivityFeed(data);
 
-            switchModalTab("tabDetails");
-            document.getElementById("taskModalBackdrop").classList.add("active");
-
         } catch (err) {
-            console.error(err);
-            showToast("Failed to load task details", "error");
+            console.error("Task detail load error:", err);
         }
     }
 
@@ -2436,6 +2663,28 @@
         toggleAssigneePicker(null, false);
         toggleInlineAssignmentForm(false);
     }
+
+    function handleBackdropClick(e) {
+        if (e.target === document.getElementById("taskModalBackdrop")) {
+            closeTaskModal();
+        }
+    }
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && document.getElementById("taskModalBackdrop")?.classList.contains("active")) {
+            closeTaskModal();
+        }
+    });
+
+    document.addEventListener("click", function (e) {
+        const card = e.target.closest(".task-card");
+        if (!card) return;
+        if (isDragging || dragJustEnded) return;
+        const taskId = card.dataset.taskId;
+        if (taskId) {
+            openEditTaskModal(taskId);
+        }
+    });
 
     function switchModalTab(tabId) {
         document.querySelectorAll(".modal-tab-btn").forEach(btn => {
@@ -2476,6 +2725,130 @@
 
     function syncSprintStatusPreview() {
         // Status changed in modal
+    }
+
+    // =========================================================
+    // PROGRESS BAR MANAGEMENT
+    // =========================================================
+    function onProgressSliderChange(val) {
+        document.getElementById("modalProgressNumber").textContent = val + "%";
+        document.getElementById("modalProgressFill").style.width = val + "%";
+        const pill = document.getElementById("modalProgressStatusPill");
+        const fill = document.getElementById("modalProgressFill");
+
+        if (val >= 100) {
+            fill.classList.add("complete");
+            pill.textContent = "Under Review / Done";
+        } else if (val == 0) {
+            fill.classList.remove("complete");
+            pill.textContent = "To Do";
+        } else {
+            fill.classList.remove("complete");
+            pill.textContent = "In Progress";
+        }
+    }
+
+    function setMilestone(val) {
+        document.getElementById("modalProgressSlider").value = val;
+        onProgressSliderChange(val);
+        const taskId = document.getElementById("modalTaskId").value;
+        if (taskId && !isCreateMode) {
+            saveAdminProgressDirectly();
+        }
+    }
+
+    async function saveAdminProgressDirectly() {
+        const taskId = document.getElementById("modalTaskId").value;
+        const progress = document.getElementById("modalProgressSlider").value;
+        if (!taskId || isCreateMode) return;
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append("progress", progress);
+
+            const res = await fetch(`/admin/tasks/${taskId}/progress`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    [csrfHeader]: csrfToken
+                },
+                body: formData.toString()
+            });
+            const json = await res.json();
+            if (json.success) {
+                showToast(`Progress set to ${progress}%`);
+                document.getElementById("modalProgressNumber").textContent = progress + "%";
+                document.getElementById("modalProgressFill").style.width = progress + "%";
+
+                // Update card visually
+                const card = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+                if (card) {
+                    const fill = card.querySelector(".card-progress-fill");
+                    const lbl = card.querySelector(".card-progress-label span:last-child");
+                    if (fill) {
+                        fill.style.width = progress + "%";
+                        if (progress >= 100) fill.classList.add("complete"); else fill.classList.remove("complete");
+                    }
+                    if (lbl) lbl.textContent = progress + "%";
+                }
+            } else {
+                showToast(json.message || "Failed to update progress", "error");
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("Error updating progress", "error");
+        }
+    }
+
+    async function approveCurrentModalTask() {
+        const taskId = document.getElementById("modalTaskId").value;
+        if (!taskId) return;
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append("reviewComment", "Approved by administrator");
+
+            const res = await fetch(`/admin/tasks/${taskId}/approve`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    [csrfHeader]: csrfToken
+                },
+                body: formData.toString()
+            });
+
+            const json = await res.json();
+            if (json.success) {
+                showToast("Task approved and completed!");
+                // Update modal state
+                document.getElementById("taskApprovedBanner").classList.add("show");
+                document.getElementById("btnModalApproveTask").style.display = "none";
+                document.getElementById("modalProgressNumber").textContent = "100%";
+                document.getElementById("modalProgressFill").style.width = "100%";
+                document.getElementById("modalProgressFill").classList.add("complete");
+                document.getElementById("modalProgressSlider").value = 100;
+                document.getElementById("modalProgressStatusPill").textContent = "Completed";
+                document.getElementById("modalStatusSelect").value = "APPROVED";
+
+                // Move card visually to APPROVED column
+                const card = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+                const approvedContainer = document.querySelector(`.cards-container[data-drop-status="APPROVED"]`);
+                if (card && approvedContainer) {
+                    approvedContainer.appendChild(card);
+                    card.dataset.status = "APPROVED";
+                    const fill = card.querySelector(".card-progress-fill");
+                    const lbl = card.querySelector(".card-progress-label span:last-child");
+                    if (fill) { fill.style.width = "100%"; fill.classList.add("complete"); }
+                    if (lbl) lbl.textContent = "100%";
+                    updateColumnCounters();
+                }
+            } else {
+                showToast(json.message || "Could not approve task", "error");
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("Error approving task", "error");
+        }
     }
 
     // =========================================================
@@ -2708,6 +3081,7 @@
     // =========================================================
     function renderCommentsFeed(comments) {
         const feed = document.getElementById("modalCommentsFeed");
+        if (!feed) return;
         if (!Array.isArray(comments) || comments.length === 0) {
             feed.innerHTML = '<div style="padding: 24px; text-align: center; color: #94a3b8; font-size: 12px;">No comments yet. Start the discussion below.</div>';
             return;
@@ -2813,6 +3187,10 @@
         formData.append("status", status);
         formData.append("complexity", complexity);
         formData.append("priority", priority);
+        const progressVal = document.getElementById("modalProgressSlider") ? document.getElementById("modalProgressSlider").value : null;
+        if (progressVal !== null) {
+            formData.append("progress", progressVal);
+        }
         formData.append("deadlineBs", deadlineBs);
         formData.append("deadlineTime", deadlineTime);
         formData.append("tags", tags);
@@ -2887,12 +3265,14 @@
     // =========================================================
     // DRAG AND DROP STATUS MANAGEMENT
     // =========================================================
-    let draggedCard = null;
-
     function initDragAndDrop() {
         document.querySelectorAll(".task-card").forEach(card => {
+            card.setAttribute("draggable", "true");
+
             card.addEventListener("dragstart", function (e) {
                 draggedCard = this;
+                isDragging = true;
+                dragJustEnded = false;
                 this.classList.add("dragging");
                 e.dataTransfer.setData("text/plain", this.dataset.taskId);
                 e.dataTransfer.effectAllowed = "move";
@@ -2900,60 +3280,128 @@
 
             card.addEventListener("dragend", function () {
                 this.classList.remove("dragging");
-                draggedCard = null;
                 document.querySelectorAll(".kanban-column").forEach(col => col.classList.remove("drag-over"));
+                isDragging = false;
+                dragJustEnded = true;
+                setTimeout(() => {
+                    dragJustEnded = false;
+                    draggedCard = null;
+                }, 250);
             });
         });
 
-        document.querySelectorAll(".cards-container").forEach(container => {
-            container.addEventListener("dragover", function (e) {
+        // Listen on kanban columns to capture drops across the entire column area
+        document.querySelectorAll(".kanban-column").forEach(col => {
+            col.addEventListener("dragover", function (e) {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = "move";
-                this.closest(".kanban-column").classList.add("drag-over");
+                this.classList.add("drag-over");
             });
 
-            container.addEventListener("dragleave", function () {
-                this.closest(".kanban-column").classList.remove("drag-over");
+            col.addEventListener("dragleave", function (e) {
+                if (!this.contains(e.relatedTarget)) {
+                    this.classList.remove("drag-over");
+                }
             });
 
-            container.addEventListener("drop", async function (e) {
+            col.addEventListener("drop", async function (e) {
                 e.preventDefault();
-                this.closest(".kanban-column").classList.remove("drag-over");
+                this.classList.remove("drag-over");
                 if (!draggedCard) return;
 
-                const targetStatus = this.dataset.dropStatus;
+                const targetContainer = this.querySelector(".cards-container");
+                if (!targetContainer) return;
+
+                const targetStatus = targetContainer.dataset.dropStatus || this.dataset.status;
                 const currentStatus = draggedCard.dataset.status;
                 const taskId = draggedCard.dataset.taskId;
 
+                if (!targetStatus || !taskId) return;
                 if (targetStatus === currentStatus) return;
 
+                const originalContainer = draggedCard.parentElement;
+                const originalStatus = currentStatus;
+
                 // Move visually
-                this.appendChild(draggedCard);
+                targetContainer.appendChild(draggedCard);
                 draggedCard.dataset.status = targetStatus;
+
+                // Visual progress feedback on card
+                const fill = draggedCard.querySelector(".card-progress-fill");
+                const lbl = draggedCard.querySelector(".card-progress-label span:last-child");
+                if (targetStatus === "APPROVED") {
+                    if (fill) { fill.style.width = "100%"; fill.classList.add("complete"); }
+                    if (lbl) lbl.textContent = "100%";
+                } else if (targetStatus === "TODO") {
+                    if (fill) { fill.style.width = "0%"; fill.classList.remove("complete"); }
+                    if (lbl) lbl.textContent = "0%";
+                }
+
                 updateColumnCounters();
+                updateEmptyStates();
 
-                // Persist via API
+                // Persist to backend via API
+                const token = getCsrfToken();
+                const header = getCsrfHeader();
+
+                const formData = new URLSearchParams();
+                formData.append("status", targetStatus);
+                if (token) formData.append("_csrf", token);
+
+                const reqHeaders = {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                };
+                if (header && token) {
+                    reqHeaders[header] = token;
+                }
+
                 try {
-                    const formData = new URLSearchParams();
-                    formData.append("status", targetStatus);
-
                     const res = await fetch(`/admin/tasks/${taskId}/status`, {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                            [csrfHeader]: csrfToken
-                        },
+                        headers: reqHeaders,
                         body: formData.toString()
                     });
-                    const json = await res.json();
-                    if (json.success) {
-                        showToast(`Task moved to ${targetStatus.replace('_', ' ')}`);
-                    } else {
-                        showToast(json.message || "Could not move task", "error");
+
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        let errMsg = `Server returned ${res.status}`;
+                        try {
+                            const errJson = JSON.parse(errText);
+                            if (errJson.message) errMsg = errJson.message;
+                        } catch(ign) {}
+                        throw new Error(errMsg);
                     }
+
+                    const json = await res.json();
+                    if (!json.success) {
+                        throw new Error(json.message || "Failed to update task status");
+                    }
+
+                    // Confirmed successfully saved in backend
+                    if (targetStatus === "APPROVED") {
+                        showToast("Task approved and completed!");
+                    } else if (targetStatus === "TODO") {
+                        showToast("Task moved to To Do");
+                    } else {
+                        showToast(`Task moved to ${targetStatus.replace(/_/g, ' ')}`);
+                    }
+
+                    if (json.progress !== undefined && fill && lbl) {
+                        fill.style.width = json.progress + "%";
+                        if (json.progress >= 100) fill.classList.add("complete"); else fill.classList.remove("complete");
+                        lbl.textContent = json.progress + "%";
+                    }
+
                 } catch (err) {
-                    console.error(err);
-                    showToast("Error updating task status", "error");
+                    console.error("Drop save error:", err);
+                    // Revert visually on failure so UI remains accurate
+                    if (originalContainer && draggedCard) {
+                        originalContainer.appendChild(draggedCard);
+                        draggedCard.dataset.status = originalStatus;
+                        updateColumnCounters();
+                        updateEmptyStates();
+                    }
+                    showToast(err.message || "Could not move task", "error");
                 }
             });
         });
@@ -2961,9 +3409,32 @@
 
     function updateColumnCounters() {
         ["TODO", "IN_PROGRESS", "READY_FOR_REVIEW", "APPROVED"].forEach(st => {
-            const count = document.querySelectorAll(`.cards-container[data-drop-status="${st}"] .task-card`).length;
+            const container = document.querySelector(`.cards-container[data-drop-status="${st}"]`);
+            const count = container ? container.querySelectorAll(".task-card").length : 0;
             const badge = document.getElementById("count-" + st);
             if (badge) badge.textContent = count;
+        });
+    }
+
+    function updateEmptyStates() {
+        document.querySelectorAll(".cards-container").forEach(c => {
+            const hasCards = c.querySelectorAll(".task-card").length > 0;
+            let empty = c.querySelector(".empty-column-state");
+            if (hasCards) {
+                if (empty) empty.style.display = "none";
+            } else {
+                if (!empty) {
+                    empty = document.createElement("div");
+                    empty.className = "empty-column-state";
+                    const st = c.dataset.dropStatus || "";
+                    empty.textContent = st === "TODO" ? "No tasks to do" :
+                                        st === "IN_PROGRESS" ? "No tasks in progress" :
+                                        st === "READY_FOR_REVIEW" ? "No tasks under review" :
+                                        "No completed tasks";
+                    c.appendChild(empty);
+                }
+                empty.style.display = "block";
+            }
         });
     }
 
@@ -2997,6 +3468,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         initDragAndDrop();
         updateColumnCounters();
+        updateEmptyStates();
 
         // Close popover on outside click
         document.addEventListener("click", function (e) {

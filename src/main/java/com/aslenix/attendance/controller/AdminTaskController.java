@@ -270,14 +270,26 @@ public class AdminTaskController {
     // ADMIN DRAG & DROP TASK STATUS
     // ============================================================
 
-    @PostMapping("/{id}/status")
+    @PostMapping(value = {"/{id}/status", "/{id}/move"})
     @ResponseBody
     public ResponseEntity<?> updateTaskStatus(
             @PathVariable Long id,
-            @RequestParam String status) {
+            @RequestParam(required = false) String status,
+            @RequestBody(required = false) Map<String, Object> body) {
 
         try {
-            Task task = taskService.moveTaskByAdmin(id, status);
+            String targetStatus = status;
+            if ((targetStatus == null || targetStatus.trim().isEmpty()) && body != null && body.containsKey("status")) {
+                targetStatus = Objects.toString(body.get("status"), null);
+            }
+            if (targetStatus == null || targetStatus.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Status is required."
+                ));
+            }
+
+            Task task = taskService.moveTaskByAdmin(id, targetStatus.trim());
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Task status updated successfully.",
@@ -287,7 +299,7 @@ public class AdminTaskController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", e.getMessage()
+                    "message", e.getMessage() != null ? e.getMessage() : "Error updating task status"
             ));
         }
     }
@@ -297,11 +309,73 @@ public class AdminTaskController {
     // ============================================================
 
     @PostMapping("/{id}/approve")
-    public String approveTask(
+    @ResponseBody
+    public ResponseEntity<?> approveTask(
             @PathVariable Long id,
             @RequestParam(required = false) String reviewComment) {
-        taskService.approveTask(id, reviewComment);
-        return "redirect:/admin/tasks";
+        try {
+            Task task = taskService.approveTask(id, reviewComment);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Task approved successfully.",
+                    "status", task.getStatus(),
+                    "progress", task.getProgress()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to approve task."
+            ));
+        }
+    }
+
+    @PostMapping("/{id}/progress")
+    @ResponseBody
+    public ResponseEntity<?> updateProgress(
+            @PathVariable Long id,
+            @RequestParam Integer progress) {
+        try {
+            if (progress == null || progress < 0 || progress > 100) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Progress must be between 0 and 100."
+                ));
+            }
+            Task task = taskService.getTask(id);
+            task.setProgress(progress);
+            if (progress == 0) {
+                task.setStatus("TODO");
+            } else if (progress >= 100) {
+                task.setProgress(100);
+            }
+            task = taskService.updateTask(
+                    id,
+                    task.getTitle(),
+                    task.getDescription(),
+                    task.getAssignees() != null ? new ArrayList<>(task.getAssignees()) : List.of(),
+                    task.getStatus(),
+                    task.getPriority(),
+                    task.getComplexity(),
+                    progress,
+                    task.getDueDate(),
+                    task.getDeadline(),
+                    task.getDeadlineBs(),
+                    task.getDeadlineTime(),
+                    task.getTags()
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Progress updated.",
+                    "progress", task.getProgress(),
+                    "status", task.getStatus()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to update progress."
+            ));
+        }
     }
 
     @PostMapping("/{id}/reject")

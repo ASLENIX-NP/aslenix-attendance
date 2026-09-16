@@ -78,6 +78,60 @@ public class EmployeeTaskController {
     }
 
     // ============================================================
+    // UPDATE TASK (From Modal)
+    // ============================================================
+
+    @PostMapping("/{id}/update")
+    @ResponseBody
+    public ResponseEntity<?> updateTask(
+            @PathVariable Long id,
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "MEDIUM") String priority,
+            @RequestParam(defaultValue = "MEDIUM") String complexity,
+            @RequestParam(required = false) Integer progress,
+            @RequestParam(required = false) String deadlineBs,
+            @RequestParam(required = false) String deadlineTime,
+            @RequestParam(required = false) String tags,
+            Authentication authentication) {
+
+        Employee employee = getCurrentEmployee(authentication);
+        if (employee == null) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Unauthorized"));
+        }
+
+        try {
+            Task task = taskService.updateTaskByEmployee(
+                    id,
+                    employee,
+                    title,
+                    description,
+                    status,
+                    priority,
+                    complexity,
+                    progress,
+                    deadlineBs,
+                    deadlineTime,
+                    tags
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Task updated successfully.",
+                    "task", buildTaskJsonMap(task)
+            ));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to update task."
+            ));
+        }
+    }
+
+    // ============================================================
     // UPDATE PROGRESS
     // ============================================================
 
@@ -163,11 +217,12 @@ public class EmployeeTaskController {
     // DRAG & DROP MOVE
     // ============================================================
 
-    @PostMapping("/{id}/move")
+    @PostMapping(value = {"/{id}/move", "/{id}/status"})
     @ResponseBody
     public ResponseEntity<Map<String, Object>> moveTask(
             @PathVariable Long id,
-            @RequestParam String status,
+            @RequestParam(required = false) String status,
+            @RequestBody(required = false) Map<String, Object> body,
             Authentication authentication) {
 
         Map<String, Object> response = new HashMap<>();
@@ -180,7 +235,17 @@ public class EmployeeTaskController {
                 return ResponseEntity.status(401).body(response);
             }
 
-            Task task = taskService.moveTask(id, employee, status);
+            String targetStatus = status;
+            if ((targetStatus == null || targetStatus.trim().isEmpty()) && body != null && body.containsKey("status")) {
+                targetStatus = Objects.toString(body.get("status"), null);
+            }
+            if (targetStatus == null || targetStatus.trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Status is required.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            Task task = taskService.moveTask(id, employee, targetStatus.trim());
 
             response.put("success", true);
             response.put("message", "Task moved successfully.");

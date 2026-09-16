@@ -220,6 +220,55 @@ public class TaskService {
     }
 
     // ============================================================
+    // UPDATE TASK (Employee Self-Edit)
+    // ============================================================
+
+    public Task updateTaskByEmployee(
+            Long id,
+            Employee employee,
+            String title,
+            String description,
+            String status,
+            String priority,
+            String complexity,
+            Integer progress,
+            String deadlineBs,
+            String deadlineTime,
+            String tags
+    ) {
+        Task task = getTask(id);
+        verifyEmployeeOwnership(task, employee);
+
+        // Security check: Title, description, complexity, priority, and deadlines
+        // are restricted to Administrator edits only. Existing values are preserved.
+
+        if (status != null && !status.trim().isEmpty()) {
+            String normStatus = status.trim().toUpperCase();
+            if (normStatus.equals("UNDER_REVIEW")) normStatus = "READY_FOR_REVIEW";
+            if (!"APPROVED".equals(normStatus) && !"COMPLETED".equals(normStatus)) {
+                task.setStatus(normStatus);
+            }
+        }
+
+        if (progress != null) {
+            int p = Math.max(0, Math.min(100, progress));
+            task.setProgress(p);
+            if (p >= 100 && !"APPROVED".equals(task.getStatus())) {
+                task.setStatus("READY_FOR_REVIEW");
+                if (task.getCompletedAt() == null) task.setCompletedAt(LocalDateTime.now());
+            } else if (p == 0 && !"APPROVED".equals(task.getStatus())) {
+                task.setStatus("TODO");
+            } else if (p > 0 && !"APPROVED".equals(task.getStatus()) && !"READY_FOR_REVIEW".equals(task.getStatus())) {
+                task.setStatus("IN_PROGRESS");
+            }
+        }
+
+        task.setUpdatedAt(LocalDateTime.now());
+
+        return taskRepository.save(task);
+    }
+
+    // ============================================================
     // WORK ASSIGNMENTS (Sub-tasks)
     // ============================================================
 
