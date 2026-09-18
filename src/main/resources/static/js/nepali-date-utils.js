@@ -463,7 +463,9 @@
                     const inst = adInput.nepaliDatePicker({
                         ndpYear: true,
                         ndpMonth: true,
-                        ndpYearCount: 20
+                        ndpYearCount: 20,
+                        language: "english",
+                        unicodeDate: false
                     });
                     bindDatePickerInteractions(adInput, inst);
                 }
@@ -513,6 +515,8 @@
                     ndpYear: true,
                     ndpMonth: true,
                     ndpYearCount: 100,
+                    language: "english",
+                    unicodeDate: false,
                     onChange: function () {
                         syncBsToAd(bsInput, adInput);
                     }

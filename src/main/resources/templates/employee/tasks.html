@@ -21,6 +21,7 @@
     <script src="/js/nepali-date-utils.js"></script>
 
 
+    <link rel="stylesheet" href="/css/aslenix-theme.css">
     <style>
         /* =====================================================
            RESET & CORE VARIABLES
@@ -69,211 +70,246 @@
         ===================================================== */
         .sidebar {
             position: fixed;
-            top: 0;
             left: 0;
+            top: 0;
+            bottom: 0;
             width: 250px;
-            height: 100vh;
+            padding: 23px 14px 18px;
+            display: flex;
+            flex-direction: column;
             background: #ffffff;
-            border-right: 1px solid #e8edf6;
-            display: flex;
-            flex-direction: column;
+            border-right: 1px solid #e4e9f3;
+            box-shadow: 4px 0 24px rgba(15, 23, 42, 0.05);
             z-index: 1000;
-            box-shadow: 2px 0 16px rgba(25, 35, 65, 0.045);
-        }
-
-        .sidebar-section-title {
-            padding: 22px 20px 10px;
-            font-size: 11px;
-            font-weight: 850;
-            letter-spacing: 1.1px;
-            text-transform: uppercase;
-            color: #8a96aa;
-        }
-
-        .sidebar-menu {
-            padding: 0 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
             overflow-y: auto;
         }
 
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 99px;
+        }
+
+        .brand {
+            height: 78px;
+            margin-bottom: 25px;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background: transparent;
+        }
+
+        .brand img {
+            display: block;
+            width: auto;
+            height: 52px;
+            max-width: 175px;
+            object-fit: contain;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            transition: transform .25s ease, opacity .25s ease;
+        }
+
+        .brand img:hover {
+            transform: scale(1.04);
+            opacity: .92;
+        }
+
+        .sidebar-section-title {
+            padding: 0 13px;
+            margin-bottom: 10px;
+            color: #a0a9bc;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
         .sidebar-link {
+            position: relative;
+            width: 100%;
+            min-height: 59px;
+            padding: 10px 11px;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            color: #5a667d;
-            transition: all 0.2s ease;
-            position: relative;
-            font-size: 13px;
-            font-weight: 600;
+            border-radius: 11px;
+            color: #536078;
+            background: transparent;
+            text-decoration: none;
+            transition: background .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
         }
 
         .sidebar-link:hover {
+            background: #f7f8fc;
             color: #4f46e5;
-            background: #f8fafc;
             transform: translateX(2px);
         }
 
         .sidebar-link.active {
-            color: #4f46e5;
+            color: #4338ca;
             background: #eef2ff;
-            font-weight: 750;
+            box-shadow: 0 2px 10px rgba(83, 101, 223, 0.09);
+            transform: none;
         }
 
         .sidebar-link.active::before {
-            content: '';
+            content: "";
             position: absolute;
             left: 0;
-            top: 8px;
-            bottom: 8px;
+            top: 10px;
+            bottom: 10px;
             width: 3.5px;
-            border-radius: 0 4px 4px 0;
-            background: #4f46e5;
+            border-radius: 0 6px 6px 0;
+            background: linear-gradient(180deg, #4f46e5, #6366f1, #8b5cf6);
+            box-shadow: 0 2px 10px rgba(104, 69, 220, 0.28);
         }
 
         .sidebar-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 9px;
+            width: 37px;
+            height: 37px;
+            flex: 0 0 37px;
             display: grid;
             place-items: center;
-            background: #f4f6fa;
-            color: #6b778d;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
+            border-radius: 9px;
+            background: #f4f6fb;
+            color: #68748b;
+            transition: background .2s ease, color .2s ease, transform .2s ease;
         }
 
-        .sidebar-link:hover .sidebar-icon,
+        .sidebar-link:hover .sidebar-icon {
+            background: #e9edff;
+            color: #5364e8;
+        }
+
         .sidebar-link.active .sidebar-icon {
-            background: #ffffff;
+            background: linear-gradient(135deg, #eeeaff, #eaf1ff);
             color: #4f46e5;
-            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 3px 8px rgba(83, 101, 223, 0.08);
         }
 
         .sidebar-icon svg {
-            width: 17px;
-            height: 17px;
-            stroke: currentColor;
+            width: 18px;
+            height: 18px;
             fill: none;
-            stroke-width: 1.8;
+            stroke: currentColor;
+            stroke-width: 1.9;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
 
         .sidebar-text {
+            min-width: 0;
             display: flex;
             flex-direction: column;
-            min-width: 0;
+            gap: 2px;
         }
 
         .sidebar-text strong {
+            color: inherit;
             font-size: 13px;
             font-weight: 700;
-            color: #202a44;
-            line-height: 1.25;
+            white-space: nowrap;
         }
 
         .sidebar-text span {
-            font-size: 10.5px;
-            color: #8a96aa;
-            margin-top: 1px;
-            line-height: 1.2;
+            color: #a1aabd;
+            font-size: 10px;
+            white-space: nowrap;
         }
 
         .sidebar-link.active .sidebar-text strong {
-            color: #4f46e5;
+            color: #4338ca;
+        }
+
+        .sidebar-link.active .sidebar-text span {
+            color: #858fb0;
         }
 
         .sidebar-bottom {
-            padding: 16px 20px;
-            border-top: 1px solid #edf1f8;
             margin-top: auto;
+            padding: 14px 8px 4px;
         }
 
         .sidebar-bottom-logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 9px;
+            padding: 11px 10px;
+            border-radius: 11px;
+            background: linear-gradient(110deg, #f7f8fc 0%, #f2f4fb 100%);
+            border: 1px solid #e8ecf4;
         }
 
         .sidebar-bottom-logo img {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            object-fit: cover;
+            width: auto;
+            height: 30px;
+            max-width: 30px;
+            object-fit: contain;
+        }
+
+        .sidebar-bottom-logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
         }
 
         .sidebar-brand-title {
-            font-size: 13.5px;
-            font-weight: 850;
-            letter-spacing: 0.8px;
-            background: linear-gradient(135deg, #0f172a 0%, #4f46e5 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: .8px;
+        }
+
+        .sidebar-gradient-line {
+            width: 30px;
+            height: 2px;
+            margin-top: 9px;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #4f46e5, #6366f1, #8b5cf6);
         }
 
         /* =====================================================
            TOP HEADER
         ===================================================== */
         .top-header {
+            position: sticky;
+            top: 0;
             height: 70px;
-            background: #ffffff;
-            border-bottom: 1px solid #e8edf6;
+            padding: 0 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 32px;
-            position: sticky;
-            top: 0;
+            gap: 25px;
+            background: rgba(255, 255, 255, .92);
+            border-bottom: 1px solid rgba(228, 233, 245, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 2px 12px rgba(25, 35, 65, 0.045);
             z-index: 900;
-            box-shadow: 0 2px 10px rgba(25, 35, 65, 0.02);
-        }
-
-        .header-search {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #f4f6fa;
-            border: 1px solid #e2e8f0;
-            padding: 8px 16px;
-            border-radius: 12px;
-            width: 320px;
-            transition: all 0.2s ease;
-        }
-
-        .header-search:focus-within {
-            background: #ffffff;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-        }
-
-        .header-search svg {
-            width: 16px;
-            height: 16px;
-            color: #94a3b8;
-            flex-shrink: 0;
-        }
-
-        .header-search input {
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 13px;
-            color: #0f172a;
-            width: 100%;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 16px;
+            justify-content: flex-end;
+            gap: 18px;
+            min-width: 0;
+            margin-left: auto;
         }
 
-        /* NOTIFICATIONS */
         .notification-wrapper {
             position: relative;
         }
@@ -386,165 +422,335 @@
             font-weight: 850;
         }
 
-        .notification-mark-all {
-            border: none;
-            background: transparent;
-            color: #4f46e5;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: background .15s ease;
+        .notification-header-count {
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 99px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-size: 8px;
+            font-weight: 850;
         }
 
-        .notification-mark-all:hover {
-            background: #eef2ff;
+        .notification-header-count.show {
+            display: inline-flex;
+        }
+
+        .mark-all-read-button {
+            padding: 6px 8px;
+            border-radius: 7px;
+            background: transparent;
+            color: #4f46e5;
+            font-size: 9px;
+            font-weight: 750;
+            cursor: pointer;
+            border: none;
+            transition: background .18s ease, color .18s ease;
+        }
+
+        .mark-all-read-button:hover {
+            background: #f2f4ff;
+        }
+
+        .mark-all-read-button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
         }
 
         .notification-dropdown-body {
-            max-height: 380px;
+            max-height: 420px;
             overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .notification-dropdown-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .notification-dropdown-body::-webkit-scrollbar-thumb {
+            background: #dce1eb;
+            border-radius: 99px;
         }
 
         .notification-item {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f1f5f9;
+            position: relative;
+            width: 100%;
+            padding: 14px 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            background: #ffffff;
+            border: 0;
+            border-bottom: 1px solid #f0f2f6;
+            text-align: left;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: background .18s ease;
         }
 
-        .notification-item:hover { background: #f8fafc; }
-        .notification-item.unread { background: #eff6ff; }
-        .notification-title { font-size: 12.5px; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
-        .notification-text { font-size: 11.5px; color: #64748b; line-height: 1.4; }
-        .notification-time { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-        .notification-loading, .notification-empty { padding: 24px; text-align: center; color: #94a3b8; font-size: 12px; }
+        .notification-item:hover {
+            background: #f8f9fd;
+        }
 
-        .header-date {
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item.unread {
+            background: #fcfaff;
+        }
+
+        .notification-item.unread:hover {
+            background: #f8f4ff;
+        }
+
+        .notification-item.unread::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 13px;
+            bottom: 13px;
+            width: 3px;
+            border-radius: 0 4px 4px 0;
+            background: linear-gradient(180deg, #4f46e5, #6366f1, #8b5cf6);
+        }
+
+        .notification-item-icon {
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: #eef1ff;
+            color: #4f46e5;
+        }
+
+        .notification-item-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .notification-item-content {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .notification-item-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .notification-item-title {
+            color: #27314b;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .notification-item.unread .notification-item-title {
+            color: #0f172a;
+        }
+
+        .notification-item-time {
+            flex-shrink: 0;
+            color: #a0a8b8;
+            font-size: 8px;
+            font-weight: 650;
+            white-space: nowrap;
+        }
+
+        .notification-item-message {
+            margin-top: 4px;
+            color: #7e899e;
+            font-size: 9px;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+
+        .notification-loading {
+            padding: 35px 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 7px 14px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 12px;
+            justify-content: center;
+            gap: 9px;
+            color: #8c96a9;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .notification-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #e5e8f0;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: notificationSpin .7s linear infinite;
+        }
+
+        @keyframes notificationSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification-empty {
+            padding: 38px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: #8c96a9;
+            font-size: 11px;
             font-weight: 600;
-            color: #475569;
         }
 
-        .header-date svg {
-            width: 15px;
-            height: 15px;
-            color: #6366f1;
+        .profile-wrapper {
+            position: relative;
         }
 
-        .profile-wrapper { position: relative; }
         .profile {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 6px 14px 6px 8px;
-            border-radius: 12px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            gap: 9px;
+            padding-left: 4px;
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .profile:hover {
-            background: #ffffff;
-            border-color: #cbd5e1;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 0;
+            background: transparent;
+            font: inherit;
+            color: inherit;
+            padding: 0;
         }
 
         .profile-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 12.5px;
+            width: 36px;
+            height: 36px;
             display: grid;
             place-items: center;
-            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.35);
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6846d9, #394fe1);
+            box-shadow: 0 4px 12px rgba(70, 70, 190, .16);
         }
 
         .profile-info {
             display: flex;
             flex-direction: column;
+            gap: 2px;
             text-align: left;
         }
 
         .profile-name {
-            font-size: 12.5px;
-            font-weight: 750;
-            color: #1e293b;
-            line-height: 1.2;
+            color: #1b2440;
+            font-size: 11px;
+            font-weight: 800;
         }
 
         .profile-role {
-            font-size: 10.5px;
-            font-weight: 600;
-            color: #64748b;
+            color: #929caf;
+            font-size: 9px;
         }
 
         .profile-dropdown {
             position: absolute;
-            top: calc(100% + 8px);
+            top: calc(100% + 10px);
             right: 0;
-            width: 200px;
+            width: 190px;
+            padding: 7px;
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 6px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            display: none;
-            z-index: 1000;
+            border: 1px solid #e8edf4;
+            border-radius: 11px;
+            box-shadow: 0 12px 30px rgba(35, 48, 85, .12);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-7px);
+            transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
         }
 
-        .profile-dropdown.show { display: block; }
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
         .profile-dropdown-item {
+            width: 100%;
+            min-height: 40px;
+            padding: 0 11px;
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 12px;
-            font-size: 12.5px;
-            font-weight: 600;
-            color: #334155;
             border-radius: 8px;
-            transition: all 0.15s;
-            cursor: pointer;
-            border: none;
             background: transparent;
-            width: 100%;
+            color: #4d5870;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
             text-align: left;
+            border: none;
+            transition: background .18s ease, color .18s ease;
         }
 
         .profile-dropdown-item:hover {
-            background: #f1f5f9;
-            color: #0f172a;
+            background: #f5f7fb;
+            color: #4f46e5;
         }
 
         .profile-dropdown-item svg {
-            width: 15px;
-            height: 15px;
-            color: #64748b;
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
         }
 
         .profile-dropdown-divider {
             height: 1px;
-            background: #e2e8f0;
-            margin: 4px 0;
+            margin: 5px 4px;
+            background: #edf0f5;
         }
 
-        .logout-item { color: #ef4444; }
-        .logout-item svg { color: #ef4444; }
-        .logout-item:hover {
-            background: #fef2f2;
-            color: #dc2626;
+        .logout-form {
+            margin: 0;
+            padding: 0;
+        }
+
+        .logout-item {
+            border: 0;
+            font-family: inherit;
+        }
+
+        .header-date {
+            height: 35px;
+            padding-left: 17px;
+            border-left: 1px solid #e8edf4;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #59657b;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .header-date svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         /* =====================================================
@@ -2082,12 +2288,15 @@
             z-index: 100060 !important;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             background: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            border-radius: 14px !important;
-            box-shadow: 0 24px 50px -10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(226, 232, 240, 0.8) !important;
-            padding: 10px !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 16px !important;
+            box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.9) !important;
+            padding: 14px 16px !important;
             color: #0f172a !important;
-            max-width: 290px !important;
+            width: 320px !important;
+            max-width: 95vw !important;
+            box-sizing: border-box !important;
+            user-select: none !important;
         }
 
         .ndp-container.ndp-light,
@@ -2096,26 +2305,49 @@
         }
 
         .ndp-container .ndp-header {
-            padding: 6px 4px 10px !important;
-            border-bottom: 1px solid #f1f5f9 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            gap: 4px !important;
+            padding: 2px 2px 10px 2px !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            margin-bottom: 8px !important;
+            gap: 6px !important;
         }
 
         .ndp-container .ndp-header .ndp-header-link {
-            font-weight: 750 !important;
-            font-size: 13.5px !important;
-            color: #1e293b !important;
-            border-radius: 8px !important;
-            padding: 6px 10px !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            color: #0f172a !important;
+            border-radius: 10px !important;
+            padding: 6px 12px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
             transition: all 0.15s ease !important;
+            text-decoration: none !important;
+            background: #f8fafc !important;
+            border: 1px solid #f1f5f9 !important;
         }
 
         .ndp-container .ndp-header .ndp-header-link:hover {
-            background: #f1f5f9 !important;
-            color: #4f46e5 !important;
+            background: #eef2ff !important;
+            color: #4338ca !important;
+            border-color: #c7d2fe !important;
+        }
+
+        .ndp-container .ndp-header-display {
+            font-size: 13.5px !important;
+            font-weight: 700 !important;
+            line-height: 1.3 !important;
+        }
+
+        .ndp-container .ndp-header-display-english {
+            font-size: 10.5px !important;
+            font-weight: 500 !important;
+            color: #64748b !important;
+            margin-top: 1px !important;
         }
 
         .ndp-container .ndc-nav-button {
@@ -2129,22 +2361,33 @@
             align-items: center !important;
             justify-content: center !important;
             transition: all 0.15s ease !important;
+            color: #475569 !important;
+            text-decoration: none !important;
         }
 
-        .ndp-container .ndc-nav-button:hover {
+        .ndp-container .ndc-nav-button:hover:not(.ndp-disabled) {
             background: #eef2ff !important;
             border-color: #c7d2fe !important;
             color: #4f46e5 !important;
         }
 
+        .ndp-container .ndc-nav-button.ndp-disabled {
+            opacity: 0.35 !important;
+            cursor: not-allowed !important;
+            border-color: #f1f5f9 !important;
+            background: #fafafa !important;
+        }
+
         .ndp-container .ndp-table {
-            margin-top: 6px !important;
             width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 4px !important;
+            margin-top: 4px !important;
         }
 
         .ndp-container .ndp-table th {
             font-size: 11px !important;
-            font-weight: 750 !important;
+            font-weight: 700 !important;
             text-transform: uppercase !important;
             letter-spacing: 0.5px !important;
             color: #64748b !important;
@@ -2152,62 +2395,117 @@
             text-align: center !important;
         }
 
+        .ndp-container .ndp-table th:nth-child(7) {
+            color: #ef4444 !important;
+        }
+
         .ndp-container .ndp-table td {
-            width: 34px !important;
-            height: 32px !important;
+            width: 36px !important;
+            height: 34px !important;
             font-size: 13px !important;
-            font-weight: 550 !important;
+            font-weight: 600 !important;
             color: #1e293b !important;
             border-radius: 8px !important;
             text-align: center !important;
             transition: all 0.12s ease !important;
             cursor: pointer !important;
+            vertical-align: middle !important;
+            border: 1px solid transparent !important;
+            background: transparent !important;
         }
 
-        .ndp-container .ndp-table td:hover:not(.ndp-disabled) {
+        .ndp-container .ndp-table td:nth-child(7):not(.ndp-selected):not(.ndp-disabled) {
+            color: #dc2626 !important;
+        }
+
+        .ndp-container .ndp-table td:hover:not(.ndp-disabled):not(.ndp-selected) {
             background: #eef2ff !important;
-            color: #4f46e5 !important;
+            color: #4338ca !important;
+            border-color: #c7d2fe !important;
             font-weight: 700 !important;
         }
 
-        .ndp-container .ndp-table td.ndp-selected {
-            background: #4f46e5 !important;
-            color: #ffffff !important;
-            font-weight: 750 !important;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35) !important;
-        }
-
-        .ndp-container .ndp-table td.ndp-today {
+        .ndp-container .ndp-table td.ndp-today:not(.ndp-selected) {
             color: #4f46e5 !important;
             font-weight: 800 !important;
             border: 1.5px solid #818cf8 !important;
+            background: #faf5ff !important;
+        }
+
+        .ndp-container .ndp-table td.ndp-selected {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+            color: #ffffff !important;
+            font-weight: 750 !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35) !important;
+            border: 1px solid #4338ca !important;
+        }
+
+        .ndp-container .ndp-table td.ndp-disabled {
+            color: #cbd5e1 !important;
+            cursor: not-allowed !important;
+            background: transparent !important;
         }
 
         .ndp-container .ndp-month-selection,
         .ndp-container .ndp-year-selection {
-            padding: 8px !important;
-            gap: 6px !important;
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8px !important;
+            padding: 10px 0 !important;
+            min-height: 210px !important;
+            align-content: start !important;
         }
 
         .ndp-container .ndp-month-button,
         .ndp-container .ndp-year-button {
-            border-radius: 8px !important;
-            font-size: 13px !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 9px 6px !important;
+            box-sizing: border-box !important;
+            font-size: 12.5px !important;
             font-weight: 600 !important;
-            padding: 8px 10px !important;
+            border-radius: 8px !important;
+            border: 1px solid #e2e8f0 !important;
+            background: #f8fafc !important;
+            color: #1e293b !important;
+            cursor: pointer !important;
+            text-align: center !important;
+            text-decoration: none !important;
             transition: all 0.15s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
-        .ndp-container .ndp-month-button:hover,
-        .ndp-container .ndp-year-button:hover {
+        .ndp-container .ndp-month-button:hover:not(.ndp-selected):not(.ndp-disabled),
+        .ndp-container .ndp-year-button:hover:not(.ndp-selected):not(.ndp-disabled) {
             background: #eef2ff !important;
+            border-color: #c7d2fe !important;
+            color: #4338ca !important;
+        }
+
+        .ndp-container .ndp-month-button.ndp-current:not(.ndp-selected),
+        .ndp-container .ndp-year-button.ndp-current:not(.ndp-selected) {
             color: #4f46e5 !important;
+            border-color: #a5b4fc !important;
+            font-weight: 700 !important;
         }
 
         .ndp-container .ndp-month-button.ndp-selected,
         .ndp-container .ndp-year-button.ndp-selected {
-            background: #4f46e5 !important;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+            border-color: #4338ca !important;
             color: #ffffff !important;
+            font-weight: 750 !important;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3) !important;
+        }
+
+        .ndp-container .ndp-month-button.ndp-disabled,
+        .ndp-container .ndp-year-button.ndp-disabled {
+            opacity: 0.35 !important;
+            cursor: not-allowed !important;
+            background: #fafafa !important;
+            border-color: #f1f5f9 !important;
         }
 
 
@@ -2641,23 +2939,22 @@
                 </div>
             </a>
 
-            <!-- Profile -->
-            <a th:href="@{/employee/profile}" class="sidebar-link">
-                <div class="sidebar-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                </div>
-                <div class="sidebar-text">
-                    <strong>My Profile</strong>
-                    <span>Employee information</span>
-                </div>
-            </a>
+            
         </nav>
 
+        <!-- =================================================
+        SIDEBAR BOTTOM BRAND
+    ================================================== -->
         <div class="sidebar-bottom">
             <div class="sidebar-bottom-logo">
                 <img th:src="@{/images/logo1.jpeg}" src="/images/logo1.jpeg" alt="ASLENIX">
-                <div class="sidebar-brand-title">ASLENIX</div>
+                <div class="sidebar-bottom-logo-text">
+                    <div class="sidebar-brand-title">
+                        ASLENIX
+                    </div>
+                </div>
             </div>
+            <div class="sidebar-gradient-line"></div>
         </div>
     </aside>
 
@@ -2668,71 +2965,91 @@
 
         <!-- TOP HEADER -->
         <header class="top-header">
-            <!-- Header Search -->
-            <div class="header-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="boardSearchInput" placeholder="Search my tasks...">
-            </div>
-
             <div class="header-right">
-                <!-- Notifications -->
+
+                <!-- NOTIFICATIONS -->
                 <div class="notification-wrapper">
-                    <button type="button" class="notification-button" id="notificationButton" aria-label="Notifications" aria-expanded="false">
-                        <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
+                    <button type="button" class="notification-button" id="notificationButton"
+                        aria-label="Notifications" aria-expanded="false">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                            <path d="M10 21h4"></path>
+                        </svg>
                         <span class="notification-dot" id="notificationDot"></span>
                     </button>
 
-                    <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-dropdown" id="notificationDropdown" aria-hidden="true">
                         <div class="notification-dropdown-header">
                             <div class="notification-header-title">
                                 <strong>Notifications</strong>
+                                <span class="notification-header-count" id="notificationHeaderCount">0</span>
                             </div>
-                            <button type="button" class="notification-mark-all" id="markAllReadButton">Mark all as read</button>
+                            <button type="button" class="mark-all-read-button" id="markAllReadButton" disabled>
+                                Mark all as read
+                            </button>
                         </div>
                         <div class="notification-dropdown-body" id="notificationDropdownBody">
                             <div class="notification-loading">
+                                <div class="notification-spinner"></div>
                                 <span>Loading notifications...</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Live Nepali BS Date -->
-                <div class="header-date">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    <span id="headerBsDate">Loading date...</span>
-                </div>
-
-                <!-- Profile Menu (Arrow removed as requested) -->
+                <!-- PROFILE -->
                 <div class="profile-wrapper">
-                    <button type="button" class="profile" id="profileButton">
-                        <div class="profile-avatar"
-                             th:text="${employee != null and employee.firstName != null and !employee.firstName.isEmpty() ? employee.firstName.substring(0,1).toUpperCase() : 'E'}">
+                    <button type="button" class="profile" id="profileButton" aria-label="Open profile menu"
+                        aria-expanded="false">
+                        <div class="profile-avatar" th:text="${employee != null and employee.firstName != null and !employee.firstName.isEmpty()
+                    ? employee.firstName.substring(0,1).toUpperCase()
+                    : 'E'}">
                             E
                         </div>
                         <div class="profile-info">
-                            <div class="profile-name"
-                                 th:text="${employee != null ? (employee.firstName + ' ' + (employee.lastName != null ? employee.lastName : '')) : 'Employee'}">
+                            <div class="profile-name" th:text="${employee != null ? (employee.firstName + ' ' + (employee.lastName != null ? employee.lastName : '')) : 'Employee'}">
                                 Employee
                             </div>
-                            <div class="profile-role">Employee Portal</div>
+                            <div class="profile-role">
+                                Employee Portal
+                            </div>
                         </div>
                     </button>
 
                     <div class="profile-dropdown" id="profileDropdown">
                         <a th:href="@{/employee/profile}" class="profile-dropdown-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path>
+                            </svg>
                             <span>Profile</span>
                         </a>
                         <div class="profile-dropdown-divider"></div>
-                        <form th:action="@{/logout}" method="post">
+                        <form th:action="@{/logout}" method="post" class="logout-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                             <button type="submit" class="profile-dropdown-item logout-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path><path d="M21 19V5a2 2 0 0 0-2-2h-6"></path></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M10 17l5-5-5-5"></path>
+                                    <path d="M15 12H3"></path>
+                                    <path d="M21 19V5a2 2 0 0 0-2-2h-6"></path>
+                                </svg>
                                 <span>Logout</span>
                             </button>
                         </form>
                     </div>
                 </div>
+
+                <!-- CURRENT DATE -->
+                <div class="header-date">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="17" rx="2"></rect>
+                        <path d="M16 2v4"></path>
+                        <path d="M8 2v4"></path>
+                        <path d="M3 10h18"></path>
+                    </svg>
+                    <span id="headerBsDate">Loading...</span>
+                </div>
+
             </div>
         </header>
 
@@ -2943,8 +3260,11 @@
         <!-- HEADER -->
         <div class="modal-header">
             <button type="button" class="modal-close-btn" onclick="closeTaskModal()" aria-label="Close modal">✕</button>
-            <h2 id="modalTaskTitleHeader">Edit Task</h2>
-            <p>Assign work, set complexity, and track effort-based progress for fair leaderboard scoring.</p>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <h2 id="modalTaskTitleHeader" style="margin: 0;">Assigned Task Details</h2>
+                <span class="admin-only-badge" style="background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">Assigned by Administrator</span>
+            </div>
+            <p>Review assigned scope, track progress, log deliverables, and submit for admin approval.</p>
         </div>
 
         <!-- TABS -->
@@ -3211,47 +3531,10 @@
                             <option value="UNDER_REVIEW">Under Review</option>
                             <option value="COMPLETED">Completed</option>
                             <option value="BLOCKED">Blocked</option>
-                        </select>
-                        <button type="button" class="btn-add-assignment" onclick="toggleInlineAssignmentForm()">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            Add Work Item
-                        </button>
-                    </div>
-
-                    <!-- Inline Assignment Form -->
-                    <div class="assignment-add-form" id="inlineAssignmentForm">
-                        <div style="font-size: 12px; font-weight: 750; color: #1e293b;">New Work Item</div>
-                        <input type="text" id="newAssignTitleInput" class="form-input" placeholder="Work item title (required)...">
-                        <textarea id="newAssignDescInput" class="form-textarea" placeholder="Detailed work item instructions / scope (optional)..." rows="2"></textarea>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                            <select id="newAssignEmployeeSelect" class="form-select">
-                                <option value="">Assign to task member...</option>
-                            </select>
-                            <select id="newAssignWeightSelect" class="form-select">
-                                <option value="SMALL">Small Effort</option>
-                                <option value="MEDIUM" selected>Medium Effort</option>
-                                <option value="LARGE">Large Effort</option>
-                                <option value="EPIC">Epic Effort</option>
-                            </select>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                            <div class="input-icon-group">
-                                <input type="text" id="newAssignDeadlineBsInput" class="form-input use-nepali-datepicker" placeholder="Deadline date (BS) e.g. 2083-05-20" autocomplete="off">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                <input type="hidden" id="newAssignDeadlineInput">
-                            </div>
-                            <div class="input-icon-group">
-                                <input type="time" id="newAssignDeadlineTimeInput" class="form-input" value="18:00">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px;">
-                            <button type="button" class="btn-cancel-modal" onclick="toggleInlineAssignmentForm(false)">Cancel</button>
-                            <button type="button" class="btn-add-assignment" onclick="submitNewAssignment()">Save Work Item</button>
-                        </div>
+                        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: #64748b; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 8px;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Admin-Assigned Work Items
+                        </span>
                     </div>
 
                     <!-- Work assignments list -->
@@ -3788,7 +4071,7 @@
             }
 
             // Fill Header & Info
-            document.getElementById("modalTaskTitleHeader").textContent = "Edit Task · " + (data.taskCode || "TASK");
+            document.getElementById("modalTaskTitleHeader").textContent = "Assigned Task · " + (data.taskCode || "TASK");
             document.getElementById("modalTitleInput").value = data.title || "";
             document.getElementById("modalDescriptionInput").value = data.description || "";
 
@@ -4328,10 +4611,6 @@
                             <option value="BLOCKED" ${a.status === 'BLOCKED' ? 'selected' : ''}>Blocked</option>
                             <option value="VERIFIED" ${a.status === 'VERIFIED' ? 'selected' : ''}>Verified</option>
                         </select>
-                        ${canEdit ? `
-                        <button type="button" class="btn-delete-assignment" onclick="deleteAssignmentItem(${a.id})" title="Delete work item">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>` : ''}
                     </div>
                 </div>
 
@@ -4383,60 +4662,10 @@
         } else {
             form.classList.toggle("show");
         }
-        if (form.classList.contains("show")) {
-            syncWorkItemAssigneeDropdown();
-            document.getElementById("newAssignTitleInput").focus();
-        }
     }
 
     async function submitNewAssignment() {
-        const taskId = document.getElementById("modalTaskId").value;
-        const title = document.getElementById("newAssignTitleInput").value.trim();
-        const desc = document.getElementById("newAssignDescInput") ? document.getElementById("newAssignDescInput").value.trim() : "";
-        const assigneeSelect = document.getElementById("newAssignEmployeeSelect");
-        const assigneeId = assigneeSelect ? assigneeSelect.value : "";
-        const weight = document.getElementById("newAssignWeightSelect").value;
-        const deadlineBs = document.getElementById("newAssignDeadlineBsInput") ? document.getElementById("newAssignDeadlineBsInput").value.trim() : "";
-        const deadlineTime = document.getElementById("newAssignDeadlineTimeInput") ? document.getElementById("newAssignDeadlineTimeInput").value.trim() : "";
-
-        if (!title) {
-            showToast("Please enter work item title.", "warning");
-            return;
-        }
-
-        const formData = new URLSearchParams();
-        formData.append("title", title);
-        if (desc) formData.append("description", desc);
-        if (assigneeId) formData.append("assigneeId", assigneeId);
-        formData.append("weight", weight);
-        if (deadlineBs) formData.append("deadlineBs", deadlineBs);
-        if (deadlineTime) formData.append("deadlineTime", deadlineTime);
-
-        try {
-            const res = await fetch(`/employee/tasks/${taskId}/assignments/add`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    [csrfHeader]: csrfToken
-                },
-                body: formData.toString()
-            });
-
-            const json = await res.json();
-            if (json.success) {
-                document.getElementById("newAssignTitleInput").value = "";
-                if (document.getElementById("newAssignDescInput")) document.getElementById("newAssignDescInput").value = "";
-                if (document.getElementById("newAssignDeadlineBsInput")) document.getElementById("newAssignDeadlineBsInput").value = "";
-                toggleInlineAssignmentForm(false);
-                openTaskModal(taskId);
-                showToast("Work item added.");
-            } else {
-                showToast(json.message || "Failed to add work item", "error");
-            }
-        } catch (e) {
-            console.error(e);
-            showToast("Error adding work item", "error");
-        }
+        showToast("Assigning tasks and work items can only be done by administrators.", "warning");
     }
 
     async function changeAssignmentStatus(assignmentId, newStatus) {
@@ -4466,22 +4695,7 @@
     }
 
     async function deleteAssignmentItem(assignmentId) {
-        const taskId = document.getElementById("modalTaskId").value;
-        if (!taskId || !confirm("Delete this work item?")) return;
-
-        try {
-            const res = await fetch(`/employee/tasks/${taskId}/assignments/${assignmentId}/delete`, {
-                method: "POST",
-                headers: { [csrfHeader]: csrfToken }
-            });
-            const json = await res.json();
-            if (json.success) {
-                openTaskModal(taskId);
-                showToast("Item deleted.");
-            }
-        } catch (e) {
-            console.error(e);
-        }
+        showToast("Removing work items can only be done by administrators.", "warning");
     }
 
     // =========================================================
@@ -4988,30 +5202,114 @@
     document.getElementById("complexityFilter").addEventListener("change", applyBoardFilters);
 
     // =========================================================
-    // NOTIFICATIONS SYSTEM
+    // NOTIFICATIONS & PROFILE SYSTEM (MIRRORED FROM DASHBOARD)
     // =========================================================
     const notificationButton = document.getElementById('notificationButton');
     const notificationDropdown = document.getElementById('notificationDropdown');
     const notificationDropdownBody = document.getElementById('notificationDropdownBody');
     const notificationDot = document.getElementById('notificationDot');
+    const notificationHeaderCount = document.getElementById('notificationHeaderCount');
     const markAllReadButton = document.getElementById('markAllReadButton');
 
+    function getNotificationIcon(type) {
+        const normalizedType = String(type || '').trim().toUpperCase();
+        if (normalizedType === 'SUCCESS') {
+            return `<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg>`;
+        }
+        if (normalizedType === 'ERROR') {
+            return `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>`;
+        }
+        if (normalizedType === 'WARNING') {
+            return `<svg viewBox="0 0 24 24"><path d="M12 3 2.8 20h18.4L12 3z"></path><path d="M12 9v4"></path><path d="M12 16h.01"></path></svg>`;
+        }
+        if (normalizedType === 'LEAVE') {
+            return `<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path><path d="M8 14h3"></path><path d="M8 18h2"></path></svg>`;
+        }
+        if (normalizedType === 'TASK') {
+            return `<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M8 8h8"></path><path d="m8 12 1.5 1.5L12 11"></path><path d="M13 13h3"></path></svg>`;
+        }
+        return `<svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>`;
+    }
+
+    function escapeHtml(value) {
+        if (value === null || value === undefined) return '';
+        const div = document.createElement('div');
+        div.textContent = String(value);
+        return div.innerHTML;
+    }
+
+    function showEmptyNotifications() {
+        if (!notificationDropdownBody) return;
+        notificationDropdownBody.innerHTML = `
+            <div class="notification-empty">
+                <div class="notification-empty-icon">
+                    <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
+                </div>
+                <div class="notification-empty-title">No notifications yet</div>
+                <div class="notification-empty-text">You are all caught up. New notifications will appear here.</div>
+            </div>`;
+    }
+
+    function showNotificationLoading() {
+        if (!notificationDropdownBody) return;
+        notificationDropdownBody.innerHTML = `
+            <div class="notification-loading">
+                <div class="notification-spinner"></div>
+                <span>Loading notifications...</span>
+            </div>`;
+    }
+
+    function showNotificationError() {
+        if (!notificationDropdownBody) return;
+        notificationDropdownBody.innerHTML = `
+            <div class="notification-error">
+                <div class="notification-error-title">Unable to load notifications</div>
+                <div class="notification-error-text">Please check your connection and try again.</div>
+                <button type="button" class="notification-retry-button" id="notificationRetryButton">Try again</button>
+            </div>`;
+        const retryButton = document.getElementById('notificationRetryButton');
+        if (retryButton) {
+            retryButton.addEventListener('click', function (e) {
+                e.stopPropagation();
+                loadNotifications();
+            });
+        }
+    }
+
     function updateUnreadBadge(count) {
-        if (!notificationDot) return;
-        if (count > 0) {
-            notificationDot.textContent = count > 99 ? '99+' : count;
-            notificationDot.classList.add('has-count');
-            notificationDot.style.display = 'flex';
-        } else {
-            notificationDot.textContent = '';
-            notificationDot.classList.remove('has-count');
-            notificationDot.style.display = 'none';
+        const safeCount = Number.isFinite(Number(count)) ? Math.max(0, Number(count)) : 0;
+        if (notificationDot) {
+            if (safeCount > 0) {
+                notificationDot.textContent = safeCount > 99 ? '99+' : String(safeCount);
+                notificationDot.classList.add('has-count');
+                notificationDot.style.display = 'flex';
+            } else {
+                notificationDot.textContent = '';
+                notificationDot.classList.remove('has-count');
+                notificationDot.style.display = 'none';
+            }
+        }
+        if (notificationHeaderCount) {
+            if (safeCount > 0) {
+                notificationHeaderCount.textContent = safeCount > 99 ? '99+' : String(safeCount);
+                notificationHeaderCount.classList.add('show');
+            } else {
+                notificationHeaderCount.textContent = '0';
+                notificationHeaderCount.classList.remove('show');
+            }
+        }
+        if (markAllReadButton) {
+            markAllReadButton.disabled = safeCount <= 0;
         }
     }
 
     async function loadUnreadCount() {
         try {
-            const res = await fetch('/employee/notifications/unread-count');
+            const res = await fetch('/employee/notifications/unread-count', {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            });
             if (res.ok) {
                 const data = await res.json();
                 updateUnreadBadge(data.count || 0);
@@ -5019,64 +5317,152 @@
         } catch (e) {}
     }
 
-    async function loadNotifications() {
-        notificationDropdownBody.innerHTML = '<div class="notification-loading"><span>Loading notifications...</span></div>';
-        try {
-            const res = await fetch('/employee/notifications');
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            if (!Array.isArray(data) || data.length === 0) {
-                notificationDropdownBody.innerHTML = '<div class="notification-empty">No notifications</div>';
-                return;
-            }
-            notificationDropdownBody.innerHTML = data.map(n => `
-                <div class="notification-item ${n.read ? '' : 'unread'}" onclick="markNotificationAsRead(${n.id}, this)">
-                    <div class="notification-title">${n.title}</div>
-                    <div class="notification-text">${n.message}</div>
-                    <div class="notification-time">${n.createdAt || ''}</div>
+    function renderNotifications(notifications) {
+        if (!notificationDropdownBody) return;
+        notificationDropdownBody.innerHTML = '';
+        if (!Array.isArray(notifications) || notifications.length === 0) {
+            showEmptyNotifications();
+            return;
+        }
+        notifications.forEach(function (notification) {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'notification-item';
+            if (!notification.read) item.classList.add('unread');
+            const notificationType = String(notification.type || 'GENERAL').trim().toUpperCase();
+            item.dataset.type = notificationType;
+            item.dataset.notificationId = notification.id;
+            item.setAttribute('aria-label', 'Notification: ' + (notification.title || 'Notification'));
+            item.innerHTML = `
+                <div class="notification-item-icon">
+                    ${getNotificationIcon(notificationType)}
                 </div>
-            `).join("");
-            loadUnreadCount();
+                <div class="notification-item-content">
+                    <div class="notification-item-top">
+                        <div class="notification-item-title">${escapeHtml(notification.title || 'Notification')}</div>
+                        <div class="notification-item-time">${escapeHtml(notification.time || notification.createdAt || '')}</div>
+                    </div>
+                    <div class="notification-item-message">${escapeHtml(notification.message || '')}</div>
+                    <span class="notification-item-type">${escapeHtml(notificationType)}</span>
+                </div>`;
+            item.addEventListener('click', function (event) {
+                event.stopPropagation();
+                if (notification.read) return;
+                markNotificationAsRead(notification.id, item);
+            });
+            notificationDropdownBody.appendChild(item);
+        });
+    }
+
+    async function loadNotifications() {
+        showNotificationLoading();
+        try {
+            const res = await fetch('/employee/notifications', {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            });
+            if (!res.ok) throw new Error('Failed to load notifications');
+            const notifications = await res.json();
+            renderNotifications(notifications);
+            await loadUnreadCount();
         } catch (e) {
-            notificationDropdownBody.innerHTML = '<div class="notification-empty">Could not load notifications</div>';
+            showNotificationError();
         }
     }
 
-    async function markNotificationAsRead(id, el) {
+    async function markNotificationAsRead(notificationId, item) {
+        if (notificationId === null || notificationId === undefined) return;
+        const token = getCsrfToken();
+        const header = getCsrfHeader();
         try {
-            await fetch(`/employee/notifications/${id}/read`, {
-                method: "POST",
-                headers: { [csrfHeader]: csrfToken }
+            const headers = { 'Accept': 'application/json' };
+            if (token) headers[header] = token;
+            const res = await fetch('/employee/notifications/' + encodeURIComponent(notificationId) + '/read', {
+                method: 'POST',
+                headers: headers,
+                credentials: 'same-origin'
             });
-            if (el) el.classList.remove("unread");
-            loadUnreadCount();
+            if (res.ok) {
+                if (item) item.classList.remove('unread');
+                await loadUnreadCount();
+            }
         } catch (e) {}
     }
 
-    if (markAllReadButton) {
-        markAllReadButton.addEventListener("click", async function(e) {
-            e.stopPropagation();
-            try {
-                await fetch('/employee/notifications/mark-all-as-read', {
-                    method: "POST",
-                    headers: { [csrfHeader]: csrfToken }
-                });
-                document.querySelectorAll(".notification-item.unread").forEach(i => i.classList.remove("unread"));
+    async function markAllNotificationsAsRead() {
+        const token = getCsrfToken();
+        const header = getCsrfHeader();
+        if (markAllReadButton) markAllReadButton.disabled = true;
+        try {
+            const headers = { 'Accept': 'application/json' };
+            if (token) headers[header] = token;
+            const res = await fetch('/employee/notifications/read-all', {
+                method: 'POST',
+                headers: headers,
+                credentials: 'same-origin'
+            });
+            if (res.ok) {
+                if (notificationDropdownBody) {
+                    notificationDropdownBody.querySelectorAll('.notification-item.unread').forEach(i => i.classList.remove('unread'));
+                }
                 updateUnreadBadge(0);
-            } catch (e) {}
+                await loadNotifications();
+            }
+        } catch (e) {
+            await loadUnreadCount();
+        }
+    }
+
+    if (markAllReadButton) {
+        markAllReadButton.addEventListener('click', function (e) {
+            e.stopPropagation();
+            markAllNotificationsAsRead();
         });
     }
 
+    const profileBtn = document.getElementById("profileButton");
+    const profileDropdown = document.getElementById("profileDropdown");
+
     if (notificationButton && notificationDropdown) {
-        notificationButton.addEventListener("click", function(e) {
+        notificationButton.addEventListener("click", async function (e) {
             e.stopPropagation();
             const isOpen = notificationDropdown.classList.toggle("show");
-            if (isOpen) loadNotifications();
+            notificationButton.setAttribute("aria-expanded", String(isOpen));
+            notificationDropdown.setAttribute("aria-hidden", String(!isOpen));
+            if (isOpen && profileDropdown) {
+                profileDropdown.classList.remove("show");
+                if (profileBtn) profileBtn.setAttribute("aria-expanded", "false");
+            }
+            if (isOpen) await loadNotifications();
         });
 
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             if (!notificationButton.contains(e.target) && !notificationDropdown.contains(e.target)) {
                 notificationDropdown.classList.remove("show");
+                notificationButton.setAttribute("aria-expanded", "false");
+                notificationDropdown.setAttribute("aria-hidden", "true");
+            }
+        });
+    }
+
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const isOpen = profileDropdown.classList.toggle("show");
+            profileBtn.setAttribute("aria-expanded", String(isOpen));
+            if (isOpen && notificationDropdown) {
+                notificationDropdown.classList.remove("show");
+                if (notificationButton) {
+                    notificationButton.setAttribute("aria-expanded", "false");
+                    notificationDropdown.setAttribute("aria-hidden", "true");
+                }
+            }
+        });
+        document.addEventListener("click", function (e) {
+            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove("show");
+                profileBtn.setAttribute("aria-expanded", "false");
             }
         });
     }
@@ -5095,35 +5481,29 @@
             const inst = assignBsInput.nepaliDatePicker({
                 ndpYear: true,
                 ndpMonth: true,
-                ndpYearCount: 20
+                ndpYearCount: 20,
+                language: "english",
+                unicodeDate: false
             });
             if (typeof window.bindDatePickerInteractions === 'function') {
                 window.bindDatePickerInteractions(assignBsInput, inst);
             }
         }
 
-
         // Close modal on Escape
         document.addEventListener("keydown", function (e) {
             if (e.key === "Escape") {
                 closeTaskModal();
+                if (notificationDropdown && notificationDropdown.classList.contains("show")) {
+                    notificationDropdown.classList.remove("show");
+                    if (notificationButton) notificationButton.setAttribute("aria-expanded", "false");
+                }
+                if (profileDropdown && profileDropdown.classList.contains("show")) {
+                    profileDropdown.classList.remove("show");
+                    if (profileBtn) profileBtn.setAttribute("aria-expanded", "false");
+                }
             }
         });
-
-        // Profile Dropdown Toggle
-        const profileBtn = document.getElementById("profileButton");
-        const profileDropdown = document.getElementById("profileDropdown");
-        if (profileBtn && profileDropdown) {
-            profileBtn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                profileDropdown.classList.toggle("show");
-            });
-            document.addEventListener("click", function (e) {
-                if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                    profileDropdown.classList.remove("show");
-                }
-            });
-        }
     });
 </script>
 

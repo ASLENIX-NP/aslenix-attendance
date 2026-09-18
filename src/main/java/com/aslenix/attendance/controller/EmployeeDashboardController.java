@@ -1,9 +1,11 @@
 package com.aslenix.attendance.controller;
 
+import com.aslenix.attendance.dto.StreakDto;
 import com.aslenix.attendance.entity.Attendance;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
+import com.aslenix.attendance.service.AttendanceService;
 import com.aslenix.attendance.service.LeaveRequestService;
 
 import org.springframework.security.core.Authentication;
@@ -25,15 +27,18 @@ public class EmployeeDashboardController {
     private final EmployeeRepository employeeRepository;
     private final AttendanceRepository attendanceRepository;
     private final LeaveRequestService leaveRequestService;
+    private final AttendanceService attendanceService;
 
     public EmployeeDashboardController(
             EmployeeRepository employeeRepository,
             AttendanceRepository attendanceRepository,
-            LeaveRequestService leaveRequestService) {
+            LeaveRequestService leaveRequestService,
+            AttendanceService attendanceService) {
 
         this.employeeRepository = employeeRepository;
         this.attendanceRepository = attendanceRepository;
         this.leaveRequestService = leaveRequestService;
+        this.attendanceService = attendanceService;
     }
 
     // ============================================================
@@ -206,11 +211,6 @@ public class EmployeeDashboardController {
 
         // ========================================================
         // ABSENT
-        //
-        // For now, calculate based on weekdays in the month
-        // that do not have an attendance record.
-        //
-        // Approved leave is excluded from the absent count.
         // ========================================================
 
         long workingDays = 0;
@@ -239,6 +239,27 @@ public class EmployeeDashboardController {
         model.addAttribute(
                 "absentCount",
                 absentCount
+        );
+
+        // ========================================================
+        // ATTENDANCE STREAK
+        // ========================================================
+
+        StreakDto streak = attendanceService.calculateStreak(employee);
+
+        model.addAttribute(
+                "currentStreak",
+                streak.getCurrentStreak()
+        );
+
+        model.addAttribute(
+                "longestStreak",
+                streak.getLongestStreak()
+        );
+
+        model.addAttribute(
+                "streakMessage",
+                streak.getMessage()
         );
 
         // ========================================================

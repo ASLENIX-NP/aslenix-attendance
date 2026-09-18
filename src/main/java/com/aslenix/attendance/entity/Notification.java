@@ -17,15 +17,25 @@ public class Notification {
     private Long id;
 
     // ============================================================
-    // EMPLOYEE
+    // EMPLOYEE (OPTIONAL TO ALLOW ADMIN BROADCAST NOTIFICATIONS)
     // ============================================================
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "employee_id",
-            nullable = false
+            nullable = true
     )
     private Employee employee;
+
+    // ============================================================
+    // TARGET ROLE (E.G. "ADMIN" FOR ADMIN NOTIFICATIONS)
+    // ============================================================
+
+    @Column(
+            name = "target_role",
+            length = 50
+    )
+    private String targetRole;
 
     // ============================================================
     // NOTIFICATION TITLE
@@ -101,6 +111,14 @@ public class Notification {
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
+    }
+
+    public String getTargetRole() {
+        return targetRole;
+    }
+
+    public void setTargetRole(String targetRole) {
+        this.targetRole = targetRole;
     }
 
     public String getTitle() {

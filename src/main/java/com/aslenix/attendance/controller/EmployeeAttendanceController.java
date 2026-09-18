@@ -1,12 +1,15 @@
 package com.aslenix.attendance.controller;
 
+import com.aslenix.attendance.dto.StreakDto;
 import com.aslenix.attendance.entity.Attendance;
+import com.aslenix.attendance.entity.AttendanceCorrectionRequest;
 import com.aslenix.attendance.entity.CalendarEvent;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.entity.LeaveRequest;
 import com.aslenix.attendance.entity.OfficeSettings;
 import com.aslenix.attendance.repository.AttendanceRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
+import com.aslenix.attendance.service.AttendanceCorrectionService;
 import com.aslenix.attendance.service.AttendanceService;
 import com.aslenix.attendance.service.CalendarEventService;
 import com.aslenix.attendance.service.LeaveRequestService;
@@ -16,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -35,19 +39,22 @@ public class EmployeeAttendanceController {
     private final AttendanceService attendanceService;
     private final LeaveRequestService leaveRequestService;
     private final CalendarEventService calendarEventService;
+    private final AttendanceCorrectionService attendanceCorrectionService;
 
     public EmployeeAttendanceController(
             EmployeeRepository employeeRepository,
             AttendanceRepository attendanceRepository,
             AttendanceService attendanceService,
             LeaveRequestService leaveRequestService,
-            CalendarEventService calendarEventService) {
+            CalendarEventService calendarEventService,
+            AttendanceCorrectionService attendanceCorrectionService) {
 
         this.employeeRepository = employeeRepository;
         this.attendanceRepository = attendanceRepository;
         this.attendanceService = attendanceService;
         this.leaveRequestService = leaveRequestService;
         this.calendarEventService = calendarEventService;
+        this.attendanceCorrectionService = attendanceCorrectionService;
     }
 
     // ============================================================
@@ -160,25 +167,25 @@ public class EmployeeAttendanceController {
 
         long totalWorkingMinutes = 0;
 
-        for (Attendance attendance : attendanceRecords) {
+        for (Attendance a : attendanceRecords) {
 
-            if ("PRESENT".equals(attendance.getStatus())
-                    || "LATE".equals(attendance.getStatus())) {
+            if ("PRESENT".equals(a.getStatus())
+                    || "LATE".equals(a.getStatus())) {
 
                 presentDays++;
             }
 
-            if (attendance.getCheckIn() == null) {
+            if (a.getCheckIn() == null) {
                 absentDays++;
             }
 
-            if (attendance.getCheckIn() != null
-                    && attendance.getCheckOut() != null) {
+            if (a.getCheckIn() != null
+                    && a.getCheckOut() != null) {
 
                 Duration duration =
                         Duration.between(
-                                attendance.getCheckIn(),
-                                attendance.getCheckOut()
+                                a.getCheckIn(),
+                                a.getCheckOut()
                         );
 
                 totalWorkingMinutes +=
@@ -210,7 +217,29 @@ public class EmployeeAttendanceController {
         }
 
         // --------------------------------------------------------
-        // MODEL
+        // ATTENDANCE STREAK
+        // --------------------------------------------------------
+
+        StreakDto streak = attendanceService.calculateStreak(employee);
+        model.addAttribute("currentStreak", streak.getCurrentStreak());
+        model.addAttribute("longestStreak", streak.getLongestStreak());
+        model.addAttribute("streakMessage", streak.getMessage());
+
+        // --------------------------------------------------------
+        // ATTENDANCE CORRECTION REQUESTS
+        // --------------------------------------------------------
+
+        List<AttendanceCorrectionRequest> correctionRequests =
+                attendanceCorrectionService.getEmployeeRequests(employee);
+        model.addAttribute("correctionRequests", correctionRequests);
+
+        long pendingCorrectionCount = correctionRequests.stream()
+                .filter(r -> "PENDING".equalsIgnoreCase(r.getStatus()))
+                .count();
+        model.addAttribute("pendingCorrectionCount", pendingCorrectionCount);
+
+        // --------------------------------------------------------
+        // MODEL ATTRIBUTES
         // --------------------------------------------------------
 
         model.addAttribute(
@@ -375,6 +404,43 @@ public class EmployeeAttendanceController {
         model.addAttribute("calendarEvents", calendarEventService.getAllEvents());
 
         return "employee/attendance";
+    }
+
+    // ============================================================
+    // SUBMIT ATTENDANCE CORRECTION REQUEST (EMPLOYEE)
+    // ============================================================
+
+    @PostMapping("/corrections")
+    public String submitCorrection(
+            Authentication authentication,
+            @RequestParam("attendanceDate") LocalDate attendanceDate,
+            @RequestParam("requestedCheckIn") LocalTime requestedCheckIn,
+            @RequestParam(value = "requestedCheckOut", required = false) LocalTime requestedCheckOut,
+            @RequestParam("reason") String reason,
+            RedirectAttributes redirectAttributes) {
+
+        Employee employee = getLoggedInEmployee(authentication);
+        if (employee == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            attendanceCorrectionService.submitCorrectionRequest(
+                    employee,
+                    attendanceDate,
+                    requestedCheckIn,
+                    requestedCheckOut,
+                    reason
+            );
+            redirectAttributes.addFlashAttribute("successMessage", "Correction request submitted successfully for " + attendanceDate + ".");
+            return "redirect:/employee/attendance?correctionSubmitted";
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/employee/attendance?correctionError=" + encodeMessage(e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to submit correction request.");
+            return "redirect:/employee/attendance?correctionError=" + encodeMessage("Unable to submit correction request.");
+        }
     }
 
     // ============================================================

@@ -15,6 +15,7 @@
     <script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js"></script>
     <script src="/js/nepali-date-utils.js"></script>
 
+    <link rel="stylesheet" href="/css/aslenix-theme.css">
     <style>
         /* =====================================================
            RESET & ROOT
@@ -970,9 +971,185 @@
                 font-size: 26px;
             }
         }
+
+        /* =====================================================
+           CORRECTION REQUESTS & AUDIT LOG STYLES
+        ===================================================== */
+        .filter-pills-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-pill:hover {
+            color: #0f172a;
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .filter-pill.active {
+            background: #4f46e5;
+            color: #ffffff;
+            border-color: #4f46e5;
+            box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+        }
+
+        .filter-pill .pill-count {
+            padding: 1px 7px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 800;
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .filter-pill.active .pill-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .pill-pending-highlight {
+            background: #eff6ff !important;
+            color: #1d4ed8 !important;
+        }
+
+        .btn-action-approve {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-action-approve:hover {
+            background: #bbf7d0;
+            color: #14532d;
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
+        }
+
+        .btn-action-reject {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-action-reject:hover {
+            background: #fecaca;
+            color: #7f1d1d;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
+        }
+
+        .btn-action-edit {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 11px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #4338ca;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-action-edit:hover {
+            background: #e0e7ff;
+            color: #3730a3;
+            border-color: #c7d2fe;
+        }
+
+        .modal-backdrop-custom {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-backdrop-custom.active {
+            display: flex;
+        }
+
+        .modal-card-custom {
+            background: #ffffff;
+            width: 100%;
+            max-width: 540px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalPopIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .audit-change-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .audit-prev {
+            color: #94a3b8;
+            text-decoration: line-through;
+        }
+
+        .audit-next {
+            color: #0f172a;
+            font-weight: 700;
+        }
     </style>
+    <link rel="stylesheet" href="/css/admin-dashboard.css">
 </head>
-<body>
+<body class="admin-dashboard">
 
 <!-- =====================================================
      APP LAYOUT
@@ -1245,12 +1422,168 @@
                 </div>
             </section>
 
-            <!-- ATTENDANCE PANEL -->
-            <section class="panel">
-                <div class="panel-header">
+            <!-- FLASH MESSAGES -->
+            <div th:if="${successMessage}" style="margin-bottom: 22px; padding: 14px 18px; border-radius: 14px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span th:text="${successMessage}">Success message</span>
+            </div>
+            <div th:if="${errorMessage}" style="margin-bottom: 22px; padding: 14px 18px; border-radius: 14px; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span th:text="${errorMessage}">Error message</span>
+            </div>
+
+            <!-- =================================================
+                 ATTENDANCE CORRECTION REQUESTS PANEL
+            ================================================== -->
+            <section class="panel" style="margin-bottom: 24px;">
+                <div class="panel-header" style="flex-wrap: wrap; gap: 14px;">
+                    <div>
+                        <h2>Attendance Correction Requests</h2>
+                        <span>Review and approve or reject employee attendance adjustment requests</span>
+                    </div>
+
+                    <div class="filter-pills-container" style="margin-bottom: 0;">
+                        <button type="button" class="filter-pill active" data-filter="all" onclick="filterCorrections('all', this)">
+                            All <span class="pill-count" th:text="${correctionRequests != null ? #lists.size(correctionRequests) : 0}">0</span>
+                        </button>
+                        <button type="button" class="filter-pill" data-filter="PENDING" onclick="filterCorrections('PENDING', this)">
+                            Pending <span class="pill-count pill-pending-highlight" th:text="${pendingCorrectionCount != null ? pendingCorrectionCount : 0}">0</span>
+                        </button>
+                        <button type="button" class="filter-pill" data-filter="APPROVED" onclick="filterCorrections('APPROVED', this)">
+                            Approved <span class="pill-count" th:text="${correctionRequests != null ? #lists.size(correctionRequests.?[status == 'APPROVED']) : 0}">0</span>
+                        </button>
+                        <button type="button" class="filter-pill" data-filter="REJECTED" onclick="filterCorrections('REJECTED', this)">
+                            Rejected <span class="pill-count" th:text="${correctionRequests != null ? #lists.size(correctionRequests.?[status == 'REJECTED']) : 0}">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="correctionTable">
+                        <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Date</th>
+                            <th>Req. Check In</th>
+                            <th>Req. Check Out</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Action / Review Details</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="req : ${correctionRequests}" th:attr="data-status=${req.status}" class="correction-row">
+                            <td>
+                                <div class="employee-name-cell">
+                                    <div class="employee-avatar-circle">
+                                        <span th:if="${req.employee != null and req.employee.firstName != null and !req.employee.firstName.isEmpty()}"
+                                              th:text="${#strings.substring(req.employee.firstName, 0, 1).toUpperCase()}">E</span>
+                                        <span th:unless="${req.employee != null and req.employee.firstName != null and !req.employee.firstName.isEmpty()}">E</span>
+                                    </div>
+                                    <div>
+                                        <div class="employee-fullname" th:text="${req.employee != null ? (req.employee.firstName + ' ' + (req.employee.lastName != null ? req.employee.lastName : '')) : 'Employee'}">
+                                            Employee Name
+                                        </div>
+                                        <div class="employee-code" th:text="${req.employee != null ? req.employee.employeeCode : '--'}">
+                                            EMP-001
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="date-badge bs-date" th:attr="data-ad-date=${req.attendanceDate}" th:text="${req.attendanceDate}">
+                                    2026-09-18
+                                </span>
+                            </td>
+                            <td>
+                                <span class="time-text" style="font-weight: 700; color: #1e293b;" th:text="${#temporals.format(req.requestedCheckIn, 'hh:mm a')}">09:00 AM</span>
+                            </td>
+                            <td>
+                                <span class="time-text" th:if="${req.requestedCheckOut != null}" style="font-weight: 700; color: #1e293b;" th:text="${#temporals.format(req.requestedCheckOut, 'hh:mm a')}">05:00 PM</span>
+                                <span class="time-text" th:unless="${req.requestedCheckOut != null}">—</span>
+                            </td>
+                            <td>
+                                <span style="font-size: 11.5px; color: #475569; max-width: 200px; display: inline-block; white-space: normal;" th:text="${req.reason}">Reason text</span>
+                            </td>
+                            <td>
+                                <span th:if="${req.status == 'PENDING'}" class="status-badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">
+                                    PENDING
+                                </span>
+                                <span th:if="${req.status == 'APPROVED'}" class="status-badge" style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;">
+                                    APPROVED
+                                </span>
+                                <span th:if="${req.status == 'REJECTED'}" class="status-badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;">
+                                    REJECTED
+                                </span>
+                            </td>
+                            <td>
+                                <div th:if="${req.status == 'PENDING'}" style="display: flex; align-items: center; gap: 8px;">
+                                    <button type="button" class="btn-action-approve"
+                                            th:attr="data-id=${req.id},
+                                                     data-name=${req.employee != null ? (req.employee.firstName + ' ' + (req.employee.lastName != null ? req.employee.lastName : '')) : 'Employee'},
+                                                     data-date=${req.attendanceDate},
+                                                     data-checkin=${#temporals.format(req.requestedCheckIn, 'hh:mm a')},
+                                                     data-checkout=${req.requestedCheckOut != null ? #temporals.format(req.requestedCheckOut, 'hh:mm a') : '—'},
+                                                     data-reason=${req.reason}"
+                                            onclick="openApproveModal(this)">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        Approve
+                                    </button>
+                                    <button type="button" class="btn-action-reject"
+                                            th:attr="data-id=${req.id},
+                                                     data-name=${req.employee != null ? (req.employee.firstName + ' ' + (req.employee.lastName != null ? req.employee.lastName : '')) : 'Employee'},
+                                                     data-date=${req.attendanceDate},
+                                                     data-reason=${req.reason}"
+                                            onclick="openRejectModal(this)">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        Reject
+                                    </button>
+                                </div>
+                                <div th:unless="${req.status == 'PENDING'}" style="font-size: 11px; color: #64748b; line-height: 1.4;">
+                                    <div th:if="${req.reviewedByAdminName != null}">
+                                        By: <strong style="color: #334155;" th:text="${req.reviewedByAdminName}">Admin</strong>
+                                    </div>
+                                    <div th:if="${req.reviewNote != null and !req.reviewNote.isEmpty()}" style="color: #475569; font-style: italic;" th:text="${'«' + req.reviewNote + '»'}">Note</div>
+                                    <div th:if="${req.reviewedAt != null}" style="color: #94a3b8; font-size: 10px;" th:text="${#temporals.format(req.reviewedAt, 'yyyy-MM-dd hh:mm a')}">Timestamp</div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- EMPTY STATE -->
+                        <tr th:if="${correctionRequests == null or #lists.isEmpty(correctionRequests)}" id="noCorrectionsRow">
+                            <td colspan="7">
+                                <div class="empty-state" style="padding: 35px 20px;">
+                                    <div class="empty-icon" style="background: #f1f5f9; color: #64748b; width: 40px; height: 40px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                    </div>
+                                    <div class="empty-title">No attendance correction requests</div>
+                                    <div class="empty-text">No correction requests have been submitted yet.</div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- =================================================
+                 ATTENDANCE PANEL
+            ================================================== -->
+            <section class="panel" style="margin-bottom: 24px;">
+                <div class="panel-header" style="flex-wrap: wrap; gap: 14px;">
                     <div>
                         <h2>Attendance History</h2>
                         <span>All recorded employee attendance entries</span>
+                    </div>
+
+                    <div>
+                        <button type="button" id="btnOpenDirectEditModal" class="btn-action-edit" style="padding: 8px 16px; font-size: 12.5px; background: linear-gradient(135deg, #4f46e5, #4338ca); color: #ffffff; border: none; border-radius: 10px; font-weight: 700; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            <span>+ Direct Edit / Override</span>
+                        </button>
                     </div>
                 </div>
 
@@ -1264,6 +1597,7 @@
                             <th>Check Out</th>
                             <th>Working Hours</th>
                             <th>Status</th>
+                            <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -1330,11 +1664,23 @@
                                     PRESENT
                                 </span>
                             </td>
+                            <td>
+                                <button type="button" class="btn-action-edit"
+                                        th:attr="data-empid=${attendance.employee != null ? attendance.employee.id : ''},
+                                                 data-date=${attendance.attendanceDate},
+                                                 data-checkin=${attendance.checkIn != null ? #temporals.format(attendance.checkIn, 'HH:mm') : ''},
+                                                 data-checkout=${attendance.checkOut != null ? #temporals.format(attendance.checkOut, 'HH:mm') : ''},
+                                                 data-status=${attendance.status}"
+                                        onclick="openDirectEditModalWithData(this)">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    Edit
+                                </button>
+                            </td>
                         </tr>
 
                         <!-- EMPTY STATE -->
                         <tr th:if="${attendanceRecords == null or #lists.isEmpty(attendanceRecords)}">
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="empty-state">
                                     <div class="empty-icon">
                                         <svg viewBox="0 0 24 24">
@@ -1346,6 +1692,112 @@
                                     </div>
                                     <div class="empty-title">No attendance records found</div>
                                     <div class="empty-text">Attendance entries will appear here once employees record their check-ins.</div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- =================================================
+                 ATTENDANCE AUDIT TRAIL PANEL
+            ================================================== -->
+            <section class="panel" style="margin-bottom: 24px;">
+                <div class="panel-header">
+                    <div>
+                        <h2>Attendance Audit Trail</h2>
+                        <span>Immutable record of all admin attendance approvals and manual edits</span>
+                    </div>
+
+                    <div class="records-count-box">
+                        Audit events:
+                        <strong th:text="${auditLogs != null ? #lists.size(auditLogs) : 0}">0</strong>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Admin</th>
+                            <th>Employee</th>
+                            <th>Date</th>
+                            <th>Action Type</th>
+                            <th>Adjustment Details</th>
+                            <th>Reason</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="log : ${auditLogs}">
+                            <td>
+                                <span style="font-size: 11px; font-weight: 700; color: #475569;"
+                                      th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd hh:mm:ss a')}">
+                                    2026-09-18 10:00:00 AM
+                                </span>
+                            </td>
+                            <td>
+                                <span style="font-weight: 700; color: #1e293b; font-size: 12px;"
+                                      th:text="${log.adminFullName != null ? log.adminFullName : log.adminUsername}">
+                                    Admin
+                                </span>
+                            </td>
+                            <td>
+                                <span style="font-weight: 700; color: #1e293b; font-size: 12px;"
+                                      th:text="${log.employee != null ? (log.employee.firstName + ' ' + (log.employee.lastName != null ? log.employee.lastName : '')) : '--'}">
+                                    Employee Name
+                                </span>
+                            </td>
+                            <td>
+                                <span class="date-badge bs-date" th:attr="data-ad-date=${log.attendanceDate}" th:text="${log.attendanceDate}">
+                                    2026-09-18
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${log.actionType == 'REQUEST_APPROVAL'}" class="status-badge" style="background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe;">
+                                    REQUEST APPROVAL
+                                </span>
+                                <span th:if="${log.actionType == 'DIRECT_EDIT'}" class="status-badge" style="background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff;">
+                                    DIRECT EDIT
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-size: 11px; display: flex; flex-direction: column; gap: 3px;">
+                                    <div class="audit-change-chip">
+                                        <span>Check-In:</span>
+                                        <span class="audit-prev" th:text="${log.originalCheckIn != null ? #temporals.format(log.originalCheckIn, 'hh:mm a') : 'None'}">None</span>
+                                        <span>→</span>
+                                        <span class="audit-next" th:text="${log.newCheckIn != null ? #temporals.format(log.newCheckIn, 'hh:mm a') : 'None'}">09:00 AM</span>
+                                    </div>
+                                    <div class="audit-change-chip" th:if="${log.originalCheckOut != null or log.newCheckOut != null}">
+                                        <span>Check-Out:</span>
+                                        <span class="audit-prev" th:text="${log.originalCheckOut != null ? #temporals.format(log.originalCheckOut, 'hh:mm a') : 'None'}">None</span>
+                                        <span>→</span>
+                                        <span class="audit-next" th:text="${log.newCheckOut != null ? #temporals.format(log.newCheckOut, 'hh:mm a') : 'None'}">05:00 PM</span>
+                                    </div>
+                                    <div class="audit-change-chip" th:if="${log.originalStatus != null or log.newStatus != null}">
+                                        <span>Status:</span>
+                                        <span class="audit-prev" th:text="${log.originalStatus != null ? log.originalStatus : 'None'}">None</span>
+                                        <span>→</span>
+                                        <span class="audit-next" th:text="${log.newStatus != null ? log.newStatus : 'None'}">PRESENT</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span style="font-size: 11.5px; color: #475569;" th:text="${log.reason}">Reason text</span>
+                            </td>
+                        </tr>
+
+                        <!-- EMPTY STATE -->
+                        <tr th:if="${auditLogs == null or #lists.isEmpty(auditLogs)}">
+                            <td colspan="7">
+                                <div class="empty-state" style="padding: 35px 20px;">
+                                    <div class="empty-icon" style="background: #f1f5f9; color: #64748b; width: 40px; height: 40px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    </div>
+                                    <div class="empty-title">No audit log entries yet</div>
+                                    <div class="empty-text">Approved corrections and manual attendance changes will be recorded here with an immutable audit trail.</div>
                                 </div>
                             </td>
                         </tr>
@@ -1608,6 +2060,328 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     bsDateElement.textContent = formatNepaliDate();
+});
+</script>
+
+<!-- =============================================================
+     ADMIN ATTENDANCE MODALS
+============================================================== -->
+
+<!-- APPROVE CORRECTION MODAL -->
+<div id="approveModal" class="modal-backdrop-custom">
+    <div class="modal-card-custom">
+        <div style="padding: 20px 24px; border-bottom: 1px solid #edf2f7; display: flex; align-items: center; justify-content: space-between; background: #f8fafc;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.12); color: #059669; display: grid; place-items: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0f172a;">Approve Attendance Correction</h3>
+                    <p style="margin: 0; font-size: 11px; color: #64748b;">Updates attendance record and recalculates working streak</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeApproveModal()" style="background: transparent; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
+        </div>
+
+        <form id="approveForm" method="post" action="" style="padding: 24px;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px; margin-bottom: 12px;">
+                    <div>
+                        <span style="color: #64748b; display: block; font-size: 11px; font-weight: 600;">Employee:</span>
+                        <strong id="approveModalEmpName" style="color: #0f172a; font-size: 13px;">Employee Name</strong>
+                    </div>
+                    <div>
+                        <span style="color: #64748b; display: block; font-size: 11px; font-weight: 600;">Date:</span>
+                        <strong id="approveModalDate" style="color: #0f172a; font-size: 13px;">2026-09-18</strong>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px; margin-bottom: 12px;">
+                    <div>
+                        <span style="color: #64748b; display: block; font-size: 11px; font-weight: 600;">Req. Check-In:</span>
+                        <strong id="approveModalReqIn" style="color: #4338ca; font-size: 13px;">09:00 AM</strong>
+                    </div>
+                    <div>
+                        <span style="color: #64748b; display: block; font-size: 11px; font-weight: 600;">Req. Check-Out:</span>
+                        <strong id="approveModalReqOut" style="color: #4338ca; font-size: 13px;">05:00 PM</strong>
+                    </div>
+                </div>
+                <div>
+                    <span style="color: #64748b; display: block; font-size: 11px; font-weight: 600;">Reason:</span>
+                    <span id="approveModalReason" style="color: #334155; font-size: 12px; font-style: italic;">Reason text</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 22px;">
+                <label for="approveNote" style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px;">Admin Review Note <span style="font-weight: normal; color: #94a3b8;">(Optional)</span></label>
+                <input type="text" id="approveNote" name="note" placeholder="e.g. Verified with client meeting schedule" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 13px; color: #1e293b; outline: none;" />
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
+                <button type="button" onclick="closeApproveModal()" style="padding: 10px 18px; border-radius: 10px; border: 1px solid #e2e8f0; background: #ffffff; color: #64748b; font-weight: 700; font-size: 13px; cursor: pointer;">Cancel</button>
+                <button type="submit" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">Approve & Apply</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- REJECT CORRECTION MODAL -->
+<div id="rejectModal" class="modal-backdrop-custom">
+    <div class="modal-card-custom">
+        <div style="padding: 20px 24px; border-bottom: 1px solid #edf2f7; display: flex; align-items: center; justify-content: space-between; background: #f8fafc;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(239, 68, 68, 0.12); color: #dc2626; display: grid; place-items: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0f172a;">Reject Attendance Correction</h3>
+                    <p style="margin: 0; font-size: 11px; color: #64748b;">Decline request and notify employee with explanation</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeRejectModal()" style="background: transparent; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
+        </div>
+
+        <form id="rejectForm" method="post" action="" style="padding: 24px;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px; margin-bottom: 10px;">
+                    <div>
+                        <span style="color: #64748b; display: block; font-size: 11px; font-weight: 600;">Employee:</span>
+                        <strong id="rejectModalEmpName" style="color: #0f172a; font-size: 13px;">Employee Name</strong>
+                    </div>
+                    <div>
+                        <span style="color: #64748b; display: block; font-size: 11px; font-weight: 600;">Date:</span>
+                        <strong id="rejectModalDate" style="color: #0f172a; font-size: 13px;">2026-09-18</strong>
+                    </div>
+                </div>
+                <div>
+                    <span style="color: #64748b; display: block; font-size: 11px; font-weight: 600;">Requested Reason:</span>
+                    <span id="rejectModalReason" style="color: #334155; font-size: 12px; font-style: italic;">Reason text</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 22px;">
+                <label for="rejectNote" style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px;">Reason for Rejection <span style="color: #ef4444;">*</span></label>
+                <textarea id="rejectNote" name="note" rows="3" required placeholder="Explain why this request cannot be approved..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 13px; color: #1e293b; outline: none; resize: vertical;"></textarea>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
+                <button type="button" onclick="closeRejectModal()" style="padding: 10px 18px; border-radius: 10px; border: 1px solid #e2e8f0; background: #ffffff; color: #64748b; font-weight: 700; font-size: 13px; cursor: pointer;">Cancel</button>
+                <button type="submit" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);">Reject Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- DIRECT EDIT ATTENDANCE MODAL -->
+<div id="directEditModal" class="modal-backdrop-custom">
+    <div class="modal-card-custom" style="max-width: 580px;">
+        <div style="padding: 20px 24px; border-bottom: 1px solid #edf2f7; display: flex; align-items: center; justify-content: space-between; background: #f8fafc;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(79, 70, 229, 0.12); color: #4f46e5; display: grid; place-items: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0f172a;">Direct Edit / Override Attendance</h3>
+                    <p style="margin: 0; font-size: 11px; color: #64748b;">Create or modify an attendance record directly with audit trail</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeDirectEditModal()" style="background: transparent; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
+        </div>
+
+        <form th:action="@{/admin/attendance/edit}" method="post" id="directEditForm" style="padding: 24px;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <!-- NOTICE PROMPT -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; display: flex; gap: 10px; align-items: flex-start;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.2" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div style="font-size: 12px; color: #334155; line-height: 1.5;">
+                    <strong>Notice:</strong> Overriding attendance directly modifies the official attendance record and triggers an automatic recalculation of the employee's attendance streak. An immutable audit log entry will be permanently created.
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; margin-bottom: 16px;">
+                <div>
+                    <label for="directEditEmployee" style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px;">Select Employee <span style="color: #ef4444;">*</span></label>
+                    <select id="directEditEmployee" name="employeeId" required style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 13px; color: #1e293b; outline: none; background: #ffffff;">
+                        <option value="">-- Choose Employee --</option>
+                        <option th:each="emp : ${employees}"
+                                th:value="${emp.id}"
+                                th:text="${(emp.firstName != null ? emp.firstName : '') + ' ' + (emp.lastName != null ? emp.lastName : '') + ' (' + emp.employeeCode + ')'}">
+                            Employee Name (EMP-001)
+                        </option>
+                    </select>
+                </div>
+                <div>
+                    <label for="directEditDate" style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px;">Attendance Date <span style="color: #ef4444;">*</span></label>
+                    <input type="date" id="directEditDate" name="attendanceDate" required style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 13px; color: #1e293b; outline: none;" />
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <div>
+                    <label for="directEditCheckIn" style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px;">Check-In <span style="color: #ef4444;">*</span></label>
+                    <input type="time" id="directEditCheckIn" name="checkIn" required style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 13px; color: #1e293b; outline: none;" />
+                </div>
+                <div>
+                    <label for="directEditCheckOut" style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px;">Check-Out</label>
+                    <input type="time" id="directEditCheckOut" name="checkOut" style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 13px; color: #1e293b; outline: none;" />
+                </div>
+                <div>
+                    <label for="directEditStatus" style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px;">Status Override</label>
+                    <select id="directEditStatus" name="status" style="width: 100%; padding: 10px 10px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 12.5px; color: #1e293b; outline: none; background: #ffffff;">
+                        <option value="AUTO">Auto (Office Rules)</option>
+                        <option value="PRESENT">PRESENT</option>
+                        <option value="LATE">LATE</option>
+                        <option value="HALF_DAY">HALF_DAY</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 22px;">
+                <label for="directEditReason" style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 6px;">Reason for Manual Adjustment <span style="color: #ef4444;">*</span></label>
+                <textarea id="directEditReason" name="reason" rows="2" required placeholder="State why this record is being created or overridden..." style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 13px; color: #1e293b; outline: none; resize: vertical;"></textarea>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
+                <button type="button" onclick="closeDirectEditModal()" style="padding: 10px 18px; border-radius: 10px; border: 1px solid #e2e8f0; background: #ffffff; color: #64748b; font-weight: 700; font-size: 13px; cursor: pointer;">Cancel</button>
+                <button type="submit" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(135deg, #4f46e5, #4338ca); color: #ffffff; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);">Save Attendance</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- =============================================================
+     CORRECTION & EDIT CONTROLLER SCRIPTS
+============================================================== -->
+<script>
+// Filter corrections by status
+function filterCorrections(status, btn) {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const rows = document.querySelectorAll('.correction-row');
+    let visibleCount = 0;
+    rows.forEach(r => {
+        if (status === 'all' || r.getAttribute('data-status') === status) {
+            r.style.display = '';
+            visibleCount++;
+        } else {
+            r.style.display = 'none';
+        }
+    });
+
+    const noRow = document.getElementById('noCorrectionsRow');
+    if (noRow) {
+        noRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : (rows.length === 0 ? '' : 'none');
+    }
+}
+
+// Approve modal
+function openApproveModal(btn) {
+    const id = btn.getAttribute('data-id');
+    document.getElementById('approveModalEmpName').textContent = btn.getAttribute('data-name');
+    document.getElementById('approveModalDate').textContent = btn.getAttribute('data-date');
+    document.getElementById('approveModalReqIn').textContent = btn.getAttribute('data-checkin');
+    document.getElementById('approveModalReqOut').textContent = btn.getAttribute('data-checkout');
+    document.getElementById('approveModalReason').textContent = btn.getAttribute('data-reason');
+    document.getElementById('approveForm').action = '/admin/attendance/corrections/' + id + '/approve';
+    document.getElementById('approveModal').classList.add('active');
+}
+function closeApproveModal() {
+    document.getElementById('approveModal').classList.remove('active');
+}
+
+// Reject modal
+function openRejectModal(btn) {
+    const id = btn.getAttribute('data-id');
+    document.getElementById('rejectModalEmpName').textContent = btn.getAttribute('data-name');
+    document.getElementById('rejectModalDate').textContent = btn.getAttribute('data-date');
+    document.getElementById('rejectModalReason').textContent = btn.getAttribute('data-reason');
+    document.getElementById('rejectForm').action = '/admin/attendance/corrections/' + id + '/reject';
+    document.getElementById('rejectModal').classList.add('active');
+}
+function closeRejectModal() {
+    document.getElementById('rejectModal').classList.remove('active');
+}
+
+// Direct Edit modal
+function openDirectEditModalWithData(btn) {
+    const empId = btn.getAttribute('data-empid');
+    const date = btn.getAttribute('data-date');
+    const checkin = btn.getAttribute('data-checkin');
+    const checkout = btn.getAttribute('data-checkout');
+    const status = btn.getAttribute('data-status');
+
+    if (empId) document.getElementById('directEditEmployee').value = empId;
+    if (date) document.getElementById('directEditDate').value = date;
+    if (checkin) document.getElementById('directEditCheckIn').value = checkin;
+    if (checkout) document.getElementById('directEditCheckOut').value = checkout;
+    if (status) document.getElementById('directEditStatus').value = status;
+    document.getElementById('directEditModal').classList.add('active');
+}
+
+function closeDirectEditModal() {
+    document.getElementById('directEditModal').classList.remove('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btnOpenDirect = document.getElementById('btnOpenDirectEditModal');
+    if (btnOpenDirect) {
+        btnOpenDirect.addEventListener('click', function() {
+            document.getElementById('directEditForm').reset();
+            const dateInput = document.getElementById('directEditDate');
+            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+            document.getElementById('directEditModal').classList.add('active');
+        });
+    }
+
+    // Close on backdrop click
+    ['approveModal', 'rejectModal', 'directEditModal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', function(e) {
+                if (e.target === el) el.classList.remove('active');
+            });
+        }
+    });
+
+    // Close on ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            ['approveModal', 'rejectModal', 'directEditModal'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+        }
+    });
+
+    // Automatic Nepali BS date format for all .bs-date elements
+    const bsElements = document.querySelectorAll('.bs-date');
+    bsElements.forEach(function(el) {
+        const adDateStr = el.getAttribute('data-ad-date');
+        if (adDateStr) {
+            try {
+                if (typeof convertAdToBsString === 'function') {
+                    el.textContent = convertAdToBsString(new Date(adDateStr), 'DD MMM YYYY') + ' BS';
+                } else if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.AD2BS) {
+                    const parts = adDateStr.split('-');
+                    if (parts.length === 3) {
+                        const bs = NepaliFunctions.AD2BS({
+                            year: parseInt(parts[0]),
+                            month: parseInt(parts[1]),
+                            day: parseInt(parts[2])
+                        });
+                        if (bs) el.textContent = `${bs.year}-${String(bs.month).padStart(2,'0')}-${String(bs.day).padStart(2,'0')} BS`;
+                    }
+                }
+            } catch(err) {
+                console.error('Error formatting BS date for el:', err);
+            }
+        }
+    });
 });
 </script>
 

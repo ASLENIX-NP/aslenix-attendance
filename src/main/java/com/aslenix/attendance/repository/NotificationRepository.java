@@ -43,4 +43,25 @@ public interface NotificationRepository
             Long id,
             Employee employee
     );
+
+    // ============================================================
+    // ADMIN NOTIFICATIONS
+    // ============================================================
+
+    List<Notification> findByTargetRoleOrderByCreatedAtDesc(
+            String targetRole
+    );
+
+    List<Notification> findByTargetRoleAndReadFalseOrderByCreatedAtDesc(
+            String targetRole
+    );
+
+    long countByTargetRoleAndReadFalse(
+            String targetRole
+    );
+
+    Optional<Notification> findByIdAndTargetRole(
+            Long id,
+            String targetRole
+    );
 }

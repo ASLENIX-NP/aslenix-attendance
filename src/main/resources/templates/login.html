@@ -18,13 +18,14 @@
         }
 
         :root {
-            --background: #f6f8fc;
-            --foreground: #0f172a;
+            --background: #f4f7f6;
+            --foreground: #102536;
             --card: #ffffff;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --border: #e2e8f0;
-            --muted: #64748b;
+            --primary: #e72b71;
+            --primary-hover: #c91c5e;
+            --border: #dbe5e7;
+            --muted: #6b7b85;
+            --spectrum: linear-gradient(112deg, #df2368 0%, #f05d43 31%, #f3a21c 59%, #168bd1 100%);
         }
 
         body {
@@ -34,8 +35,8 @@
             justify-content: center;
             font-family: Inter, ui-sans-serif, system-ui, sans-serif;
             background:
-                radial-gradient(circle at 88% 12%, rgba(79, 70, 229, 0.08), transparent 32%),
-                radial-gradient(circle at 12% 88%, rgba(99, 102, 241, 0.06), transparent 35%),
+                radial-gradient(circle at 88% 12%, rgba(242, 161, 31, 0.13), transparent 32%),
+                radial-gradient(circle at 12% 88%, rgba(22, 139, 209, 0.09), transparent 35%),
                 var(--background);
             color: var(--foreground);
             -webkit-font-smoothing: antialiased;
@@ -49,7 +50,17 @@
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 18px;
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+            box-shadow: 0 18px 42px rgba(16, 37, 54, 0.10);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto;
+            height: 4px;
+            background: var(--spectrum);
         }
 
         .logo {
@@ -57,8 +68,9 @@
             font-size: 28px;
             font-weight: 850;
             letter-spacing: 0.8px;
-            color: #0f172a;
+            color: #102536;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 4px;
@@ -69,9 +81,18 @@
             width: 7px;
             height: 7px;
             border-radius: 50%;
-            background: var(--primary);
+            background: var(--spectrum);
             display: inline-block;
-            margin-bottom: -12px;
+            margin: -2px 0 0;
+        }
+
+        .login-logo-mark {
+            display: block;
+            width: 74px;
+            height: 74px;
+            object-fit: contain;
+            margin: 0 auto 12px;
+            filter: drop-shadow(0 7px 14px rgba(242, 161, 31, 0.20));
         }
 
         .subtitle {
@@ -110,7 +131,7 @@
         input:focus {
             border-color: var(--primary);
             background: #ffffff;
-            box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.12);
+            box-shadow: 0 0 0 3.5px rgba(231, 43, 113, 0.14);
         }
 
         input::placeholder {
@@ -122,20 +143,20 @@
             padding: 13px;
             border: none;
             border-radius: 10px;
-            background: var(--primary);
+            background: var(--spectrum);
             color: white;
             font-size: 15px;
             font-weight: 750;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+            box-shadow: 0 7px 17px rgba(223, 35, 104, 0.22);
             margin-top: 6px;
         }
 
         button:hover {
-            background: var(--primary-hover);
+            filter: brightness(.96) saturate(1.08);
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.32);
+            box-shadow: 0 9px 21px rgba(223, 35, 104, 0.26);
         }
 
         button:active {
@@ -173,7 +194,7 @@
 
 <div class="login-container">
 
-    <div class="logo">ASLENIX</div>
+    <div class="logo"><img class="login-logo-mark" src="/images/aslenix.png" alt="ASLENIX">ASLENIX</div>
 
     <div class="subtitle">
         Attendance Management System

@@ -4,6 +4,7 @@ import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.entity.Notification;
 import com.aslenix.attendance.repository.NotificationRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,7 @@ public class NotificationService {
     }
 
     // ============================================================
-    // CREATE NOTIFICATION
+    // CREATE EMPLOYEE NOTIFICATION
     // ============================================================
 
     public Notification createNotification(
@@ -43,8 +44,53 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
+    @Autowired(required = false)
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
+    @jakarta.annotation.PostConstruct
+    public void initSchemaCompatibility() {
+        if (jdbcTemplate != null) {
+            try {
+                jdbcTemplate.execute("ALTER TABLE notifications MODIFY employee_id BIGINT NULL");
+            } catch (Exception ignored) {
+                // Table might already allow null or DB might not be MySQL
+            }
+        }
+    }
+
     // ============================================================
-    // GET ALL NOTIFICATIONS
+    // CREATE ADMIN NOTIFICATION
+    // ============================================================
+
+    public Notification createAdminNotification(
+            Employee employee,
+            String title,
+            String message,
+            String type
+    ) {
+
+        Notification notification = new Notification();
+
+        notification.setEmployee(employee);
+        notification.setTargetRole("ADMIN");
+        notification.setTitle(title);
+        notification.setMessage(message);
+        notification.setType(type);
+        notification.setRead(false);
+
+        return notificationRepository.save(notification);
+    }
+
+    public Notification createAdminNotification(
+            String title,
+            String message,
+            String type
+    ) {
+        return createAdminNotification(null, title, message, type);
+    }
+
+    // ============================================================
+    // GET ALL NOTIFICATIONS (EMPLOYEE)
     // ============================================================
 
     @Transactional(readOnly = true)
@@ -57,7 +103,7 @@ public class NotificationService {
     }
 
     // ============================================================
-    // GET UNREAD NOTIFICATIONS
+    // GET UNREAD NOTIFICATIONS (EMPLOYEE)
     // ============================================================
 
     @Transactional(readOnly = true)
@@ -70,7 +116,7 @@ public class NotificationService {
     }
 
     // ============================================================
-    // GET UNREAD COUNT
+    // GET UNREAD COUNT (EMPLOYEE)
     // ============================================================
 
     @Transactional(readOnly = true)
@@ -83,7 +129,7 @@ public class NotificationService {
     }
 
     // ============================================================
-    // MARK ONE AS READ
+    // MARK ONE AS READ (EMPLOYEE)
     // ============================================================
 
     public boolean markAsRead(
@@ -106,7 +152,7 @@ public class NotificationService {
     }
 
     // ============================================================
-    // MARK ALL AS READ
+    // MARK ALL AS READ (EMPLOYEE)
     // ============================================================
 
     public void markAllAsRead(
@@ -127,7 +173,7 @@ public class NotificationService {
     }
 
     // ============================================================
-    // DELETE NOTIFICATION
+    // DELETE NOTIFICATION (EMPLOYEE)
     // ============================================================
 
     public boolean deleteNotification(
@@ -145,5 +191,44 @@ public class NotificationService {
 
                 })
                 .orElse(false);
+    }
+
+    // ============================================================
+    // ADMIN NOTIFICATIONS API
+    // ============================================================
+
+    @Transactional(readOnly = true)
+    public List<Notification> getAdminNotifications() {
+        return notificationRepository.findByTargetRoleOrderByCreatedAtDesc("ADMIN");
+    }
+
+    @Transactional(readOnly = true)
+    public List<Notification> getAdminUnreadNotifications() {
+        return notificationRepository.findByTargetRoleAndReadFalseOrderByCreatedAtDesc("ADMIN");
+    }
+
+    @Transactional(readOnly = true)
+    public long getAdminUnreadCount() {
+        return notificationRepository.countByTargetRoleAndReadFalse("ADMIN");
+    }
+
+    public boolean markAdminAsRead(Long notificationId) {
+        return notificationRepository
+                .findByIdAndTargetRole(notificationId, "ADMIN")
+                .map(notification -> {
+                    notification.setRead(true);
+                    notificationRepository.save(notification);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    public void markAllAdminAsRead() {
+        List<Notification> notifications =
+                notificationRepository.findByTargetRoleAndReadFalseOrderByCreatedAtDesc("ADMIN");
+        for (Notification notification : notifications) {
+            notification.setRead(true);
+        }
+        notificationRepository.saveAll(notifications);
     }
 }

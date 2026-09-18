@@ -208,46 +208,11 @@ public class EmployeeTaskController {
             @RequestParam(required = false) String note,
             Authentication authentication) {
 
-        Employee employee = getCurrentEmployee(authentication);
-        if (employee == null) {
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Unauthorized"));
-        }
-
-        try {
-            Task task = taskService.getTask(id);
-            if (task.isLocked()) {
-                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Task is approved and locked."));
-            }
-
-            boolean isAssigned = (task.getEmployee() != null && task.getEmployee().getId().equals(employee.getId())) ||
-                    (task.getAssignees() != null && task.getAssignees().stream().anyMatch(a -> a.getId().equals(employee.getId())));
-
-            if (!isAssigned) {
-                return ResponseEntity.status(403).body(Map.of("success", false, "message", "Access denied"));
-            }
-
-            Employee targetAssignee = employee;
-            if (assigneeId != null) {
-                Employee chosen = employeeRepository.findById(assigneeId).orElse(null);
-                if (chosen != null) {
-                    targetAssignee = chosen;
-                }
-            }
-
-            TaskAssignment assignment = taskService.addAssignment(
-                    id, title, description, targetAssignee, deadline, deadlineBs, deadlineTime, 0, "TODO", weight, note
-            );
-
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Work item added.",
-                    "assignment", buildAssignmentMap(assignment, employee),
-                    "taskProgress", task.getProgress(),
-                    "taskStatus", task.getStatus()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
-        }
+        // Enforce: Assigning tasks and work items can only be done by administrators
+        return ResponseEntity.status(403).body(Map.of(
+                "success", false,
+                "message", "Assigning tasks and work items can only be done by administrators."
+        ));
     }
 
     @PostMapping("/{id}/assignments/{assignmentId}/progress")
@@ -431,31 +396,11 @@ public class EmployeeTaskController {
             @PathVariable Long assignmentId,
             Authentication authentication) {
 
-        Employee employee = getCurrentEmployee(authentication);
-        if (employee == null) {
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Unauthorized"));
-        }
-
-        try {
-            Task task = taskService.getTask(id);
-            if (task.isLocked()) {
-                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Task is approved and locked."));
-            }
-
-            TaskAssignment existing = task.getAssignments().stream()
-                    .filter(a -> a.getId().equals(assignmentId))
-                    .findFirst()
-                    .orElse(null);
-
-            if (existing == null || existing.getAssignee() == null || !existing.getAssignee().getId().equals(employee.getId())) {
-                return ResponseEntity.status(403).body(Map.of("success", false, "message", "You can only delete your own work items."));
-            }
-
-            taskService.deleteAssignment(id, assignmentId);
-            return ResponseEntity.ok(Map.of("success", true, "message", "Assignment deleted."));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
-        }
+        // Enforce: Removing task assignments and work items can only be done by administrators
+        return ResponseEntity.status(403).body(Map.of(
+                "success", false,
+                "message", "Removing work items and task assignments can only be done by administrators."
+        ));
     }
 
     // ============================================================
