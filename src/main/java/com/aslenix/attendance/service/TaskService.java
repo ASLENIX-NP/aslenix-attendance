@@ -102,6 +102,8 @@ public class TaskService {
             List<Employee> assignees,
             String priority,
             String complexity,
+            String status,
+            Integer progress,
             LocalDate dueDate,
             LocalDate deadline,
             String deadlineBs,
@@ -124,11 +126,31 @@ public class TaskService {
 
         task.setPriority(normalizePriority(priority));
         task.setComplexity(normalizeComplexity(complexity));
-        task.setStatus("TODO");
-        task.setProgress(0);
+
+        int p = progress != null ? Math.max(0, Math.min(100, progress)) : 0;
+        task.setProgress(p);
+
+        String initialStatus = "TODO";
+        if (status != null && !status.trim().isEmpty()) {
+            String norm = status.trim().toUpperCase();
+            if ("UNDER_REVIEW".equals(norm)) norm = "READY_FOR_REVIEW";
+            if ("COMPLETED".equals(norm)) norm = "APPROVED";
+            initialStatus = norm;
+        } else {
+            if (p >= 100) initialStatus = "READY_FOR_REVIEW";
+            else if (p > 0) initialStatus = "IN_PROGRESS";
+        }
+        task.setStatus(initialStatus);
+        if ("APPROVED".equals(initialStatus)) {
+            task.setProgress(100);
+            task.setCompletedAt(LocalDateTime.now());
+            task.setApprovedAt(LocalDateTime.now());
+        }
+
         task.setDueDate(dueDate);
         task.setDeadline(deadline);
-        task.setDeadlineBs(deadlineBs != null && !deadlineBs.trim().isEmpty() ? deadlineBs.trim() : null);
+        String cleanBs = (deadlineBs != null && !deadlineBs.trim().isEmpty() && !deadlineBs.contains("undefined")) ? deadlineBs.trim() : null;
+        task.setDeadlineBs(cleanBs);
         task.setDeadlineTime(deadlineTime != null && !deadlineTime.trim().isEmpty() ? deadlineTime.trim() : null);
         task.setTags(tags != null && !tags.trim().isEmpty() ? tags.trim() : null);
 
@@ -137,6 +159,21 @@ public class TaskService {
         task.setUpdatedAt(now);
 
         return taskRepository.save(task);
+    }
+
+    public Task createTask(
+            String title,
+            String description,
+            List<Employee> assignees,
+            String priority,
+            String complexity,
+            LocalDate dueDate,
+            LocalDate deadline,
+            String deadlineBs,
+            String deadlineTime,
+            String tags
+    ) {
+        return createTask(title, description, assignees, priority, complexity, "TODO", 0, dueDate, deadline, deadlineBs, deadlineTime, tags);
     }
 
     // ============================================================
@@ -189,12 +226,24 @@ public class TaskService {
         task.setComplexity(normalizeComplexity(complexity));
 
         if (progress != null) {
-            task.setProgress(Math.max(0, Math.min(100, progress)));
+            int p = Math.max(0, Math.min(100, progress));
+            task.setProgress(p);
+            if (!"APPROVED".equals(task.getStatus())) {
+                if (p >= 100) {
+                    task.setStatus("READY_FOR_REVIEW");
+                    if (task.getCompletedAt() == null) task.setCompletedAt(LocalDateTime.now());
+                } else if (p == 0) {
+                    task.setStatus("TODO");
+                } else if ("TODO".equals(task.getStatus())) {
+                    task.setStatus("IN_PROGRESS");
+                }
+            }
         }
 
         task.setDueDate(dueDate);
         task.setDeadline(deadline);
-        task.setDeadlineBs(deadlineBs != null && !deadlineBs.trim().isEmpty() ? deadlineBs.trim() : null);
+        String cleanBs = (deadlineBs != null && !deadlineBs.trim().isEmpty() && !deadlineBs.contains("undefined")) ? deadlineBs.trim() : null;
+        task.setDeadlineBs(cleanBs);
         task.setDeadlineTime(deadlineTime != null && !deadlineTime.trim().isEmpty() ? deadlineTime.trim() : null);
         task.setTags(tags != null && !tags.trim().isEmpty() ? tags.trim() : null);
 

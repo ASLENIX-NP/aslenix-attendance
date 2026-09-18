@@ -296,6 +296,22 @@
             if (adInput.dataset.nepaliInitialized === 'true') return;
             adInput.dataset.nepaliInitialized = 'true';
 
+            // Check if this input is already directly meant for BS dates (id or name contains 'bs')
+            const isDirectBs = (adInput.id && adInput.id.toLowerCase().includes('bs')) ||
+                               (adInput.name && adInput.name.toLowerCase().includes('bs')) ||
+                               (adInput.getAttribute('data-is-bs') === 'true');
+
+            if (isDirectBs) {
+                if (typeof adInput.nepaliDatePicker === 'function') {
+                    adInput.nepaliDatePicker({
+                        ndpYear: true,
+                        ndpMonth: true,
+                        ndpYearCount: 20
+                    });
+                }
+                return;
+            }
+
             // 1. Hide the original AD input
             adInput.style.display = 'none';
 
@@ -372,8 +388,19 @@
 
         if (typeof NepaliFunctions !== 'undefined' && NepaliFunctions.BS2AD) {
             try {
-                const adObj = NepaliFunctions.BS2AD(bsVal);
-                if (adObj) {
+                let bsObj = null;
+                if (typeof bsVal === 'object' && bsVal !== null) {
+                    bsObj = bsVal;
+                } else if (typeof NepaliFunctions.ConvertToDateObject === 'function') {
+                    bsObj = NepaliFunctions.ConvertToDateObject(bsVal, "YYYY-MM-DD");
+                } else {
+                    const p = bsVal.split('-');
+                    if (p.length === 3) {
+                        bsObj = { year: parseInt(p[0], 10), month: parseInt(p[1], 10), day: parseInt(p[2], 10) };
+                    }
+                }
+                const adObj = bsObj ? NepaliFunctions.BS2AD(bsObj) : null;
+                if (adObj && !isNaN(adObj.year) && !isNaN(adObj.month) && !isNaN(adObj.day)) {
                     const y = String(adObj.year);
                     const m = String(adObj.month).padStart(2, '0');
                     const d = String(adObj.day).padStart(2, '0');

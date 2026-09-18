@@ -5,6 +5,7 @@ import com.aslenix.attendance.entity.Task;
 import com.aslenix.attendance.entity.TaskAssignment;
 import com.aslenix.attendance.entity.TaskComment;
 import com.aslenix.attendance.repository.EmployeeRepository;
+import com.aslenix.attendance.repository.LeaveRequestRepository;
 import com.aslenix.attendance.service.TaskService;
 
 import org.springframework.http.ResponseEntity;
@@ -22,12 +23,15 @@ public class AdminTaskController {
 
     private final TaskService taskService;
     private final EmployeeRepository employeeRepository;
+    private final LeaveRequestRepository leaveRequestRepository;
 
     public AdminTaskController(
             TaskService taskService,
-            EmployeeRepository employeeRepository) {
+            EmployeeRepository employeeRepository,
+            LeaveRequestRepository leaveRequestRepository) {
         this.taskService = taskService;
         this.employeeRepository = employeeRepository;
+        this.leaveRequestRepository = leaveRequestRepository;
     }
 
     // ============================================================
@@ -39,6 +43,7 @@ public class AdminTaskController {
         model.addAttribute("activePage", "tasks");
         model.addAttribute("tasks", taskService.getAllTasks());
         model.addAttribute("employees", employeeRepository.findAll());
+        model.addAttribute("pendingLeaveCount", leaveRequestRepository.countByStatus("PENDING"));
         return "admin/tasks";
     }
 
@@ -54,6 +59,8 @@ public class AdminTaskController {
             @RequestParam(required = false) Long employeeId,
             @RequestParam(defaultValue = "MEDIUM") String priority,
             @RequestParam(defaultValue = "MEDIUM") String complexity,
+            @RequestParam(defaultValue = "TODO") String status,
+            @RequestParam(required = false) Integer progress,
             @RequestParam(required = false) LocalDate dueDate,
             @RequestParam(required = false) String deadlineBs,
             @RequestParam(required = false) String deadlineTime,
@@ -74,6 +81,8 @@ public class AdminTaskController {
                 assignees,
                 priority,
                 complexity,
+                status,
+                progress,
                 dueDate,
                 null,
                 deadlineBs,
@@ -343,10 +352,15 @@ public class AdminTaskController {
             }
             Task task = taskService.getTask(id);
             task.setProgress(progress);
-            if (progress == 0) {
-                task.setStatus("TODO");
-            } else if (progress >= 100) {
-                task.setProgress(100);
+            if (!"APPROVED".equals(task.getStatus())) {
+                if (progress == 0) {
+                    task.setStatus("TODO");
+                } else if (progress >= 100) {
+                    task.setProgress(100);
+                    task.setStatus("READY_FOR_REVIEW");
+                } else if ("TODO".equals(task.getStatus())) {
+                    task.setStatus("IN_PROGRESS");
+                }
             }
             task = taskService.updateTask(
                     id,

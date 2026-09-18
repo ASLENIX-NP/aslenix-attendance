@@ -89,4 +89,28 @@ class AslenixAttendanceApplicationTests {
 		assertTrue(adminHtml.contains("id=\"modalDeadlineBsInput\" class=\"form-input use-nepali-datepicker\""),
 				"Admin deadline BS must have nepali datepicker");
 	}
+
+	@Test
+	void testProgressBarLiveSyncAndAutoCommit() throws Exception {
+		String adminHtml = Files.readString(Path.of("src/main/resources/templates/admin/tasks.html"));
+		String empHtml = Files.readString(Path.of("src/main/resources/templates/employee/tasks.html"));
+
+		// Sliders have onchange auto-commit handlers
+		assertTrue(adminHtml.contains("onchange=\"onProgressSliderCommit(this.value)\""),
+				"Admin slider must have onchange commit handler");
+		assertTrue(empHtml.contains("onchange=\"onSliderInputCommit(this.value)\""),
+				"Employee slider must have onchange commit handler");
+
+		// Auto commit functions exist
+		assertTrue(adminHtml.contains("function onProgressSliderCommit"),
+				"Admin must have onProgressSliderCommit function");
+		assertTrue(empHtml.contains("function onSliderInputCommit"),
+				"Employee must have onSliderInputCommit function");
+
+		// Task card fragments guard against undefined in deadlineBs
+		assertTrue(adminHtml.contains("!#strings.contains(task.deadlineBs, 'undefined')"),
+				"Admin task card fragment must guard against undefined deadlineBs");
+		assertTrue(empHtml.contains("!#strings.contains(task.deadlineBs, 'undefined')"),
+				"Employee task card fragment must guard against undefined deadlineBs");
+	}
 }

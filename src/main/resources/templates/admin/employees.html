@@ -900,9 +900,14 @@
             place-items: center;
         }
 
-        .aslenix-mark svg {
-            width: 24px;
-            height: 24px;
+        .aslenix-mark svg,
+        .aslenix-mark img,
+        .aslenix-mark-img {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
         }
 
         .qr-card-brand-text {
@@ -1650,17 +1655,7 @@
                     <div class="qr-card-top">
                         <div class="qr-card-brand">
                             <div class="aslenix-mark">
-                                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M14 3L25 22H3L14 3Z" stroke="url(#aslenixGrad)" stroke-width="3" stroke-linejoin="round"/>
-                                    <path d="M14 10L20 20H8L14 10Z" fill="url(#aslenixGrad)"/>
-                                    <defs>
-                                        <linearGradient id="aslenixGrad" x1="3" y1="3" x2="25" y2="22" gradientUnits="userSpaceOnUse">
-                                            <stop stop-color="#ec4899"/>
-                                            <stop offset="0.5" stop-color="#8b5cf6"/>
-                                            <stop offset="1" stop-color="#06b6d4"/>
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
+                                <img th:src="@{/images/logo1.png}" src="/images/logo1.png" alt="ASLENIX" class="aslenix-mark-img">
                             </div>
                             <div class="qr-card-brand-text">
                                 <strong>ASLENIX</strong>

@@ -2163,9 +2163,13 @@
                      th:text="${#strings.substring(task.employee.firstName, 0, 1).toUpperCase()}">E</div>
             </div>
 
-            <div class="card-meta-deadline" th:if="${task?.deadlineBs != null || task?.dueDate != null}">
+            <div class="card-meta-deadline" th:if="${task?.deadlineBs != null && !#strings.isEmpty(task.deadlineBs) && !#strings.contains(task.deadlineBs, 'undefined')}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <span th:text="${task?.deadlineBs != null ? (task.deadlineBs + ' BS') : task.dueDate}">Date</span>
+                <span th:text="${task.deadlineBs + ' BS'}">Date</span>
+            </div>
+            <div class="card-meta-deadline" th:if="${(task?.deadlineBs == null || #strings.isEmpty(task.deadlineBs) || #strings.contains(task.deadlineBs, 'undefined')) && task?.dueDate != null}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span th:text="${task.dueDate}">Date</span>
             </div>
 
             <div class="card-assignments-count" th:if="${task?.assignments != null && !task.assignments.isEmpty()}">
@@ -2325,7 +2329,7 @@
 
                     <!-- Interactive Slider & Update Button -->
                     <div class="progress-slider-row">
-                        <input type="range" class="progress-range-slider" id="modalProgressSlider" min="0" max="100" value="0" oninput="onSliderInputChange(this.value)">
+                        <input type="range" class="progress-range-slider" id="modalProgressSlider" min="0" max="100" value="0" oninput="onSliderInputChange(this.value)" onchange="onSliderInputCommit(this.value)">
                         <button type="button" class="btn-update-progress" onclick="saveEmployeeProgress()">Update Progress</button>
                     </div>
 
@@ -2673,7 +2677,7 @@
             }
 
             // Deadline & Tags
-            document.getElementById("modalDeadlineBsInput").value = data.deadlineBs || (data.dueDate || "");
+            document.getElementById("modalDeadlineBsInput").value = (data.deadlineBs && !data.deadlineBs.includes("undefined")) ? data.deadlineBs : (data.dueDate || "");
             document.getElementById("modalDeadlineTimeInput").value = data.deadlineTime || "14:00";
             document.getElementById("modalTagsInput").value = data.tags || "";
 
@@ -2869,29 +2873,58 @@
         val = parseInt(val, 10) || 0;
         document.getElementById("modalProgressNumber").textContent = val + "%";
         const fill = document.getElementById("modalProgressFill");
-        if (fill) fill.style.width = val + "%";
+        if (fill) {
+            fill.style.width = val + "%";
+            if (val >= 100) fill.classList.add("complete"); else fill.classList.remove("complete");
+        }
         const pill = document.getElementById("modalProgressStatusPill");
+        const statusSelect = document.getElementById("modalStatusSelect");
 
         if (val >= 100) {
-            if (fill) fill.classList.add("complete");
             if (pill) pill.textContent = "Under Review / Done";
+            if (statusSelect && statusSelect.value !== "APPROVED") {
+                statusSelect.value = "READY_FOR_REVIEW";
+            }
         } else if (val === 0) {
-            if (fill) fill.classList.remove("complete");
             if (pill) pill.textContent = "To Do";
+            if (statusSelect && statusSelect.value !== "APPROVED") {
+                statusSelect.value = "TODO";
+            }
         } else {
-            if (fill) fill.classList.remove("complete");
             if (pill) pill.textContent = "In Progress";
+            if (statusSelect && statusSelect.value === "TODO") {
+                statusSelect.value = "IN_PROGRESS";
+            }
+        }
+
+        // Live visual update on task card in DOM
+        const taskId = document.getElementById("modalTaskId").value;
+        if (taskId) {
+            const card = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+            if (card) {
+                const cardFill = card.querySelector(".card-progress-fill");
+                const lbl = card.querySelector(".card-progress-label span:last-child");
+                if (cardFill) {
+                    cardFill.style.width = val + "%";
+                    if (val >= 100) cardFill.classList.add("complete"); else cardFill.classList.remove("complete");
+                }
+                if (lbl) lbl.textContent = val + "%";
+            }
+        }
+    }
+
+    function onSliderInputCommit(val) {
+        onSliderInputChange(val);
+        const taskId = document.getElementById("modalTaskId").value;
+        if (taskId) {
+            saveEmployeeProgress();
         }
     }
 
     function setEmployeeMilestone(val) {
         const slider = document.getElementById("modalProgressSlider");
         if (slider) slider.value = val;
-        onSliderInputChange(val);
-        const taskId = document.getElementById("modalTaskId").value;
-        if (taskId) {
-            saveEmployeeProgress();
-        }
+        onSliderInputCommit(val);
     }
 
     async function saveEmployeeProgress() {
@@ -2934,15 +2967,18 @@
                     if (lbl) lbl.textContent = progress + "%";
                 }
 
-                // If progress reached 100%, check if task status changed to READY_FOR_REVIEW
-                if (json.status && json.status !== currentTaskData?.status) {
-                    currentTaskData.status = json.status;
+                // If progress or status changed, sync column
+                if (json.status) {
+                    if (currentTaskData) currentTaskData.status = json.status;
+                    const statusSelect = document.getElementById("modalStatusSelect");
+                    if (statusSelect) statusSelect.value = json.status;
                     const targetContainer = document.querySelector(`.cards-container[data-drop-status="${json.status}"]`);
                     if (card && targetContainer && card.parentElement !== targetContainer) {
                         targetContainer.appendChild(card);
                         card.dataset.status = json.status;
-                        updateColumnCounters();
                     }
+                    updateColumnCounters();
+                    updateEmptyStates();
                 }
             } else {
                 showToast(json.message || "Failed to update progress", "error");
