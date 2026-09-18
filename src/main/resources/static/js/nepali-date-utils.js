@@ -287,9 +287,166 @@
     }
 
     /* ---------------------------------------------
+       PATCH NEPALI DATE PICKER PROTOTYPE (V5)
+       Ensures viewport-accurate fixed positioning and
+       modal-safe elevation (z-index: 100060)
+    --------------------------------------------- */
+    function patchNepaliDatePickerPrototype() {
+        if (typeof HTMLElement.prototype.nepaliDatePicker !== 'function') return;
+        try {
+            const dummy = document.createElement('input');
+            const testInstance = dummy.nepaliDatePicker();
+            if (testInstance) {
+                const proto = Object.getPrototypeOf(testInstance);
+                if (proto && !proto._aslenixPatched) {
+                    proto._aslenixPatched = true;
+                    proto.positionDatePicker = function () {
+                        if (!this.inputElement || !this.datePickerDiv) return;
+                        const rect = this.inputElement.getBoundingClientRect();
+                        const picker = this.datePickerDiv;
+                        picker.style.position = 'fixed';
+                        picker.style.zIndex = '100060';
+
+                        const pickerHeight = picker.offsetHeight || 280;
+                        const pickerWidth = picker.offsetWidth || 280;
+                        const spaceBelow = window.innerHeight - rect.bottom;
+                        let top = rect.bottom + 4;
+                        if (spaceBelow < pickerHeight && rect.top > pickerHeight) {
+                            top = rect.top - pickerHeight - 4;
+                        }
+                        let left = rect.left;
+                        if (left + pickerWidth > window.innerWidth) {
+                            left = window.innerWidth - pickerWidth - 16;
+                        }
+                        if (left < 8) left = 8;
+                        picker.style.top = Math.max(8, top) + 'px';
+                        picker.style.left = left + 'px';
+                    };
+                }
+                if (typeof testInstance.destroy === 'function') {
+                    testInstance.destroy(dummy);
+                }
+            }
+        } catch (e) {
+            console.warn('ASLENIX DatePicker prototype patch:', e);
+        }
+
+        // Global scroll & resize handler to keep open picker stuck to input even during modal scrolling
+        if (!window._aslenixPickerScrollBound) {
+            window._aslenixPickerScrollBound = true;
+            window.addEventListener('scroll', function () {
+                const picker = document.querySelector('.ndp-container');
+                if (picker && window._currentActiveDatePickerInput) {
+                    const rect = window._currentActiveDatePickerInput.getBoundingClientRect();
+                    picker.style.position = 'fixed';
+                    picker.style.zIndex = '100060';
+                    const pickerHeight = picker.offsetHeight || 280;
+                    const pickerWidth = picker.offsetWidth || 280;
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    let top = rect.bottom + 4;
+                    if (spaceBelow < pickerHeight && rect.top > pickerHeight) {
+                        top = rect.top - pickerHeight - 4;
+                    }
+                    let left = rect.left;
+                    if (left + pickerWidth > window.innerWidth) {
+                        left = window.innerWidth - pickerWidth - 16;
+                    }
+                    if (left < 8) left = 8;
+                    picker.style.top = Math.max(8, top) + 'px';
+                    picker.style.left = left + 'px';
+                }
+            }, { passive: true, capture: true });
+
+            window.addEventListener('resize', function () {
+                const picker = document.querySelector('.ndp-container');
+                if (picker && window._currentActiveDatePickerInput) {
+                    const rect = window._currentActiveDatePickerInput.getBoundingClientRect();
+                    picker.style.top = (rect.bottom + 4) + 'px';
+                    picker.style.left = rect.left + 'px';
+                }
+            }, { passive: true });
+        }
+    }
+
+    /* ---------------------------------------------
+       BIND DATE PICKER INTERACTIONS
+       Keeps calendar visible on focus, click, and typing
+    --------------------------------------------- */
+    function bindDatePickerInteractions(inputEl, ndpInstance) {
+        if (!inputEl) return;
+        inputEl._ndpInstance = ndpInstance;
+
+        function ensureVisible() {
+            window._currentActiveDatePickerInput = inputEl;
+            if (inputEl._ndpInstance && typeof inputEl._ndpInstance.showDatePicker === 'function') {
+                inputEl._ndpInstance.showDatePicker();
+            } else if (typeof inputEl.focus === 'function') {
+                inputEl.focus();
+            }
+        }
+
+        inputEl.addEventListener('focus', function () {
+            window._currentActiveDatePickerInput = inputEl;
+        });
+
+        inputEl.addEventListener('click', function () {
+            ensureVisible();
+        });
+
+        inputEl.addEventListener('input', function () {
+            window._currentActiveDatePickerInput = inputEl;
+            // Make sure the calendar is visible while inputting dates
+            const picker = document.querySelector('.ndp-container');
+            if (!picker && inputEl._ndpInstance && typeof inputEl._ndpInstance.showDatePicker === 'function') {
+                inputEl._ndpInstance.showDatePicker();
+            }
+
+            // Sync typed date with calendar grid view
+            const rawVal = inputEl.value ? inputEl.value.trim() : '';
+            const val = convertNepaliNumbersToEnglish(rawVal);
+            if (val.match(/^\d{4}-\d{2}-\d{2}$/) && typeof NepaliFunctions !== 'undefined') {
+                try {
+                    let dateObj = null;
+                    if (typeof NepaliFunctions.ConvertToDateObject === 'function') {
+                        dateObj = NepaliFunctions.ConvertToDateObject(val, "YYYY-MM-DD");
+                    } else {
+                        const p = val.split('-');
+                        dateObj = { year: parseInt(p[0], 10), month: parseInt(p[1], 10), day: parseInt(p[2], 10) };
+                    }
+                    if (dateObj && inputEl._ndpInstance) {
+                        inputEl._ndpInstance.currentDate = dateObj;
+                        inputEl._ndpInstance.currentYearView = dateObj.year;
+                        inputEl._ndpInstance.currentMonthView = dateObj.month;
+                        if (typeof inputEl._ndpInstance.renderCalendar === 'function') {
+                            inputEl._ndpInstance.renderCalendar();
+                        }
+                        if (typeof inputEl._ndpInstance.positionDatePicker === 'function') {
+                            inputEl._ndpInstance.positionDatePicker();
+                        }
+                    }
+                } catch (ignored) {}
+            }
+        });
+
+        // If inside an .input-icon-group, make entire group / calendar icon open the picker
+        const parentGroup = inputEl.closest('.input-icon-group');
+        if (parentGroup) {
+            parentGroup.style.cursor = 'pointer';
+            parentGroup.addEventListener('click', function (e) {
+                if (e.target !== inputEl) {
+                    inputEl.focus();
+                    ensureVisible();
+                }
+            });
+        }
+    }
+
+    /* ---------------------------------------------
        INITIALIZE NEPALI DATE PICKERS (.use-nepali-datepicker)
     --------------------------------------------- */
     function initNepaliDatePickers() {
+        patchNepaliDatePickerPrototype();
+
         const pickers = document.querySelectorAll('.use-nepali-datepicker');
 
         pickers.forEach(function (adInput) {
@@ -303,11 +460,12 @@
 
             if (isDirectBs) {
                 if (typeof adInput.nepaliDatePicker === 'function') {
-                    adInput.nepaliDatePicker({
+                    const inst = adInput.nepaliDatePicker({
                         ndpYear: true,
                         ndpMonth: true,
                         ndpYearCount: 20
                     });
+                    bindDatePickerInteractions(adInput, inst);
                 }
                 return;
             }
@@ -351,7 +509,7 @@
 
             // 5. Initialize the Nepali Date Picker widget
             if (typeof bsInput.nepaliDatePicker === 'function') {
-                bsInput.nepaliDatePicker({
+                const inst = bsInput.nepaliDatePicker({
                     ndpYear: true,
                     ndpMonth: true,
                     ndpYearCount: 100,
@@ -359,6 +517,7 @@
                         syncBsToAd(bsInput, adInput);
                     }
                 });
+                bindDatePickerInteractions(bsInput, inst);
             }
 
             // 6. Handle change and input events
@@ -425,6 +584,8 @@
     window.initNepaliDatePickers = initNepaliDatePickers;
     window.convertAdToBsString = convertAdToBsString;
     window.convertNepaliNumbersToEnglish = convertNepaliNumbersToEnglish;
+    window.bindDatePickerInteractions = bindDatePickerInteractions;
+    window.patchNepaliDatePickerPrototype = patchNepaliDatePickerPrototype;
 
     /* ---------------------------------------------
        DOM READY LISTENER

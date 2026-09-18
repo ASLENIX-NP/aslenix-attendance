@@ -1,6 +1,7 @@
 package com.aslenix.attendance.repository;
 
 import com.aslenix.attendance.entity.Employee;
+import com.aslenix.attendance.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface EmployeeRepository
     Optional<Employee> findByEmail(String email);
 
     List<Employee> findAllByOrderByFirstNameAsc();
+
+    List<Employee> findByUserRole(Role role);
 }

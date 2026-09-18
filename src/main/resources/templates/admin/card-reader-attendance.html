@@ -1938,38 +1938,236 @@
             font-weight: 500;
         }
 
-        /* TOAST ALERT */
-        .as-toast {
+        /* =====================================================
+           UPGRADED UNDERSTANDABLE TOAST & NOTIFICATION POPUP
+        ===================================================== */
+        .toast-container {
             position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            opacity: 0;
-            background: #0f172a;
-            color: #ffffff;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 750;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+            top: 24px;
+            right: 24px;
+            z-index: 100099 !important;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 10000;
-            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+            max-width: 450px;
+            width: calc(100vw - 48px);
         }
 
-        .as-toast.show {
-            transform: translateX(-50%) translateY(0);
+        .toast {
+            pointer-events: auto;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 18px 16px 16px;
+            border-radius: 14px;
+            background: #0f172a;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35), 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .toast.show {
+            transform: translateX(0);
             opacity: 1;
         }
 
-        .as-toast.error {
+        .toast-icon-wrap {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .toast-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+        }
+
+        .toast-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            font-weight: 450;
+            color: #cbd5e1;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .toast-guidance {
+            margin-top: 9px;
+            padding: 8px 11px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.45;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .toast-guidance-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .toast-close-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            margin: -4px -6px 0 0;
+            flex-shrink: 0;
+        }
+
+        .toast-close-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .toast-progress-track {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .toast-progress-fill {
+            height: 100%;
+            width: 100%;
+            transform-origin: left;
+            transition: width linear;
+        }
+
+        /* Category Color Themes */
+        .toast.error {
+            background: #1c1014;
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+        .toast.error .toast-icon-wrap {
+            background: rgba(239, 68, 68, 0.18);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+        .toast.error .toast-badge {
+            background: rgba(239, 68, 68, 0.22);
+            color: #fca5a5;
+        }
+        .toast.error .toast-guidance {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fecaca;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        .toast.error .toast-progress-fill {
             background: #ef4444;
         }
 
-        .as-toast.success {
+        .toast.warning {
+            background: #1c160c;
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+        .toast.warning .toast-icon-wrap {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .toast.warning .toast-badge {
+            background: rgba(245, 158, 11, 0.22);
+            color: #fde68a;
+        }
+        .toast.warning .toast-guidance {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fef3c7;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+        .toast.warning .toast-progress-fill {
+            background: #f59e0b;
+        }
+
+        .toast.success {
+            background: #091713;
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+        .toast.success .toast-icon-wrap {
+            background: rgba(16, 185, 129, 0.18);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .toast.success .toast-badge {
+            background: rgba(16, 185, 129, 0.22);
+            color: #a7f3d0;
+        }
+        .toast.success .toast-progress-fill {
             background: #10b981;
+        }
+
+        .toast.info {
+            background: #0f172a;
+            border-color: rgba(99, 102, 241, 0.35);
+        }
+        .toast.info .toast-icon-wrap {
+            background: rgba(99, 102, 241, 0.18);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.35);
+        }
+        .toast.info .toast-badge {
+            background: rgba(99, 102, 241, 0.22);
+            color: #c7d2fe;
+        }
+        .toast.info .toast-guidance {
+            background: rgba(99, 102, 241, 0.12);
+            color: #e0e7ff;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+        }
+        .toast.info .toast-progress-fill {
+            background: #6366f1;
         }
 
         /* RESPONSIVE */
@@ -2631,8 +2829,9 @@
     </div>
 </div>
 
-<!-- FLOATING TOAST -->
-<div class="as-toast" id="asToast">Notification message</div>
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="taskToastContainer" class="toast-container" role="region" aria-label="Notifications"></div>
+<div id="asToast" style="display:none;"></div>
 
 <!-- =========================================================
      LIVE SCRIPTS: SCAN, CAMERA, ATTENDANCE & AUDIT LOGS
@@ -2697,15 +2896,271 @@ document.addEventListener('DOMContentLoaded', function () {
     const attCheckInVal = document.getElementById('attCheckInVal');
     const attCheckOutVal = document.getElementById('attCheckOutVal');
 
-    // Toast
-    const asToast = document.getElementById('asToast');
-    function showToast(msg, type = 'info') {
-        if (!asToast) return;
-        asToast.textContent = msg;
-        asToast.className = 'as-toast ' + type + ' show';
+    // =========================================================
+    // UNDERSTANDABLE NOTIFICATION & ERROR POPUP SYSTEM
+    // =========================================================
+    function getToastIconSvg(name) {
+        switch (name) {
+            case "lock":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+            case "note":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+            case "shield":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+            case "check":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            case "user":
+            case "user-check":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="18" y1="8" x2="23" y2="13"></line><line x1="23" y1="8" x2="18" y2="13"></line></svg>`;
+            case "clock":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+            case "alert":
+            default:
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        }
+    }
+
+    function parseUnderstandableNotice(msg, type = "info") {
+        if (!msg) {
+            return {
+                title: type === "error" ? "Action Blocked" : "Notice",
+                message: "An unexpected event occurred.",
+                guidance: "Please refresh the page and try again.",
+                badge: type === "error" ? "Blocked" : "Info",
+                type: type,
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        const lower = String(msg).toLowerCase();
+
+        // 1. Already Checked In
+        if (lower.includes("already checked in")) {
+            return {
+                title: "Already Checked In Today",
+                message: msg,
+                guidance: "This employee already has an active check-in record for today. If they are finishing their shift, choose 'CHECK OUT'.",
+                badge: "Already Present",
+                type: "warning",
+                iconSvg: getToastIconSvg("clock")
+            };
+        }
+
+        // 2. Card or ID Scan Required
+        if (lower.includes("scan an employee card") || lower.includes("card or id")) {
+            return {
+                title: "Card Or ID Scan Required",
+                message: "Please provide employee identification to proceed.",
+                guidance: "Tap an NFC/RFID card on the USB reader, point the camera at their QR ID badge, or type the code manually.",
+                badge: "Input Needed",
+                type: "warning",
+                iconSvg: getToastIconSvg("user")
+            };
+        }
+
+        // 3. Employee Not Recognized
+        if (lower.includes("not recognized") || lower.includes("not found") || lower.includes("unrecognized")) {
+            return {
+                title: "Employee Not Recognized",
+                message: msg || "The scanned card or code does not match any active employee profile.",
+                guidance: "Please verify that the employee is registered and their card is linked in Digital QR IDs.",
+                badge: "Unregistered",
+                type: "error",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        // 4. Camera Access Blocked
+        if (lower.includes("camera")) {
+            return {
+                title: "Camera Access Blocked",
+                message: msg,
+                guidance: "Please allow camera permissions in your browser address bar settings to enable live QR scanning.",
+                badge: "Permissions",
+                type: "warning",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        // 5. Failed to record or process attendance
+        if (lower.includes("failed to record") || lower.includes("failed to process") || lower.includes("could not be completed")) {
+            return {
+                title: "Attendance Operation Failed",
+                message: msg,
+                guidance: "The attendance log could not be saved to the database. Check system connectivity and try again.",
+                badge: "Sync Error",
+                type: "error",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        // 6. Card Scanned / Verified Success
+        if (lower.includes("scanned & verified") || lower.includes("verified for")) {
+            return {
+                title: "Card Verified Successfully",
+                message: msg,
+                guidance: "",
+                badge: "Verified",
+                type: "success",
+                iconSvg: getToastIconSvg("check")
+            };
+        }
+
+        // 7. Reader Connected / Disconnected
+        if (lower.includes("reader connected") || lower.includes("reader status: ok")) {
+            return {
+                title: "Card Reader Online",
+                message: msg,
+                guidance: "",
+                badge: "Connected",
+                type: "success",
+                iconSvg: getToastIconSvg("check")
+            };
+        }
+        if (lower.includes("reader disconnected")) {
+            return {
+                title: "Card Reader Disconnected",
+                message: "RFID/NFC Card Reader was unplugged or lost USB connection.",
+                guidance: "Check the USB cable connection to continue hardware scanning.",
+                badge: "Hardware",
+                type: "warning",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        // Default Success
+        if (type === "success") {
+            return {
+                title: "Attendance Recorded",
+                message: msg,
+                guidance: "",
+                badge: "Success",
+                type: "success",
+                iconSvg: getToastIconSvg("check")
+            };
+        }
+
+        // Default Error
+        if (type === "error") {
+            return {
+                title: "Attendance Action Blocked",
+                message: msg,
+                guidance: "Please check employee status and card reader connectivity before trying again.",
+                badge: "Error Notice",
+                type: "error",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        return {
+            title: "Notification",
+            message: msg,
+            guidance: "",
+            badge: "Notice",
+            type: type,
+            iconSvg: getToastIconSvg("info")
+        };
+    }
+
+    let toastTimer = null;
+    let toastProgressInterval = null;
+
+    function showToast(msg, type = "info") {
+        const parsed = parseUnderstandableNotice(msg, type);
+        let container = document.getElementById("taskToastContainer");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "taskToastContainer";
+            container.className = "toast-container";
+            document.body.appendChild(container);
+        }
+
+        // Clean up previous toast if active
+        container.innerHTML = "";
+        clearTimeout(toastTimer);
+        clearInterval(toastProgressInterval);
+
+        const toast = document.createElement("div");
+        toast.className = `toast ${parsed.type}`;
+        toast.setAttribute("role", "alert");
+
+        const guidanceHtml = parsed.guidance ? `
+            <div class="toast-guidance">
+                <svg class="toast-guidance-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>${parsed.guidance}</span>
+            </div>
+        ` : '';
+
+        toast.innerHTML = `
+            <div class="toast-icon-wrap">${parsed.iconSvg}</div>
+            <div class="toast-content">
+                <div class="toast-title-row">
+                    <span class="toast-title">${parsed.title}</span>
+                    <span class="toast-badge">${parsed.badge}</span>
+                </div>
+                <div class="toast-message">${parsed.message}</div>
+                ${guidanceHtml}
+            </div>
+            <button type="button" class="toast-close-btn" title="Dismiss (or click to close)">✕</button>
+            <div class="toast-progress-track">
+                <div class="toast-progress-fill" style="width: 100%;"></div>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // Force browser reflow to trigger smooth entrance animation
+        requestAnimationFrame(() => {
+            toast.classList.add("show");
+        });
+
+        // Reading duration: 6.5s for errors, 5.5s for warnings, 3.8s for success
+        const duration = parsed.type === "error" ? 6500 : (parsed.type === "warning" ? 5500 : 3800);
+        let remaining = duration;
+        const intervalStep = 50;
+        const progressFill = toast.querySelector(".toast-progress-fill");
+
+        const updateProgress = () => {
+            remaining -= intervalStep;
+            if (progressFill) {
+                const pct = Math.max(0, (remaining / duration) * 100);
+                progressFill.style.width = pct + "%";
+            }
+            if (remaining <= 0) {
+                dismissToast(toast);
+            }
+        };
+
+        toastProgressInterval = setInterval(updateProgress, intervalStep);
+
+        // Pause countdown on mouse hover so user can comfortably read longer guidance
+        toast.addEventListener("mouseenter", () => {
+            clearInterval(toastProgressInterval);
+        });
+
+        toast.addEventListener("mouseleave", () => {
+            clearInterval(toastProgressInterval);
+            toastProgressInterval = setInterval(updateProgress, intervalStep);
+        });
+
+        // Close button
+        const closeBtn = toast.querySelector(".toast-close-btn");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => dismissToast(toast));
+        }
+    }
+
+    function dismissToast(toast) {
+        if (!toast) return;
+        clearInterval(toastProgressInterval);
+        toast.classList.remove("show");
         setTimeout(() => {
-            asToast.className = 'as-toast';
-        }, 3800);
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 350);
     }
 
     // Audio Beep Feedback

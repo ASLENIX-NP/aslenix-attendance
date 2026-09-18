@@ -1277,39 +1277,224 @@
             color: #64748b;
         }
 
-        /* TOAST NOTIFICATION */
-        .settings-toast {
+        /* UPGRADED UNDERSTANDABLE TOAST & NOTIFICATION POPUP */
+        .toast-container {
             position: fixed;
-            bottom: 28px;
-            right: 28px;
-            background: #0f172a;
-            color: #ffffff;
-            padding: 12px 18px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            box-shadow: 0 10px 30px rgba(25, 35, 65, 0.22);
-            z-index: 9999;
+            top: 24px;
+            right: 24px;
+            z-index: 100099 !important;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            opacity: 0;
-            transform: translateY(14px);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-direction: column;
+            gap: 12px;
+            max-width: 440px;
+            width: calc(100vw - 48px);
             pointer-events: none;
         }
 
-        .settings-toast.show {
+        .toast {
+            position: relative;
+            pointer-events: auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 18px;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            opacity: 0;
+            transform: translateX(30px) scale(0.96);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast.show {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(0) scale(1);
         }
 
-        .settings-toast.success {
-            border-left: 4px solid #22c55e;
+        .toast-icon-wrap {
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
         }
 
-        .settings-toast.error {
-            border-left: 4px solid #ef4444;
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .toast-title {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .toast-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .toast-message {
+            font-size: 12.5px;
+            color: #cbd5e1;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .toast-guidance {
+            margin-top: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .toast-guidance-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .toast-close-btn {
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            font-size: 16px;
+            line-height: 1;
+            transition: all 0.15s ease;
+            margin-top: -2px;
+            margin-right: -4px;
+        }
+
+        .toast-close-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .toast-progress-track {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .toast-progress-fill {
+            height: 100%;
+            width: 100%;
+            transition: width 0.05s linear;
+        }
+
+        /* VARIANTS */
+        .toast.error {
+            background: #0f172a;
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+        .toast.error .toast-icon-wrap {
+            background: rgba(239, 68, 68, 0.18);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+        .toast.error .toast-badge {
+            background: rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+        }
+        .toast.error .toast-guidance {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fecaca;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        .toast.error .toast-progress-fill {
+            background: #ef4444;
+        }
+
+        .toast.warning {
+            background: #0f172a;
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+        .toast.warning .toast-icon-wrap {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .toast.warning .toast-badge {
+            background: rgba(245, 158, 11, 0.25);
+            color: #fde68a;
+        }
+        .toast.warning .toast-guidance {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fef3c7;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+        .toast.warning .toast-progress-fill {
+            background: #f59e0b;
+        }
+
+        .toast.success {
+            background: #0f172a;
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+        .toast.success .toast-icon-wrap {
+            background: rgba(34, 197, 94, 0.18);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.35);
+        }
+        .toast.success .toast-badge {
+            background: rgba(34, 197, 94, 0.22);
+            color: #bbf7d0;
+        }
+        .toast.success .toast-progress-fill {
+            background: #22c55e;
+        }
+
+        .toast.info {
+            background: #0f172a;
+            border-color: rgba(99, 102, 241, 0.35);
+        }
+        .toast.info .toast-icon-wrap {
+            background: rgba(99, 102, 241, 0.18);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.35);
+        }
+        .toast.info .toast-badge {
+            background: rgba(99, 102, 241, 0.22);
+            color: #c7d2fe;
+        }
+        .toast.info .toast-guidance {
+            background: rgba(99, 102, 241, 0.12);
+            color: #e0e7ff;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+        }
+        .toast.info .toast-progress-fill {
+            background: #6366f1;
         }
 
         /* FORM ACTIONS */
@@ -2436,8 +2621,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<!-- WORKING DAYS PRESETS, LIVE SYNC & BACKEND CONNECTIVITY SCRIPT -->
-<div id="settingsToast" class="settings-toast" role="alert" aria-live="assertive"></div>
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="taskToastContainer" class="toast-container" role="region" aria-label="Notifications"></div>
+<div id="settingsToast" style="display:none;"></div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -2446,17 +2632,226 @@ document.addEventListener('DOMContentLoaded', function () {
     const presetButtons = document.querySelectorAll('.preset-btn[data-preset]');
     const btnQuickSaveDays = document.getElementById('btnQuickSaveDays');
     const scheduleGrid = document.getElementById('scheduleGrid');
-    const toastEl = document.getElementById('settingsToast');
-    let toastTimeout = null;
+
+    // =========================================================
+    // UNDERSTANDABLE NOTIFICATION & ERROR POPUP SYSTEM
+    // =========================================================
+    function getToastIconSvg(name) {
+        switch (name) {
+            case "lock":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+            case "note":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+            case "shield":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+            case "check":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            case "user":
+            case "user-check":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="18" y1="8" x2="23" y2="13"></line><line x1="23" y1="8" x2="18" y2="13"></line></svg>`;
+            case "clock":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+            case "alert":
+            default:
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        }
+    }
+
+    function parseUnderstandableNotice(msg, type = "info") {
+        if (!msg) {
+            return {
+                title: type === "error" ? "Action Blocked" : "Notice",
+                message: "An unexpected event occurred.",
+                guidance: "Please refresh the page and try again.",
+                badge: type === "error" ? "Blocked" : "Info",
+                type: type,
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        const lower = String(msg).toLowerCase();
+
+        // 1. Preset applied
+        if (lower.includes("preset applied")) {
+            return {
+                title: "Working Days Preset Applied",
+                message: msg,
+                guidance: "Review the highlighted days below, then click 'Save Configuration' to apply changes to the company calendar.",
+                badge: "Preset",
+                type: "info",
+                iconSvg: getToastIconSvg("note")
+            };
+        }
+
+        // 2. Saved successfully
+        if (lower.includes("saved to backend") || lower.includes("saved successfully")) {
+            return {
+                title: "Configuration Saved",
+                message: "Working days and attendance schedule updated successfully.",
+                guidance: "",
+                badge: "Saved",
+                type: "success",
+                iconSvg: getToastIconSvg("check")
+            };
+        }
+
+        // 3. Save failed / Unable to connect
+        if (lower.includes("failed to save") || lower.includes("unable to connect") || lower.includes("failed to update")) {
+            return {
+                title: "Schedule Save Failed",
+                message: msg,
+                guidance: "Unable to reach the server to persist operational days. Check database connectivity or admin session.",
+                badge: "Sync Error",
+                type: "error",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        // 4. Day toggled
+        if (lower.includes("is now a working day") || lower.includes("is now a holiday")) {
+            return {
+                title: "Calendar Day Toggled",
+                message: msg,
+                guidance: "",
+                badge: "Calendar",
+                type: "success",
+                iconSvg: getToastIconSvg("check")
+            };
+        }
+
+        // Default Success
+        if (type === "success") {
+            return {
+                title: "Settings Updated",
+                message: msg,
+                guidance: "",
+                badge: "Success",
+                type: "success",
+                iconSvg: getToastIconSvg("check")
+            };
+        }
+
+        // Default Error
+        if (type === "error") {
+            return {
+                title: "Configuration Error",
+                message: msg,
+                guidance: "The settings modification could not be saved. Please try again.",
+                badge: "Error Notice",
+                type: "error",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        return {
+            title: "Notification",
+            message: msg,
+            guidance: "",
+            badge: "Notice",
+            type: type,
+            iconSvg: getToastIconSvg("info")
+        };
+    }
+
+    let toastTimer = null;
+    let toastProgressInterval = null;
 
     function showToast(message, type = 'success') {
-        if (!toastEl) return;
-        clearTimeout(toastTimeout);
-        toastEl.textContent = message;
-        toastEl.className = 'settings-toast ' + type + ' show';
-        toastTimeout = setTimeout(() => {
-            toastEl.classList.remove('show');
-        }, 3200);
+        const parsed = parseUnderstandableNotice(message, type);
+        let container = document.getElementById("taskToastContainer");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "taskToastContainer";
+            container.className = "toast-container";
+            document.body.appendChild(container);
+        }
+
+        // Clean up previous toast if active
+        container.innerHTML = "";
+        clearTimeout(toastTimer);
+        clearInterval(toastProgressInterval);
+
+        const toast = document.createElement("div");
+        toast.className = `toast ${parsed.type}`;
+        toast.setAttribute("role", "alert");
+
+        const guidanceHtml = parsed.guidance ? `
+            <div class="toast-guidance">
+                <svg class="toast-guidance-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>${parsed.guidance}</span>
+            </div>
+        ` : '';
+
+        toast.innerHTML = `
+            <div class="toast-icon-wrap">${parsed.iconSvg}</div>
+            <div class="toast-content">
+                <div class="toast-title-row">
+                    <span class="toast-title">${parsed.title}</span>
+                    <span class="toast-badge">${parsed.badge}</span>
+                </div>
+                <div class="toast-message">${parsed.message}</div>
+                ${guidanceHtml}
+            </div>
+            <button type="button" class="toast-close-btn" title="Dismiss (or click to close)">✕</button>
+            <div class="toast-progress-track">
+                <div class="toast-progress-fill" style="width: 100%;"></div>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // Force browser reflow to trigger smooth entrance animation
+        requestAnimationFrame(() => {
+            toast.classList.add("show");
+        });
+
+        // Reading duration: 6.5s for errors, 5.5s for warnings, 3.8s for success
+        const duration = parsed.type === "error" ? 6500 : (parsed.type === "warning" ? 5500 : 3800);
+        let remaining = duration;
+        const intervalStep = 50;
+        const progressFill = toast.querySelector(".toast-progress-fill");
+
+        const updateProgress = () => {
+            remaining -= intervalStep;
+            if (progressFill) {
+                const pct = Math.max(0, (remaining / duration) * 100);
+                progressFill.style.width = pct + "%";
+            }
+            if (remaining <= 0) {
+                dismissToast(toast);
+            }
+        };
+
+        toastProgressInterval = setInterval(updateProgress, intervalStep);
+
+        // Pause countdown on mouse hover so user can comfortably read longer guidance
+        toast.addEventListener("mouseenter", () => {
+            clearInterval(toastProgressInterval);
+        });
+
+        toast.addEventListener("mouseleave", () => {
+            clearInterval(toastProgressInterval);
+            toastProgressInterval = setInterval(updateProgress, intervalStep);
+        });
+
+        // Close button
+        const closeBtn = toast.querySelector(".toast-close-btn");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => dismissToast(toast));
+        }
+    }
+
+    function dismissToast(toast) {
+        if (!toast) return;
+        clearInterval(toastProgressInterval);
+        toast.classList.remove("show");
+        setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 350);
     }
 
     function getCsrf() {

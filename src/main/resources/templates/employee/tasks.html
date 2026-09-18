@@ -15,10 +15,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;850&display=swap" rel="stylesheet">
 
     <!-- NEPALI DATE CONVERTER & PICKER -->
-    <link rel="stylesheet" href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/nepali-date-converter/dist/nepali-date-converter.umd.js"></script>
-    <script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js"></script>
+    <link rel="stylesheet" href="/css/nepali.datepicker.v5.0.6.min.css">
+    <script src="/js/nepali-date-converter.umd.js"></script>
+    <script src="/js/nepali.datepicker.v5.0.6.min.js"></script>
     <script src="/js/nepali-date-utils.js"></script>
+
 
     <style>
         /* =====================================================
@@ -1794,32 +1795,779 @@
 
         .submit-review-box.show { display: flex; }
 
-        /* TOAST */
-        .toast {
+        /* =====================================================
+           UPGRADED UNDERSTANDABLE TOAST & NOTIFICATION POPUP
+        ===================================================== */
+        .toast-container {
             position: fixed;
-            bottom: 24px;
+            top: 24px;
             right: 24px;
-            padding: 12px 20px;
-            background: #1e293b;
-            color: #ffffff;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.25s ease;
+            z-index: 100099 !important;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             pointer-events: none;
-            z-index: 9999;
+            max-width: 450px;
+            width: calc(100vw - 48px);
+        }
+
+        .toast {
+            pointer-events: auto;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 18px 16px 16px;
+            border-radius: 14px;
+            background: #0f172a;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35), 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .toast.show {
+            transform: translateX(0);
             opacity: 1;
-            transform: translateY(0);
         }
 
-        .toast.success { background: #065f46; border-left: 4px solid #10b981; }
-        .toast.error { background: #991b1b; border-left: 4px solid #ef4444; }
+        .toast-icon-wrap {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .toast-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+        }
+
+        .toast-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            font-weight: 450;
+            color: #cbd5e1;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .toast-guidance {
+            margin-top: 9px;
+            padding: 8px 11px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.45;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .toast-guidance-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .toast-close-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            margin: -4px -6px 0 0;
+            flex-shrink: 0;
+        }
+
+        .toast-close-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .toast-progress-track {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .toast-progress-fill {
+            height: 100%;
+            width: 100%;
+            transform-origin: left;
+            transition: width linear;
+        }
+
+        /* Category Color Themes */
+        .toast.error {
+            background: #1c1014;
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+        .toast.error .toast-icon-wrap {
+            background: rgba(239, 68, 68, 0.18);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+        .toast.error .toast-badge {
+            background: rgba(239, 68, 68, 0.22);
+            color: #fca5a5;
+        }
+        .toast.error .toast-guidance {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fecaca;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        .toast.error .toast-progress-fill {
+            background: #ef4444;
+        }
+
+        .toast.warning {
+            background: #1c160c;
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+        .toast.warning .toast-icon-wrap {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .toast.warning .toast-badge {
+            background: rgba(245, 158, 11, 0.22);
+            color: #fde68a;
+        }
+        .toast.warning .toast-guidance {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fef3c7;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+        .toast.warning .toast-progress-fill {
+            background: #f59e0b;
+        }
+
+        .toast.success {
+            background: #091713;
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+        .toast.success .toast-icon-wrap {
+            background: rgba(16, 185, 129, 0.18);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .toast.success .toast-badge {
+            background: rgba(16, 185, 129, 0.22);
+            color: #a7f3d0;
+        }
+        .toast.success .toast-progress-fill {
+            background: #10b981;
+        }
+
+        .toast.info {
+            background: #0f172a;
+            border-color: rgba(99, 102, 241, 0.35);
+        }
+        .toast.info .toast-icon-wrap {
+            background: rgba(99, 102, 241, 0.18);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.35);
+        }
+        .toast.info .toast-badge {
+            background: rgba(99, 102, 241, 0.22);
+            color: #c7d2fe;
+        }
+        .toast.info .toast-guidance {
+            background: rgba(99, 102, 241, 0.12);
+            color: #e0e7ff;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+        }
+        .toast.info .toast-progress-fill {
+            background: #6366f1;
+        }
+
+        /* Modal Inline Alert */
+        .modal-inline-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            line-height: 1.45;
+            animation: alertShake 0.35s ease;
+        }
+
+        @keyframes alertShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        .modal-inline-alert.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .modal-inline-alert.warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .modal-inline-alert strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 3px;
+            color: #7f1d1d;
+        }
+
+        .modal-inline-alert.warning strong {
+            color: #78350f;
+        }
+
+        /* =====================================================
+           NEPALI DATEPICKER OVERLAY & ELEVATION (V5 + Legacy)
+           Guarantees calendar is visible on top of all modals
+        ===================================================== */
+        .ndp-container,
+        #ndp-nepali-box,
+        .nepali-datepicker,
+        [role="dialog"][aria-label="Date Picker"] {
+            position: fixed !important;
+            z-index: 100060 !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 14px !important;
+            box-shadow: 0 24px 50px -10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(226, 232, 240, 0.8) !important;
+            padding: 10px !important;
+            color: #0f172a !important;
+            max-width: 290px !important;
+        }
+
+        .ndp-container.ndp-light,
+        .ndp-container.ndp-light .ndp-table {
+            background: #ffffff !important;
+        }
+
+        .ndp-container .ndp-header {
+            padding: 6px 4px 10px !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 4px !important;
+        }
+
+        .ndp-container .ndp-header .ndp-header-link {
+            font-weight: 750 !important;
+            font-size: 13.5px !important;
+            color: #1e293b !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .ndp-container .ndp-header .ndp-header-link:hover {
+            background: #f1f5f9 !important;
+            color: #4f46e5 !important;
+        }
+
+        .ndp-container .ndc-nav-button {
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 8px !important;
+            border: 1px solid #e2e8f0 !important;
+            background: #f8fafc !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .ndp-container .ndc-nav-button:hover {
+            background: #eef2ff !important;
+            border-color: #c7d2fe !important;
+            color: #4f46e5 !important;
+        }
+
+        .ndp-container .ndp-table {
+            margin-top: 6px !important;
+            width: 100% !important;
+        }
+
+        .ndp-container .ndp-table th {
+            font-size: 11px !important;
+            font-weight: 750 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            color: #64748b !important;
+            padding: 6px 0 !important;
+            text-align: center !important;
+        }
+
+        .ndp-container .ndp-table td {
+            width: 34px !important;
+            height: 32px !important;
+            font-size: 13px !important;
+            font-weight: 550 !important;
+            color: #1e293b !important;
+            border-radius: 8px !important;
+            text-align: center !important;
+            transition: all 0.12s ease !important;
+            cursor: pointer !important;
+        }
+
+        .ndp-container .ndp-table td:hover:not(.ndp-disabled) {
+            background: #eef2ff !important;
+            color: #4f46e5 !important;
+            font-weight: 700 !important;
+        }
+
+        .ndp-container .ndp-table td.ndp-selected {
+            background: #4f46e5 !important;
+            color: #ffffff !important;
+            font-weight: 750 !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35) !important;
+        }
+
+        .ndp-container .ndp-table td.ndp-today {
+            color: #4f46e5 !important;
+            font-weight: 800 !important;
+            border: 1.5px solid #818cf8 !important;
+        }
+
+        .ndp-container .ndp-month-selection,
+        .ndp-container .ndp-year-selection {
+            padding: 8px !important;
+            gap: 6px !important;
+        }
+
+        .ndp-container .ndp-month-button,
+        .ndp-container .ndp-year-button {
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            padding: 8px 10px !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .ndp-container .ndp-month-button:hover,
+        .ndp-container .ndp-year-button:hover {
+            background: #eef2ff !important;
+            color: #4f46e5 !important;
+        }
+
+        .ndp-container .ndp-month-button.ndp-selected,
+        .ndp-container .ndp-year-button.ndp-selected {
+            background: #4f46e5 !important;
+            color: #ffffff !important;
+        }
+
+
+        /* Locked Task Badge */
+        .task-card-locked-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #047857;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            margin-bottom: 8px;
+        }
+
+        /* Enhanced Work Item Card */
+        .assignment-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .assignment-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .assignment-card.overdue {
+            border-color: #fca5a5;
+            background: #fffafa;
+        }
+
+        .assignment-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .assignment-card-title-block {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .assignment-card-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .assignment-card-desc {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.45;
+            margin-top: 4px;
+            background: #f8fafc;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .assignment-card-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .assignment-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .assignment-meta-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .assignment-assignee-name {
+            font-weight: 600;
+            color: #334155;
+            font-size: 12px;
+        }
+
+        .assignment-deadline-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .assignment-deadline-tag.overdue {
+            background: #fee2e2;
+            color: #b91c1c;
+            font-weight: 650;
+        }
+
+        .badge-overdue {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            letter-spacing: 0.5px;
+        }
+
+        .assignment-meta-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .work-item-progress-section {
+            background: #f8fafc;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .work-item-progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 650;
+            margin-bottom: 4px;
+        }
+
+        .work-item-progress-val {
+            color: #4f46e5;
+            font-weight: 750;
+        }
+
+        .work-item-progress-track {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .work-item-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #6366f1);
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+
+        .work-item-progress-fill.complete {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .btn-update-wi-progress {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 9px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 650;
+            color: #4f46e5;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-update-wi-progress:hover {
+            background: #e0e7ff;
+            border-color: #a5b4fc;
+        }
+
+        .btn-wi-history {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 9px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #475569;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-wi-history:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .tag-view-only {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10.5px;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Sub Modals */
+        .modal-backdrop-sub {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100020;
+            padding: 20px;
+        }
+
+        .modal-backdrop-sub.active,
+        .modal-backdrop-sub.show {
+            display: flex !important;
+        }
+
+        .modal-dialog-sub {
+            background: #ffffff;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-header-sub {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e8edf6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header-sub h3 {
+            font-size: 15px;
+            font-weight: 750;
+            color: #0f172a;
+        }
+
+        .modal-body-sub {
+            padding: 18px 20px;
+        }
+
+        .modal-footer-sub {
+            padding: 12px 20px;
+            border-top: 1px solid #e8edf6;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .history-timeline-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .history-item-entry {
+            border-left: 2px solid #6366f1;
+            padding-left: 14px;
+            margin-left: 6px;
+            position: relative;
+        }
+
+        .history-item-entry::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #6366f1;
+            border: 2px solid #ffffff;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .history-progress-badge {
+            font-size: 11px;
+            font-weight: 750;
+            color: #4f46e5;
+            background: #eef2ff;
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+
+        .history-item-time {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .history-item-author {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.5px;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .history-author-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #94a3b8;
+        }
+
+        .history-item-note {
+            font-size: 12px;
+            color: #1e293b;
+            background: #f8fafc;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            line-height: 1.45;
+        }
 
         /* RESPONSIVE */
         @media (max-width: 1280px) {
@@ -2106,12 +2854,18 @@
 <th:block th:fragment="taskCardFragment(task)" th:if="${task != null}">
     <div class="task-card"
          style="cursor: pointer;"
-         th:attr="draggable=${task?.status != 'APPROVED' and task?.status != 'COMPLETED' ? 'true' : 'false'}, data-task-id=${task?.id}, data-status=${task?.status == 'UNDER_REVIEW' ? 'READY_FOR_REVIEW' : (task?.status == 'COMPLETED' ? 'APPROVED' : task?.status)}, data-priority=${task?.priority}, data-complexity=${task?.complexity}"
+         th:attr="draggable=${!task?.isLocked() and task?.status != 'APPROVED' and task?.status != 'COMPLETED' ? 'true' : 'false'}, data-task-id=${task?.id}, data-status=${task?.status == 'UNDER_REVIEW' ? 'READY_FOR_REVIEW' : (task?.status == 'COMPLETED' ? 'APPROVED' : task?.status)}, data-priority=${task?.priority}, data-complexity=${task?.complexity}, data-locked=${task?.isLocked()}"
          th:onclick="'openTaskModal(' + ${task?.id} + ')'">
 
         <!-- Top Badges -->
         <div class="task-card-top">
-            <span class="task-code-badge" th:text="${task?.taskCode}">TASK-001</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="task-code-badge" th:text="${task?.taskCode}">TASK-001</span>
+                <span class="task-card-locked-badge" th:if="${task?.isLocked()}" title="Task is approved and locked">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span>Locked</span>
+                </span>
+            </div>
             <div class="badge-group">
                 <span class="complexity-badge"
                       th:classappend="${task?.complexity == 'SMALL' ? 'comp-small' : (task?.complexity == 'LARGE' ? 'comp-large' : (task?.complexity == 'EPIC' ? 'comp-epic' : 'comp-medium'))}"
@@ -2467,18 +3221,36 @@
                     <!-- Inline Assignment Form -->
                     <div class="assignment-add-form" id="inlineAssignmentForm">
                         <div style="font-size: 12px; font-weight: 750; color: #1e293b;">New Work Item</div>
-                        <input type="text" id="newAssignTitleInput" class="form-input" placeholder="Work item title / note...">
-                        <div style="display: flex; gap: 8px;">
-                            <select id="newAssignWeightSelect" class="form-select" style="width: 140px;">
+                        <input type="text" id="newAssignTitleInput" class="form-input" placeholder="Work item title (required)...">
+                        <textarea id="newAssignDescInput" class="form-textarea" placeholder="Detailed work item instructions / scope (optional)..." rows="2"></textarea>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                            <select id="newAssignEmployeeSelect" class="form-select">
+                                <option value="">Assign to task member...</option>
+                            </select>
+                            <select id="newAssignWeightSelect" class="form-select">
                                 <option value="SMALL">Small Effort</option>
                                 <option value="MEDIUM" selected>Medium Effort</option>
                                 <option value="LARGE">Large Effort</option>
                                 <option value="EPIC">Epic Effort</option>
                             </select>
                         </div>
-                        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div class="input-icon-group">
+                                <input type="text" id="newAssignDeadlineBsInput" class="form-input use-nepali-datepicker" placeholder="Deadline date (BS) e.g. 2083-05-20" autocomplete="off">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                <input type="hidden" id="newAssignDeadlineInput">
+                            </div>
+                            <div class="input-icon-group">
+                                <input type="time" id="newAssignDeadlineTimeInput" class="form-input" value="18:00">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px;">
                             <button type="button" class="btn-cancel-modal" onclick="toggleInlineAssignmentForm(false)">Cancel</button>
-                            <button type="button" class="btn-add-assignment" onclick="submitNewAssignment()">Save Item</button>
+                            <button type="button" class="btn-add-assignment" onclick="submitNewAssignment()">Save Work Item</button>
                         </div>
                     </div>
 
@@ -2525,8 +3297,86 @@
     </div>
 </div>
 
-<!-- TOAST NOTIFICATION -->
-<div id="taskToast" class="toast" role="status" aria-live="polite"></div>
+<!-- =====================================================
+     WORK ITEM PROGRESS MODAL (MANDATORY NOTE VALIDATION)
+====================================================== -->
+<div class="modal-backdrop-sub" id="wiProgressModal">
+    <div class="modal-dialog-sub">
+        <div class="modal-header-sub">
+            <h3 id="wiProgressModalTitle">Update Work Item Progress</h3>
+            <button type="button" class="modal-close-btn" onclick="closeWiProgressModal()">✕</button>
+        </div>
+        <div class="modal-body-sub">
+            <input type="hidden" id="wiProgressAssignmentId" value="">
+            <div style="font-size: 13.5px; font-weight: 750; color: #1e293b; margin-bottom: 12px;" id="wiProgressItemName">Work Item</div>
+
+            <div class="form-group">
+                <label class="form-label" style="display: flex; justify-content: space-between;">
+                    <span>Progress Percentage</span>
+                    <strong id="wiProgressDisplayVal" style="color: #4f46e5; font-size: 14px;">0%</strong>
+                </label>
+                <div class="total-progress-track" style="margin-bottom: 8px;">
+                    <div class="total-progress-fill" id="wiProgressVisualBar" style="width: 0%;"></div>
+                </div>
+                <input type="range" class="progress-range-slider" id="wiProgressSlider" min="0" max="100" value="0" oninput="onWiSliderChange(this.value)">
+                <div class="progress-milestones" style="margin-top: 8px;">
+                    <button type="button" class="btn-milestone" onclick="setWiMilestone(0)">0% (To Do)</button>
+                    <button type="button" class="btn-milestone" onclick="setWiMilestone(25)">25%</button>
+                    <button type="button" class="btn-milestone" onclick="setWiMilestone(50)">50% (Halfway)</button>
+                    <button type="button" class="btn-milestone" onclick="setWiMilestone(75)">75%</button>
+                    <button type="button" class="btn-milestone" onclick="setWiMilestone(100)">100% (Done)</button>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+                <label class="form-label" for="wiProgressNoteInput">
+                    Update Note / Description <span style="color: #ef4444; font-weight: 800;">* (Mandatory on progress change)</span>
+                </label>
+                <textarea id="wiProgressNoteInput" class="form-textarea" placeholder="Explain what was completed, blockers resolved, or why progress changed..." rows="3"></textarea>
+                <div id="wiProgressError" class="modal-inline-alert error" style="display: none;">
+                    <div style="font-size: 18px; line-height: 1; flex-shrink: 0;">⚠️</div>
+                    <div style="flex: 1;">
+                        <strong id="wiProgressErrorTitle">Update Note Required</strong>
+                        <p id="wiProgressErrorDesc" style="margin: 0; font-size: 12px; color: #991b1b; line-height: 1.45;">
+                            A brief description is mandatory whenever progress percentage changes. Please explain what was completed so it can be recorded in the audit history.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer-sub">
+            <button type="button" class="btn-cancel-modal" onclick="closeWiProgressModal()">Cancel</button>
+            <button type="button" class="btn-save-modal" onclick="submitWiProgress()">Save Progress</button>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================
+     WORK ITEM AUDIT HISTORY MODAL
+====================================================== -->
+<div class="modal-backdrop-sub" id="wiHistoryModal">
+    <div class="modal-dialog-sub" style="max-width: 520px;">
+        <div class="modal-header-sub">
+            <div>
+                <h3 style="font-size: 15px; font-weight: 750; color: #0f172a;">Work Item Update History</h3>
+                <p id="wiHistoryItemName" style="font-size: 12px; color: #64748b; margin-top: 2px;">Audit Log</p>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closeWiHistoryModal()">✕</button>
+        </div>
+        <div class="modal-body-sub" style="max-height: 420px; overflow-y: auto; padding: 16px 20px;">
+            <div id="wiHistoryTimeline" class="history-timeline-wrap">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+        <div class="modal-footer-sub">
+            <button type="button" class="btn-cancel-modal" onclick="closeWiHistoryModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="taskToastContainer" class="toast-container" role="region" aria-label="Notifications"></div>
+<div id="taskToast" style="display:none;"></div>
 
 <!-- =====================================================
      SCRIPTS
@@ -2555,17 +3405,321 @@
     // Modal State
     let currentTaskData = null;
 
-    // Toast helper
+    // =========================================================
+    // UNDERSTANDABLE NOTIFICATION & ERROR POPUP SYSTEM
+    // =========================================================
+    function getToastIconSvg(name) {
+        switch (name) {
+            case "lock":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+            case "note":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+            case "shield":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+            case "check":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            case "user":
+            case "user-check":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="18" y1="8" x2="23" y2="13"></line><line x1="23" y1="8" x2="18" y2="13"></line></svg>`;
+            case "clock":
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+            case "alert":
+            default:
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        }
+    }
+
+    function parseUnderstandableNotice(msg, type = "info") {
+        if (!msg) {
+            return {
+                title: type === "error" ? "Action Blocked" : "Notice",
+                message: "An unexpected event occurred.",
+                guidance: "Please refresh the page and try again.",
+                badge: type === "error" ? "Blocked" : "Info",
+                type: type,
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        const lower = String(msg).toLowerCase();
+
+        // 1. Locked Task
+        if (lower.includes("locked") || (lower.includes("approved") && (lower.includes("cannot") || lower.includes("not allowed")))) {
+            return {
+                title: "Task Is Approved & Locked",
+                message: "This task has already been reviewed, approved, and finalized.",
+                guidance: "Approved tasks cannot be moved across the board, edited, or modified. To make revisions, contact an administrator.",
+                badge: "Task Locked",
+                type: "error",
+                iconSvg: getToastIconSvg("lock")
+            };
+        }
+
+        // 2. Mandatory Note on Progress Change
+        if (lower.includes("mandatory") || lower.includes("strictly required") || (lower.includes("note") && lower.includes("progress")) || (lower.includes("description") && lower.includes("progress"))) {
+            return {
+                title: "Update Note Required",
+                message: "A brief description/note must be provided whenever progress percentage is changed.",
+                guidance: "Please enter a short note explaining what was completed, resolved, or changed before saving.",
+                badge: "Note Required",
+                type: "warning",
+                iconSvg: getToastIconSvg("note")
+            };
+        }
+
+        // 3. Employee Admin Approval Restriction
+        if (lower.includes("only administrators can approve") || (lower.includes("admin") && lower.includes("approve") && lower.includes("review"))) {
+            return {
+                title: "Admin Sign-Off Required",
+                message: "Only administrators can directly approve completed tasks.",
+                guidance: "Please move this task to 'UNDER REVIEW' (Ready for Review) so an administrator can inspect and approve it.",
+                badge: "Restricted",
+                type: "warning",
+                iconSvg: getToastIconSvg("shield")
+            };
+        }
+
+        // 4. Employee Ownership / Peer Subtask Editing
+        if (lower.includes("own assigned") || lower.includes("unauthorized") || lower.includes("access denied") || (lower.includes("permission") && lower.includes("work item"))) {
+            return {
+                title: "Assigned To Another Member",
+                message: "This work item is assigned to a different team member.",
+                guidance: "You have view-only access. Only the assigned employee or an administrator can update this subtask's progress.",
+                badge: "View Only",
+                type: "warning",
+                iconSvg: getToastIconSvg("user-check")
+            };
+        }
+
+        // 5. Already Checked In
+        if (lower.includes("already checked in")) {
+            return {
+                title: "Already Checked In Today",
+                message: msg,
+                guidance: "Check-in can only be recorded once per day. Please check out at the end of the shift.",
+                badge: "Attendance",
+                type: "warning",
+                iconSvg: getToastIconSvg("clock")
+            };
+        }
+
+        // 5.5 Work Item Assignee Must Be Assigned to Task
+        if (lower.includes("only be assigned to a team member") || lower.includes("assigned to this task")) {
+            return {
+                title: "Task Member Required",
+                message: "Work items can only be assigned to team members who are assigned to this task.",
+                guidance: "Please select an employee who is already assigned to this task.",
+                badge: "Assignee Restriction",
+                type: "warning",
+                iconSvg: getToastIconSvg("user")
+            };
+        }
+
+        // 6. Missing Assignee / Column employee_id
+        if (lower.includes("employee_id") || lower.includes("assignee")) {
+            return {
+                title: "Assignee Selection Required",
+                message: "A task requires at least one primary employee assignment.",
+                guidance: "Please select an employee from the assignee list before creating or updating the task.",
+                badge: "Input Required",
+                type: "warning",
+                iconSvg: getToastIconSvg("user")
+            };
+        }
+
+        // 7. Board Move Failed
+        if (lower.includes("could not move") || lower.includes("move task")) {
+            return {
+                title: "Board Status Update Failed",
+                message: msg,
+                guidance: "The task card could not be moved. Please ensure the task is not locked and refresh the board.",
+                badge: "Board Action",
+                type: "error",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        // 8. Save / Delete Failed
+        if (lower.includes("failed to save") || lower.includes("error saving") || lower.includes("failed to delete")) {
+            return {
+                title: "Operation Could Not Be Completed",
+                message: msg,
+                guidance: "The server could not process your request. Check that all required fields are filled out and the task is unlocked.",
+                badge: "Action Failed",
+                type: "error",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        // 9. Work Item Title Required
+        if (lower.includes("work item title") || lower.includes("subtask title") || lower.includes("checklist item title")) {
+            return {
+                title: "Work Item Title Required",
+                message: "Please enter a descriptive title for this work item before adding it.",
+                guidance: "Type a short title in the work item name field, then click Add Work Item.",
+                badge: "Title Required",
+                type: "warning",
+                iconSvg: getToastIconSvg("note")
+            };
+        }
+
+        // 10. Task Title Required
+        if (lower.includes("task title")) {
+            return {
+                title: "Task Title Required",
+                message: "A task cannot be created or saved without a descriptive title.",
+                guidance: "Please enter a title in the Task Title field at the top of the form before saving.",
+                badge: "Title Required",
+                type: "warning",
+                iconSvg: getToastIconSvg("note")
+            };
+        }
+
+        // 11. Save Task First Before Subtasks or Comments
+        if (lower.includes("save the task first")) {
+            return {
+                title: "Save Task First",
+                message: "Checklist work items and discussion comments can only be attached to a saved task.",
+                guidance: "Please save or create the task first. Once saved, you can add subtasks and post comments.",
+                badge: "Action Sequence",
+                type: "warning",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        // Default Success
+        if (type === "success") {
+            return {
+                title: "Action Completed",
+                message: msg,
+                guidance: "",
+                badge: "Success",
+                type: "success",
+                iconSvg: getToastIconSvg("check")
+            };
+        }
+
+        // Default Error
+        if (type === "error") {
+            return {
+                title: "Action Could Not Be Completed",
+                message: msg,
+                guidance: "Please check your inputs and try again. If the issue continues, contact an administrator.",
+                badge: "Error Notice",
+                type: "error",
+                iconSvg: getToastIconSvg("alert")
+            };
+        }
+
+        return {
+            title: "Notification",
+            message: msg,
+            guidance: "",
+            badge: "Notice",
+            type: type,
+            iconSvg: getToastIconSvg("info")
+        };
+    }
+
     let toastTimer = null;
+    let toastProgressInterval = null;
+
     function showToast(msg, type = "success") {
-        const toast = document.getElementById("taskToast");
-        if (!toast) return;
-        toast.textContent = msg;
-        toast.className = `toast show ${type}`;
+        const parsed = parseUnderstandableNotice(msg, type);
+        let container = document.getElementById("taskToastContainer");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "taskToastContainer";
+            container.className = "toast-container";
+            document.body.appendChild(container);
+        }
+
+        // Clean up previous toast if active
+        container.innerHTML = "";
         clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => {
-            toast.className = "toast";
-        }, 3000);
+        clearInterval(toastProgressInterval);
+
+        const toast = document.createElement("div");
+        toast.className = `toast ${parsed.type}`;
+        toast.setAttribute("role", "alert");
+
+        const guidanceHtml = parsed.guidance ? `
+            <div class="toast-guidance">
+                <svg class="toast-guidance-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>${parsed.guidance}</span>
+            </div>
+        ` : '';
+
+        toast.innerHTML = `
+            <div class="toast-icon-wrap">${parsed.iconSvg}</div>
+            <div class="toast-content">
+                <div class="toast-title-row">
+                    <span class="toast-title">${parsed.title}</span>
+                    <span class="toast-badge">${parsed.badge}</span>
+                </div>
+                <div class="toast-message">${parsed.message}</div>
+                ${guidanceHtml}
+            </div>
+            <button type="button" class="toast-close-btn" title="Dismiss (or click to close)">✕</button>
+            <div class="toast-progress-track">
+                <div class="toast-progress-fill" style="width: 100%;"></div>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // Force browser reflow to trigger smooth entrance animation
+        requestAnimationFrame(() => {
+            toast.classList.add("show");
+        });
+
+        // Generous reading duration: 6.5s for errors, 5.5s for warnings, 3.8s for success
+        const duration = parsed.type === "error" ? 6500 : (parsed.type === "warning" ? 5500 : 3800);
+        let remaining = duration;
+        const intervalStep = 50;
+        const progressFill = toast.querySelector(".toast-progress-fill");
+
+        const updateProgress = () => {
+            remaining -= intervalStep;
+            if (progressFill) {
+                const pct = Math.max(0, (remaining / duration) * 100);
+                progressFill.style.width = pct + "%";
+            }
+            if (remaining <= 0) {
+                dismissToast(toast);
+            }
+        };
+
+        toastProgressInterval = setInterval(updateProgress, intervalStep);
+
+        // Pause countdown on mouse hover so user can comfortably read longer guidance
+        toast.addEventListener("mouseenter", () => {
+            clearInterval(toastProgressInterval);
+        });
+
+        toast.addEventListener("mouseleave", () => {
+            clearInterval(toastProgressInterval);
+            toastProgressInterval = setInterval(updateProgress, intervalStep);
+        });
+
+        // Close button
+        const closeBtn = toast.querySelector(".toast-close-btn");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => dismissToast(toast));
+        }
+    }
+
+    function dismissToast(toast) {
+        if (!toast) return;
+        clearInterval(toastProgressInterval);
+        toast.classList.remove("show");
+        setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 350);
     }
 
     // =========================================================
@@ -2599,6 +3753,16 @@
                 if (sel) sel.value = card.dataset.priority;
                 syncSprintPriorityPreview();
             }
+            const isLockedPre = card.dataset.locked === "true" || card.dataset.status === "APPROVED";
+            const bannerPre = document.getElementById("taskApprovedBanner");
+            if (bannerPre) {
+                if (isLockedPre) {
+                    bannerPre.classList.add("show");
+                    bannerPre.querySelector("span").textContent = "This task has been approved and is permanently locked. Modifications are prohibited.";
+                } else {
+                    bannerPre.classList.remove("show");
+                }
+            }
         }
 
         // Open modal immediately
@@ -2611,23 +3775,27 @@
             const data = await res.json();
             currentTaskData = data;
 
+            // Check if approved / locked
+            const isLocked = Boolean(data.locked || data.status === "APPROVED");
+            const banner = document.getElementById("taskApprovedBanner");
+            if (banner) {
+                if (isLocked) {
+                    banner.classList.add("show");
+                    banner.querySelector("span").textContent = "This task has been approved and is permanently locked. Modifications are prohibited.";
+                } else {
+                    banner.classList.remove("show");
+                }
+            }
+
             // Fill Header & Info
             document.getElementById("modalTaskTitleHeader").textContent = "Edit Task · " + (data.taskCode || "TASK");
             document.getElementById("modalTitleInput").value = data.title || "";
             document.getElementById("modalDescriptionInput").value = data.description || "";
 
-            // Check if approved
-            const isApproved = data.status === "APPROVED";
-            const banner = document.getElementById("taskApprovedBanner");
-            if (banner) {
-                if (isApproved) banner.classList.add("show");
-                else banner.classList.remove("show");
-            }
-
             // Status Select
             const statusSelect = document.getElementById("modalStatusSelect");
             const approvedOption = document.getElementById("modalApprovedOption");
-            if (isApproved) {
+            if (isLocked) {
                 if (approvedOption) approvedOption.disabled = false;
                 statusSelect.value = "APPROVED";
                 statusSelect.disabled = true;
@@ -2655,18 +3823,38 @@
             const fill = document.getElementById("modalProgressFill");
             if (fill) {
                 fill.style.width = progress + "%";
-                if (data.status === "APPROVED" || progress >= 100) {
+                if (isLocked || progress >= 100) {
                     fill.classList.add("complete");
                 } else {
                     fill.classList.remove("complete");
                 }
             }
-            document.getElementById("modalProgressSlider").value = progress;
+            const slider = document.getElementById("modalProgressSlider");
+            if (slider) {
+                slider.value = progress;
+                slider.disabled = isLocked;
+            }
+
+            document.querySelectorAll(".btn-milestone").forEach(btn => {
+                btn.disabled = isLocked;
+                btn.style.pointerEvents = isLocked ? "none" : "";
+                btn.style.opacity = isLocked ? "0.5" : "";
+            });
+
+            const btnUpdateProgress = document.querySelector(".btn-update-progress");
+            if (btnUpdateProgress) btnUpdateProgress.style.display = isLocked ? "none" : "inline-flex";
+
+            const btnSaveTask = document.getElementById("btnModalSaveTask");
+            if (btnSaveTask) btnSaveTask.style.display = isLocked ? "none" : "inline-flex";
+
+            const addAssignBtn = document.querySelector(".sprint-action-bar .btn-add-assignment");
+            if (addAssignBtn) addAssignBtn.style.display = isLocked ? "none" : "inline-flex";
+            if (isLocked) toggleInlineAssignmentForm(false);
 
             const pill = document.getElementById("modalProgressStatusPill");
             if (pill) {
-                if (data.status === "APPROVED") {
-                    pill.textContent = "Completed";
+                if (isLocked) {
+                    pill.textContent = "Completed (Locked)";
                 } else if (progress >= 100 || data.status === "READY_FOR_REVIEW") {
                     pill.textContent = "Under Review";
                 } else if (progress > 0) {
@@ -2693,7 +3881,7 @@
 
             // Review button visibility
             const btnReview = document.getElementById("btnModalSubmitReview");
-            if (data.status === "APPROVED") {
+            if (isLocked) {
                 btnReview.style.display = "none";
             } else if (data.status === "READY_FOR_REVIEW") {
                 btnReview.textContent = "Resubmit Review Note";
@@ -2797,7 +3985,7 @@
         const tags = document.getElementById("modalTagsInput").value.trim();
 
         if (!title) {
-            alert("Please enter task title.");
+            showToast("Please enter task title.", "warning");
             document.getElementById("modalTitleInput").focus();
             return;
         }
@@ -3010,6 +4198,52 @@
             `;
             row.appendChild(chip);
         });
+
+        syncWorkItemAssigneeDropdown();
+    }
+
+    function syncWorkItemAssigneeDropdown() {
+        const select = document.getElementById("newAssignEmployeeSelect");
+        if (!select) return;
+
+        const previousVal = select.value;
+        select.innerHTML = "";
+
+        const assignees = (currentTaskData && Array.isArray(currentTaskData.assignees)) ? currentTaskData.assignees : [];
+
+        if (assignees.length === 0) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.textContent = "No team members assigned to task yet";
+            select.appendChild(opt);
+            select.disabled = true;
+            return;
+        }
+
+        select.disabled = false;
+
+        const defaultOpt = document.createElement("option");
+        defaultOpt.value = "";
+        defaultOpt.textContent = "Assign to task member (Optional)";
+        select.appendChild(defaultOpt);
+
+        let matchFound = false;
+        assignees.forEach(emp => {
+            const opt = document.createElement("option");
+            opt.value = emp.id;
+            opt.textContent = emp.name + (emp.code ? ` (${emp.code})` : "");
+            if (String(previousVal) === String(emp.id)) {
+                opt.selected = true;
+                matchFound = true;
+            }
+            select.appendChild(opt);
+        });
+
+        if (assignees.length === 1) {
+            select.selectedIndex = 1;
+        } else if (!matchFound) {
+            select.selectedIndex = 0;
+        }
     }
 
     // =========================================================
@@ -3060,14 +4294,97 @@
         `).join("");
     }
 
+    function renderAssignmentsList(assignments) {
+        const container = document.getElementById("modalAssignmentsList");
+        if (!container) return;
+        if (!Array.isArray(assignments) || assignments.length === 0) {
+            container.innerHTML = '<div class="no-assignments-hint">No work items found. Add items to track sub-tasks.</div>';
+            return;
+        }
+
+        const isTaskLocked = currentTaskData && (currentTaskData.locked || currentTaskData.status === "APPROVED");
+
+        container.innerHTML = assignments.map(a => {
+            const progress = (typeof a.progress === 'number') ? a.progress : 0;
+            const isOverdue = Boolean(a.isOverdue);
+            const canEdit = Boolean(a.canEdit) && !isTaskLocked;
+            const deadlineText = a.deadlineBs ? (a.deadlineBs + ' BS' + (a.deadlineTime ? ' ' + a.deadlineTime : '')) : '';
+            const assigneeInitial = a.assigneeName ? a.assigneeName.charAt(0).toUpperCase() : 'W';
+            const escapedTitle = (a.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+            return `
+            <div class="assignment-card ${isOverdue ? 'overdue' : ''}" data-id="${a.id}">
+                <div class="assignment-card-header">
+                    <div class="assignment-card-title-block">
+                        <div class="assignment-card-title">${a.title || 'Work Item'}</div>
+                        ${a.description ? `<div class="assignment-card-desc">${a.description}</div>` : ''}
+                    </div>
+                    <div class="assignment-card-actions">
+                        <select class="assignment-status-select" ${canEdit ? '' : 'disabled'} onchange="changeAssignmentStatus(${a.id}, this.value)">
+                            <option value="TODO" ${a.status === 'TODO' ? 'selected' : ''}>To Do</option>
+                            <option value="IN_PROGRESS" ${a.status === 'IN_PROGRESS' ? 'selected' : ''}>In Progress</option>
+                            <option value="UNDER_REVIEW" ${a.status === 'UNDER_REVIEW' ? 'selected' : ''}>Under Review</option>
+                            <option value="COMPLETED" ${a.status === 'COMPLETED' ? 'selected' : ''}>Completed</option>
+                            <option value="BLOCKED" ${a.status === 'BLOCKED' ? 'selected' : ''}>Blocked</option>
+                            <option value="VERIFIED" ${a.status === 'VERIFIED' ? 'selected' : ''}>Verified</option>
+                        </select>
+                        ${canEdit ? `
+                        <button type="button" class="btn-delete-assignment" onclick="deleteAssignmentItem(${a.id})" title="Delete work item">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>` : ''}
+                    </div>
+                </div>
+
+                <div class="assignment-card-meta">
+                    <div class="assignment-meta-left">
+                        <span class="chip-avatar-round" style="width: 22px; height: 22px; font-size: 10px;">${assigneeInitial}</span>
+                        <span class="assignment-assignee-name">${a.assigneeName || 'Unassigned'}</span>
+                        ${deadlineText ? `
+                        <span class="assignment-deadline-tag ${isOverdue ? 'overdue' : ''}">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            ${deadlineText}
+                        </span>` : ''}
+                        ${isOverdue ? `<span class="badge-overdue">OVERDUE</span>` : ''}
+                    </div>
+                    <div class="assignment-meta-right">
+                        ${canEdit ? `
+                        <button type="button" class="btn-update-wi-progress" onclick="openWiProgressModal(${a.id}, '${escapedTitle}', ${progress})">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            Update %
+                        </button>` : `
+                        <span class="tag-view-only">View Only</span>
+                        `}
+                        <button type="button" class="btn-wi-history" onclick="openWiHistoryModal(${a.id}, '${escapedTitle}')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            History
+                        </button>
+                    </div>
+                </div>
+
+                <div class="work-item-progress-section">
+                    <div class="work-item-progress-header">
+                        <span>Work Item Progress</span>
+                        <span class="work-item-progress-val">${progress}%</span>
+                    </div>
+                    <div class="work-item-progress-track">
+                        <div class="work-item-progress-fill ${progress >= 100 ? 'complete' : ''}" style="width: ${progress}%;"></div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join("");
+    }
+
     function toggleInlineAssignmentForm(show) {
         const form = document.getElementById("inlineAssignmentForm");
+        if (!form) return;
         if (typeof show === "boolean") {
             form.classList.toggle("show", show);
         } else {
             form.classList.toggle("show");
         }
         if (form.classList.contains("show")) {
+            syncWorkItemAssigneeDropdown();
             document.getElementById("newAssignTitleInput").focus();
         }
     }
@@ -3075,16 +4392,25 @@
     async function submitNewAssignment() {
         const taskId = document.getElementById("modalTaskId").value;
         const title = document.getElementById("newAssignTitleInput").value.trim();
+        const desc = document.getElementById("newAssignDescInput") ? document.getElementById("newAssignDescInput").value.trim() : "";
+        const assigneeSelect = document.getElementById("newAssignEmployeeSelect");
+        const assigneeId = assigneeSelect ? assigneeSelect.value : "";
         const weight = document.getElementById("newAssignWeightSelect").value;
+        const deadlineBs = document.getElementById("newAssignDeadlineBsInput") ? document.getElementById("newAssignDeadlineBsInput").value.trim() : "";
+        const deadlineTime = document.getElementById("newAssignDeadlineTimeInput") ? document.getElementById("newAssignDeadlineTimeInput").value.trim() : "";
 
         if (!title) {
-            alert("Please enter work item title.");
+            showToast("Please enter work item title.", "warning");
             return;
         }
 
         const formData = new URLSearchParams();
         formData.append("title", title);
+        if (desc) formData.append("description", desc);
+        if (assigneeId) formData.append("assigneeId", assigneeId);
         formData.append("weight", weight);
+        if (deadlineBs) formData.append("deadlineBs", deadlineBs);
+        if (deadlineTime) formData.append("deadlineTime", deadlineTime);
 
         try {
             const res = await fetch(`/employee/tasks/${taskId}/assignments/add`, {
@@ -3099,6 +4425,8 @@
             const json = await res.json();
             if (json.success) {
                 document.getElementById("newAssignTitleInput").value = "";
+                if (document.getElementById("newAssignDescInput")) document.getElementById("newAssignDescInput").value = "";
+                if (document.getElementById("newAssignDeadlineBsInput")) document.getElementById("newAssignDeadlineBsInput").value = "";
                 toggleInlineAssignmentForm(false);
                 openTaskModal(taskId);
                 showToast("Work item added.");
@@ -3154,6 +4482,156 @@
         } catch (e) {
             console.error(e);
         }
+    }
+
+    // =========================================================
+    // WORK ITEM PROGRESS MODAL (MANDATORY NOTE VALIDATION)
+    // =========================================================
+    let currentWiOriginalProgress = 0;
+
+    function openWiProgressModal(assignmentId, title, currentProgress) {
+        currentWiOriginalProgress = parseInt(currentProgress, 10) || 0;
+        document.getElementById("wiProgressAssignmentId").value = assignmentId;
+        document.getElementById("wiProgressItemName").textContent = title || "Work Item";
+        document.getElementById("wiProgressSlider").value = currentWiOriginalProgress;
+        document.getElementById("wiProgressDisplayVal").textContent = currentWiOriginalProgress + "%";
+        const bar = document.getElementById("wiProgressVisualBar");
+        if (bar) bar.style.width = currentWiOriginalProgress + "%";
+        const noteInput = document.getElementById("wiProgressNoteInput");
+        if (noteInput) {
+            noteInput.value = "";
+            noteInput.style.borderColor = "";
+            noteInput.style.boxShadow = "";
+        }
+        const errEl = document.getElementById("wiProgressError");
+        if (errEl) errEl.style.display = "none";
+        document.getElementById("wiProgressModal").classList.add("active");
+    }
+
+    function closeWiProgressModal() {
+        document.getElementById("wiProgressModal").classList.remove("active");
+    }
+
+    function onWiSliderChange(val) {
+        val = parseInt(val, 10) || 0;
+        document.getElementById("wiProgressDisplayVal").textContent = val + "%";
+        const bar = document.getElementById("wiProgressVisualBar");
+        if (bar) bar.style.width = val + "%";
+    }
+
+    function setWiMilestone(val) {
+        document.getElementById("wiProgressSlider").value = val;
+        onWiSliderChange(val);
+    }
+
+    async function submitWiProgress() {
+        const taskId = document.getElementById("modalTaskId").value;
+        const assignmentId = document.getElementById("wiProgressAssignmentId").value;
+        const newProgress = parseInt(document.getElementById("wiProgressSlider").value, 10) || 0;
+        const note = document.getElementById("wiProgressNoteInput").value.trim();
+
+        if (newProgress !== currentWiOriginalProgress && !note) {
+            const errEl = document.getElementById("wiProgressError");
+            if (errEl) {
+                errEl.style.display = "flex";
+                document.getElementById("wiProgressErrorTitle").textContent = "Description Note Required";
+                document.getElementById("wiProgressErrorDesc").textContent = `You are updating progress from ${currentWiOriginalProgress}% to ${newProgress}%. Please write a quick description in the note field below explaining what work was accomplished.`;
+            }
+            showToast("A description/update note is mandatory when changing progress.", "error");
+            const noteInput = document.getElementById("wiProgressNoteInput");
+            if (noteInput) {
+                noteInput.style.borderColor = "#ef4444";
+                noteInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.15)";
+                noteInput.focus();
+            }
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append("progress", newProgress);
+        formData.append("updateNote", note);
+
+        try {
+            const res = await fetch(`/employee/tasks/${taskId}/assignments/${assignmentId}/progress`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    [csrfHeader]: csrfToken
+                },
+                body: formData.toString()
+            });
+
+            const json = await res.json();
+            if (json.success) {
+                closeWiProgressModal();
+                showToast(`Work item progress updated to ${newProgress}%`, "success");
+                // Reload task modal data & card
+                openTaskModal(taskId);
+                if (json.taskProgress !== undefined) {
+                    const card = document.querySelector(`.task-card[data-task-id="${taskId}"]`);
+                    if (card) {
+                        const fill = card.querySelector(".card-progress-fill");
+                        const lbl = card.querySelector(".card-progress-label span:last-child");
+                        if (fill) fill.style.width = json.taskProgress + "%";
+                        if (lbl) lbl.textContent = json.taskProgress + "%";
+                    }
+                }
+            } else {
+                const errEl = document.getElementById("wiProgressError");
+                if (errEl) {
+                    errEl.style.display = "flex";
+                    document.getElementById("wiProgressErrorTitle").textContent = "Update Failed";
+                    document.getElementById("wiProgressErrorDesc").textContent = json.message || "The server rejected the progress update.";
+                }
+                showToast(json.message || "Failed to update progress", "error");
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("Error updating work item progress. Please verify your connection.", "error");
+        }
+    }
+
+    // =========================================================
+    // WORK ITEM AUDIT HISTORY MODAL
+    // =========================================================
+    async function openWiHistoryModal(assignmentId, title) {
+        const taskId = document.getElementById("modalTaskId").value;
+        document.getElementById("wiHistoryItemName").textContent = title || "Work Item";
+        const timeline = document.getElementById("wiHistoryTimeline");
+        timeline.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 20px;">Loading update history...</div>';
+        document.getElementById("wiHistoryModal").classList.add("active");
+
+        try {
+            const res = await fetch(`/employee/tasks/${taskId}/assignments/${assignmentId}/history`);
+            if (!res.ok) throw new Error("Could not load history");
+            const histories = await res.json();
+
+            if (!Array.isArray(histories) || histories.length === 0) {
+                timeline.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 24px; font-size: 13px;">No progress updates recorded yet.</div>';
+                return;
+            }
+
+            timeline.innerHTML = histories.map(h => `
+                <div class="history-item-entry">
+                    <div class="history-item-header">
+                        <span class="history-progress-badge">${h.previousProgress}% → ${h.newProgress}%</span>
+                        <span class="history-item-time">${h.createdAt || ''}</span>
+                    </div>
+                    <div class="history-item-author">
+                        <span class="history-author-dot"></span>
+                        <span>Updated by <strong>${h.updatedByName || 'Team Member'}</strong> (${h.updatedByRole || 'USER'})</span>
+                    </div>
+                    <div class="history-item-note">${h.note || 'No note provided.'}</div>
+                </div>
+            `).join("");
+        } catch (e) {
+            console.error(e);
+            timeline.innerHTML = '<div style="text-align: center; color: #ef4444; padding: 20px;">Failed to load update history.</div>';
+        }
+    }
+
+    function closeWiHistoryModal() {
+        document.getElementById("wiHistoryModal").classList.remove("active");
     }
 
     function filterAssignmentsList() {
@@ -3301,8 +4779,19 @@
     // DRAG AND DROP STATUS MANAGEMENT
     // =========================================================
     function initDragAndDrop() {
-        document.querySelectorAll(".task-card[draggable='true']").forEach(card => {
+        document.querySelectorAll(".task-card").forEach(card => {
+            if (card.dataset.locked === "true" || card.dataset.status === "APPROVED" || card.dataset.status === "COMPLETED") {
+                card.setAttribute("draggable", "false");
+            } else {
+                card.setAttribute("draggable", "true");
+            }
+
             card.addEventListener("dragstart", function (e) {
+                if (this.dataset.locked === "true" || this.dataset.status === "APPROVED" || this.dataset.status === "COMPLETED") {
+                    e.preventDefault();
+                    showToast("Approved tasks are locked and cannot be moved.", "error");
+                    return false;
+                }
                 draggedCard = this;
                 isDragging = true;
                 dragJustEnded = false;
@@ -3341,6 +4830,11 @@
                 e.preventDefault();
                 this.classList.remove("drag-over");
                 if (!draggedCard) return;
+
+                if (draggedCard.dataset.locked === "true" || draggedCard.dataset.status === "APPROVED" || draggedCard.dataset.status === "COMPLETED") {
+                    showToast("Approved tasks are locked and cannot be moved.", "error");
+                    return;
+                }
 
                 const targetContainer = this.querySelector(".cards-container");
                 if (!targetContainer) return;
@@ -3595,6 +5089,19 @@
         updateColumnCounters();
         updateEmptyStates();
         loadUnreadCount();
+
+        const assignBsInput = document.getElementById("newAssignDeadlineBsInput");
+        if (assignBsInput && typeof assignBsInput.nepaliDatePicker === 'function') {
+            const inst = assignBsInput.nepaliDatePicker({
+                ndpYear: true,
+                ndpMonth: true,
+                ndpYearCount: 20
+            });
+            if (typeof window.bindDatePickerInteractions === 'function') {
+                window.bindDatePickerInteractions(assignBsInput, inst);
+            }
+        }
+
 
         // Close modal on Escape
         document.addEventListener("keydown", function (e) {

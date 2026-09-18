@@ -3,12 +3,14 @@ package com.aslenix.attendance.controller;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.entity.Task;
 import com.aslenix.attendance.entity.TaskAssignment;
+import com.aslenix.attendance.entity.TaskAssignmentHistory;
 import com.aslenix.attendance.entity.TaskComment;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.repository.LeaveRequestRepository;
 import com.aslenix.attendance.service.TaskService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +42,12 @@ public class AdminTaskController {
 
     @GetMapping
     public String tasks(Model model) {
+        // Trigger check for overdue work items to deliver immediate alerts
+        try {
+            taskService.checkAndNotifyOverdueWorkItems();
+        } catch (Exception ignored) {
+        }
+
         model.addAttribute("activePage", "tasks");
         model.addAttribute("tasks", taskService.getAllTasks());
         model.addAttribute("employees", employeeRepository.findAll());
@@ -84,7 +92,7 @@ public class AdminTaskController {
                 status,
                 progress,
                 dueDate,
-                null,
+                dueDate,
                 deadlineBs,
                 deadlineTime,
                 tags
@@ -129,7 +137,7 @@ public class AdminTaskController {
                     complexity,
                     progress,
                     dueDate,
-                    null,
+                    dueDate,
                     deadlineBs,
                     deadlineTime,
                     tags
@@ -143,7 +151,7 @@ public class AdminTaskController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", e.getMessage()
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to update task."
             ));
         }
     }
@@ -167,7 +175,7 @@ public class AdminTaskController {
     }
 
     // ============================================================
-    // WORK ASSIGNMENTS (Sub-tasks)
+    // WORK ASSIGNMENTS (Sub-tasks / Work Items)
     // ============================================================
 
     @PostMapping("/{id}/assignments/add")
@@ -175,19 +183,26 @@ public class AdminTaskController {
     public ResponseEntity<?> addAssignment(
             @PathVariable Long id,
             @RequestParam String title,
+            @RequestParam(required = false) String description,
             @RequestParam(required = false) Long assigneeId,
             @RequestParam(defaultValue = "TODO") String status,
             @RequestParam(defaultValue = "MEDIUM") String weight,
+            @RequestParam(required = false) LocalDate deadline,
+            @RequestParam(required = false) String deadlineBs,
+            @RequestParam(required = false) String deadlineTime,
+            @RequestParam(required = false) Integer progress,
             @RequestParam(required = false) String note) {
 
         try {
             Employee assignee = assigneeId != null ? employeeRepository.findById(assigneeId).orElse(null) : null;
-            TaskAssignment assignment = taskService.addAssignment(id, title, assignee, status, weight, note);
+            TaskAssignment assignment = taskService.addAssignment(
+                    id, title, description, assignee, deadline, deadlineBs, deadlineTime, progress, status, weight, note
+            );
             Task task = taskService.getTask(id);
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Assignment added.",
+                    "message", "Work item added successfully.",
                     "assignment", buildAssignmentMap(assignment),
                     "taskProgress", task.getProgress(),
                     "taskStatus", task.getStatus()
@@ -195,7 +210,113 @@ public class AdminTaskController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", e.getMessage()
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to add work item."
+            ));
+        }
+    }
+
+    @PostMapping("/{id}/assignments/{assignmentId}/update")
+    @ResponseBody
+    public ResponseEntity<?> updateAssignment(
+            @PathVariable Long id,
+            @PathVariable Long assignmentId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false) LocalDate deadline,
+            @RequestParam(required = false) String deadlineBs,
+            @RequestParam(required = false) String deadlineTime,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String weight,
+            @RequestParam(required = false) String note) {
+
+        try {
+            Employee assignee = assigneeId != null ? employeeRepository.findById(assigneeId).orElse(null) : null;
+            TaskAssignment assignment = taskService.updateAssignment(
+                    id, assignmentId, title, description, assignee, deadline, deadlineBs, deadlineTime, status, weight, note
+            );
+            Task task = taskService.getTask(id);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Work item updated.",
+                    "assignment", buildAssignmentMap(assignment),
+                    "taskProgress", task.getProgress(),
+                    "taskStatus", task.getStatus()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to update work item."
+            ));
+        }
+    }
+
+    @PostMapping("/{id}/assignments/{assignmentId}/progress")
+    @ResponseBody
+    public ResponseEntity<?> updateAssignmentProgress(
+            @PathVariable Long id,
+            @PathVariable Long assignmentId,
+            @RequestParam Integer progress,
+            @RequestParam(required = false) String note,
+            @RequestParam(required = false) String updateNote,
+            Authentication authentication) {
+
+        try {
+            Employee currentEmployee = getCurrentEmployee(authentication);
+            String progressNote = (updateNote != null && !updateNote.trim().isEmpty()) ? updateNote : note;
+            TaskAssignment assignment = taskService.updateAssignmentProgress(assignmentId, progress, progressNote, currentEmployee);
+            Task task = taskService.getTask(id);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Work item progress updated.",
+                    "assignment", buildAssignmentMap(assignment),
+                    "taskProgress", task.getProgress(),
+                    "taskStatus", task.getStatus()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to update work item progress."
+            ));
+        }
+    }
+
+    @GetMapping("/{id}/assignments/{assignmentId}/history")
+    @ResponseBody
+    public ResponseEntity<?> getAssignmentHistory(
+            @PathVariable Long id,
+            @PathVariable Long assignmentId) {
+
+        try {
+            List<TaskAssignmentHistory> histories = taskService.getAssignmentHistories(assignmentId);
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (TaskAssignmentHistory h : histories) {
+                Map<String, Object> hMap = new HashMap<>();
+                hMap.put("id", h.getId());
+                hMap.put("previousProgress", h.getPreviousProgress());
+                hMap.put("newProgress", h.getNewProgress());
+                hMap.put("note", h.getNote());
+                String author = "Administrator";
+                String role = "ADMIN";
+                if (h.getUpdatedBy() != null) {
+                    author = (h.getUpdatedBy().getFirstName() + " " + (h.getUpdatedBy().getLastName() != null ? h.getUpdatedBy().getLastName() : "")).trim();
+                    if (h.getUpdatedBy().getUser() != null && h.getUpdatedBy().getUser().getRole() != null) {
+                        role = h.getUpdatedBy().getUser().getRole().name();
+                    }
+                }
+                hMap.put("authorName", author);
+                hMap.put("updatedByName", author);
+                hMap.put("updatedByRole", role);
+                hMap.put("createdAt", h.getCreatedAt() != null ? h.getCreatedAt().format(DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")) : "");
+                list.add(hMap);
+            }
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to fetch work item history."
             ));
         }
     }
@@ -221,7 +342,7 @@ public class AdminTaskController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", e.getMessage()
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to update status."
             ));
         }
     }
@@ -245,7 +366,7 @@ public class AdminTaskController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", e.getMessage()
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to delete assignment."
             ));
         }
     }
@@ -270,7 +391,7 @@ public class AdminTaskController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", e.getMessage()
+                    "message", e.getMessage() != null ? e.getMessage() : "Failed to add comment."
             ));
         }
     }
@@ -303,7 +424,8 @@ public class AdminTaskController {
                     "success", true,
                     "message", "Task status updated successfully.",
                     "status", task.getStatus(),
-                    "progress", task.getProgress()
+                    "progress", task.getProgress(),
+                    "locked", task.isLocked()
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -326,9 +448,10 @@ public class AdminTaskController {
             Task task = taskService.approveTask(id, reviewComment);
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Task approved successfully.",
+                    "message", "Task approved and locked successfully.",
                     "status", task.getStatus(),
-                    "progress", task.getProgress()
+                    "progress", task.getProgress(),
+                    "locked", task.isLocked()
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -350,54 +473,40 @@ public class AdminTaskController {
                         "message", "Progress must be between 0 and 100."
                 ));
             }
+
             Task task = taskService.getTask(id);
-            task.setProgress(progress);
-            if (!"APPROVED".equals(task.getStatus())) {
-                if (progress == 0) {
-                    task.setStatus("TODO");
-                } else if (progress >= 100) {
-                    task.setProgress(100);
-                    task.setStatus("READY_FOR_REVIEW");
-                } else if ("TODO".equals(task.getStatus())) {
-                    task.setStatus("IN_PROGRESS");
-                }
+            if (task.isLocked()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Task is approved and locked. Progress cannot be modified."
+                ));
             }
-            task = taskService.updateTask(
-                    id,
-                    task.getTitle(),
-                    task.getDescription(),
-                    task.getAssignees() != null ? new ArrayList<>(task.getAssignees()) : List.of(),
-                    task.getStatus(),
-                    task.getPriority(),
-                    task.getComplexity(),
-                    progress,
-                    task.getDueDate(),
-                    task.getDeadline(),
-                    task.getDeadlineBs(),
-                    task.getDeadlineTime(),
-                    task.getTags()
-            );
+
+            task.setProgress(progress);
+            if (progress >= 100) {
+                task.setStatus("READY_FOR_REVIEW");
+            } else if (progress == 0) {
+                task.setStatus("TODO");
+            } else {
+                task.setStatus("IN_PROGRESS");
+            }
+            task = taskService.updateTask(id, task.getTitle(), task.getDescription(),
+                    new ArrayList<>(task.getAssignees()), task.getStatus(), task.getPriority(),
+                    task.getComplexity(), task.getProgress(), task.getDueDate(), task.getDeadline(),
+                    task.getDeadlineBs(), task.getDeadlineTime(), task.getTags());
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Progress updated.",
-                    "progress", task.getProgress(),
-                    "status", task.getStatus()
+                    "message", "Progress updated successfully.",
+                    "status", task.getStatus(),
+                    "progress", task.getProgress()
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
-                    "message", e.getMessage() != null ? e.getMessage() : "Failed to update progress."
+                    "message", e.getMessage() != null ? e.getMessage() : "Error updating progress."
             ));
         }
-    }
-
-    @PostMapping("/{id}/reject")
-    public String rejectTask(
-            @PathVariable Long id,
-            @RequestParam(required = false) String reviewComment) {
-        taskService.rejectTask(id, reviewComment);
-        return "redirect:/admin/tasks";
     }
 
     // ============================================================
@@ -406,16 +515,26 @@ public class AdminTaskController {
 
     @PostMapping("/{id}/delete")
     public String deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
+        try {
+            taskService.deleteTask(id);
+        } catch (Exception ignored) {
+        }
         return "redirect:/admin/tasks";
     }
 
     // ============================================================
-    // JSON MAPPING HELPERS
+    // PRIVATE HELPERS FOR JSON BUILDERS
     // ============================================================
 
+    private Employee getCurrentEmployee(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        return employeeRepository.findByUserUsername(authentication.getName()).orElse(null);
+    }
+
     private Map<String, Object> buildTaskJsonMap(Task task) {
-        Map<String, Object> map = new LinkedHashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("id", task.getId());
         map.put("taskCode", task.getTaskCode());
         map.put("title", task.getTitle());
@@ -430,6 +549,7 @@ public class AdminTaskController {
         map.put("dueDate", task.getDueDate() != null ? task.getDueDate().toString() : null);
         map.put("completionNote", task.getCompletionNote());
         map.put("reviewNote", task.getReviewNote());
+        map.put("locked", task.isLocked());
         map.put("createdAt", task.getCreatedAt() != null ? task.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null);
 
         // Assignees
@@ -449,6 +569,19 @@ public class AdminTaskController {
                     assigneesList.add(empMap);
                 }
             }
+        }
+        if (assigneesList.isEmpty() && task.getEmployee() != null) {
+            Employee emp = task.getEmployee();
+            Map<String, Object> empMap = new HashMap<>();
+            empMap.put("id", emp.getId());
+            String first = emp.getFirstName() != null ? emp.getFirstName() : "";
+            String last = emp.getLastName() != null ? emp.getLastName() : "";
+            empMap.put("name", (first + " " + last).trim());
+            empMap.put("code", emp.getEmployeeCode());
+            String initials = (first.isEmpty() ? "" : first.substring(0, 1)) +
+                    (last.isEmpty() ? "" : last.substring(0, 1));
+            empMap.put("initials", initials.toUpperCase());
+            assigneesList.add(empMap);
         }
         map.put("assignees", assigneesList);
 
@@ -504,14 +637,26 @@ public class AdminTaskController {
         Map<String, Object> map = new HashMap<>();
         map.put("id", a.getId());
         map.put("title", a.getTitle());
+        map.put("description", a.getDescription() != null ? a.getDescription() : "");
         map.put("status", a.getStatus());
         map.put("weight", a.getWeight());
         map.put("note", a.getNote());
+        map.put("deadline", a.getDeadline() != null ? a.getDeadline().toString() : "");
+        map.put("deadlineBs", a.getDeadlineBs() != null ? a.getDeadlineBs() : "");
+        map.put("deadlineTime", a.getDeadlineTime() != null ? a.getDeadlineTime() : "");
+        map.put("progress", a.getProgress() != null ? a.getProgress() : 0);
+        map.put("isOverdue", a.isOverdue());
+        map.put("canEdit", a.getTask() == null || !a.getTask().isLocked());
+        map.put("historiesCount", a.getHistories() != null ? a.getHistories().size() : 0);
+
         if (a.getAssignee() != null) {
             map.put("assigneeId", a.getAssignee().getId());
             String f = a.getAssignee().getFirstName() != null ? a.getAssignee().getFirstName() : "";
             String l = a.getAssignee().getLastName() != null ? a.getAssignee().getLastName() : "";
             map.put("assigneeName", (f + " " + l).trim());
+        } else {
+            map.put("assigneeId", null);
+            map.put("assigneeName", "Unassigned");
         }
         return map;
     }

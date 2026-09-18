@@ -249,6 +249,16 @@ public class Task {
     private LocalDateTime updatedAt;
 
     // ============================================================
+    // LOCKED STATUS
+    // ============================================================
+
+    @Column(
+            name = "locked",
+            nullable = false
+    )
+    private boolean locked = false;
+
+    // ============================================================
     // CONSTRUCTOR
     // ============================================================
 
@@ -531,5 +541,13 @@ public class Task {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isLocked() {
+        return locked || "APPROVED".equalsIgnoreCase(status);
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

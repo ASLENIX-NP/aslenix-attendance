@@ -7,5 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TaskAssignmentRepository extends JpaRepository<TaskAssignment, Long> {
+
     List<TaskAssignment> findByTaskOrderByIdAsc(Task task);
+
+    List<TaskAssignment> findByTaskIdOrderByIdAsc(Long taskId);
+
+    List<TaskAssignment> findByOverdueNotifiedFalseAndDeadlineIsNotNull();
 }
