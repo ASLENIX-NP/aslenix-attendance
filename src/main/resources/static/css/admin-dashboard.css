@@ -1,11 +1,20 @@
 /* ASLENIX admin dashboard
    The dashboard template owns the data and interactions; this file owns its visual system. */
 .admin-dashboard {
-    --aslenix-pink: #EF2BA8;
-    --aslenix-purple: #9B3DF0;
-    --aslenix-blue: #168FF5;
-    --aslenix-gradient: linear-gradient(135deg, #EF2BA8 0%, #9B3DF0 50%, #168FF5 100%);
-    --aslenix-gradient-soft: linear-gradient(135deg, rgba(239, 43, 168, .10), rgba(155, 61, 240, .08) 50%, rgba(22, 143, 245, .10));
+    --aslenix-gradient: linear-gradient(
+        135deg,
+        #FF4D9D 0%,
+        #ED4AC2 30%,
+        #9855FF 55%,
+        #428EFF 80%,
+        #3EB1FC 100%
+    );
+    --aslenix-pink: #FF4D9D;
+    --aslenix-magenta: #ED4AC2;
+    --aslenix-purple: #9855FF;
+    --aslenix-blue: #428EFF;
+    --aslenix-light-blue: #3EB1FC;
+    --aslenix-gradient-soft: linear-gradient(135deg, rgba(255, 77, 157, .09), rgba(237, 74, 194, .07) 30%, rgba(152, 85, 255, .07) 55%, rgba(66, 142, 255, .07) 80%, rgba(62, 177, 252, .09) 100%);
     --bg-primary: #F8FAFC;
     --bg-secondary: #F1F5F9;
     --bg-card: #FFFFFF;
@@ -16,13 +25,13 @@
     --border: #E2E8F0;
     --border-light: #EEF2F7;
     --success: #16A34A;
-    --warning: #4f46e5;
+    --warning: var(--aslenix-purple);
     --danger: #DC2626;
-    --info: #168FF5;
+    --info: var(--aslenix-blue);
     background:
-        radial-gradient(circle at 10% 10%, rgba(239, 43, 168, .06), transparent 30%),
-        radial-gradient(circle at 90% 20%, rgba(155, 61, 240, .06), transparent 30%),
-        radial-gradient(circle at 80% 90%, rgba(22, 143, 245, .05), transparent 30%),
+        radial-gradient(circle at 10% 10%, rgba(255, 10, 120, .06), transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(122, 44, 255, .06), transparent 30%),
+        radial-gradient(circle at 80% 90%, rgba(0, 153, 247, .05), transparent 30%),
         var(--bg-primary) !important;
     color: var(--text-primary);
 }
@@ -93,15 +102,15 @@
 }
 
 .admin-dashboard .sidebar-link:hover {
-    color: #4f46e5;
+    color: var(--aslenix-purple);
     background: #f7f8fc;
     transform: translateX(2px);
 }
 
 .admin-dashboard .sidebar-link.active {
-    color: #4338ca;
-    background: #eef2ff;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, .12);
+    color: var(--aslenix-pink);
+    background: #fdf2f8;
+    box-shadow: 0 4px 12px rgba(255, 10, 120, .12);
 }
 
 .admin-dashboard .sidebar-link.active::before {
@@ -117,12 +126,12 @@
 }
 
 .admin-dashboard .sidebar-link:hover .sidebar-icon {
-    background: #eef2ff;
-    color: #4f46e5;
+    background: #f5f3ff;
+    color: var(--aslenix-purple);
 }
 
 .admin-dashboard .sidebar-link.active .sidebar-icon {
-    background: #4f46e5;
+    background: var(--aslenix-gradient);
     color: #fff;
     box-shadow: none;
 }
@@ -138,7 +147,7 @@
 }
 
 .admin-dashboard .sidebar-link.active .sidebar-text span {
-    color: #6366f1;
+    color: var(--aslenix-pink);
 }
 
 .admin-dashboard .sidebar-badge {
@@ -167,7 +176,7 @@
 .admin-dashboard .sidebar-gradient-line {
     width: 34px;
     margin-top: 10px;
-    background: #4f46e5;
+    background: var(--aslenix-gradient);
 }
 
 .admin-dashboard .page-header {
@@ -178,34 +187,38 @@
     border-radius: 14px;
     background: linear-gradient(105deg, #fff 0%, #fff 58%, #fbf7ff 100%);
     box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
+    position: relative;
+    overflow: hidden;
 }
 
 .admin-dashboard .page-header::before {
-    width: 5px;
-    background: var(--aslenix-gradient);
-    padding: 29px 32px;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: linear-gradient(105deg, #fff 0%, #fff 58%, #fbf7ff 100%);
-    box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
-}
-
-.admin-dashboard .page-header::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
     width: 5px;
     background: var(--aslenix-gradient);
 }
 
 .admin-dashboard .page-header::after {
+    content: "";
+    position: absolute;
     width: 360px;
     height: 230px;
     right: -120px;
     top: -150px;
-    border: 42px solid rgba(155, 61, 240, .08);
-    box-shadow: -34px 34px 0 -12px rgba(239, 43, 168, .08);
+    border-radius: 50%;
+    border: 42px solid rgba(122, 44, 255, .08);
+    box-shadow: -34px 34px 0 -12px rgba(255, 10, 120, .08);
 }
 
 .admin-dashboard .eyebrow {
-    color: var(--aslenix-pink) !important;
+    background: var(--aslenix-gradient) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    display: inline-block !important;
     font-size: 10px;
     letter-spacing: .18em;
 }
@@ -222,10 +235,10 @@
 }
 
 .admin-dashboard .page-status {
-    border: 1px solid rgba(155, 61, 240, .18);
+    border: 1px solid rgba(122, 44, 255, .18);
     border-radius: 999px;
     background: #fff;
-    color: #7130ad;
+    color: var(--aslenix-purple);
     box-shadow: none;
 }
 
@@ -258,10 +271,11 @@
     border-radius: 0;
     box-shadow: none;
     background: transparent;
+    position: relative;
 }
 
 .admin-dashboard .summary-card:last-child { border-right: 0 !important; }
-.admin-dashboard .summary-card::before { height: 3px; background: var(--border); }
+.admin-dashboard .summary-card::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 3px; background: var(--border); }
 .admin-dashboard .summary-card:nth-child(1)::before { background: var(--aslenix-gradient); }
 .admin-dashboard .summary-card:nth-child(2)::before { background: var(--success); }
 .admin-dashboard .summary-card:nth-child(3)::before { background: var(--warning); }
@@ -288,7 +302,7 @@
 .admin-dashboard .quick-card:nth-child(1) { background: linear-gradient(100deg, #fff 62%, #fbf3ff); }
 .admin-dashboard .quick-card:nth-child(2) { background: linear-gradient(100deg, #fff 62%, #fff4fb); }
 .admin-dashboard .quick-card:nth-child(3) { background: linear-gradient(100deg, #fff 62%, #eff8ff); }
-.admin-dashboard .quick-card:hover { border-color: rgba(155, 61, 240, .34); box-shadow: 0 10px 22px rgba(15, 23, 42, .08); }
+.admin-dashboard .quick-card:hover { border-color: rgba(122, 44, 255, .34); box-shadow: 0 10px 22px rgba(15, 23, 42, .08); }
 .admin-dashboard .quick-icon { width: 43px; height: 43px; border-radius: 10px; background: var(--aslenix-gradient-soft); color: var(--aslenix-purple); }
 .admin-dashboard .quick-card:nth-child(2) .quick-icon { color: var(--aslenix-pink); }
 .admin-dashboard .quick-card:nth-child(3) .quick-icon { color: var(--aslenix-blue); }
@@ -313,7 +327,7 @@
 .admin-dashboard .panel-header h2 { color: var(--text-heading); font-size: 15px; }
 .admin-dashboard .panel-header span { color: var(--text-muted); font-size: 11px; }
 .admin-dashboard .panel-link { padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-secondary); color: var(--aslenix-purple); font-size: 10px; text-transform: uppercase; }
-.admin-dashboard .panel-link:hover { background: #f8efff; border-color: rgba(155, 61, 240, .28); }
+.admin-dashboard .panel-link:hover { background: #f8efff; border-color: rgba(122, 44, 255, .28); }
 .admin-dashboard thead { background: var(--bg-secondary); }
 .admin-dashboard th { padding: 12px 20px; color: var(--text-muted); font-size: 9px; letter-spacing: .13em; }
 .admin-dashboard td { padding: 15px 20px; color: var(--text-secondary); border-bottom-color: var(--border-light); }

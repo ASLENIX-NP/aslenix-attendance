@@ -1,28 +1,48 @@
 /* =====================================================
    ASLENIX BRAND COLOR SYSTEM
-   Derived from the ASLENIX logo gradient:
-   Hot Pink (#FF1B8D) → Vivid Violet (#8B2FF8) → Cobalt Blue (#2563F5)
+   Derived from the official ASLENIX logo gradient:
+   #FF0A78 (0%) → #E900A8 (30%) → #7A2CFF (55%) → #006CFF (80%) → #0099F7 (100%)
 ===================================================== */
 
 :root {
-    /* ── Brand gradient stops ───────────────────────── */
-    --asl-pink:         #FF1B8D;
-    --asl-violet:       #8B2FF8;
-    --asl-blue:         #2563F5;
+    /* ── ASLENIX Brand Definition ────────────────────── */
+    --aslenix-gradient: linear-gradient(
+        135deg,
+        #FF4D9D 0%,
+        #ED4AC2 30%,
+        #9855FF 55%,
+        #428EFF 80%,
+        #3EB1FC 100%
+    );
+
+    --aslenix-pink:       #FF4D9D;
+    --aslenix-magenta:    #ED4AC2;
+    --aslenix-purple:     #9855FF;
+    --aslenix-blue:       #428EFF;
+    --aslenix-light-blue: #3EB1FC;
+
+    /* ── Brand stops & compatibility aliases ─────────── */
+    --asl-pink:         var(--aslenix-pink);
+    --asl-magenta:      var(--aslenix-magenta);
+    --asl-violet:       var(--aslenix-purple);
+    --asl-purple:       var(--aslenix-purple);
+    --asl-blue:         var(--aslenix-blue);
+    --asl-light-blue:   var(--aslenix-light-blue);
 
     /* ── Primary gradients ─────────────────────────── */
-    --asl-grad:         linear-gradient(135deg, #FF1B8D 0%, #8B2FF8 50%, #2563F5 100%);
-    --asl-grad-h:       linear-gradient(135deg, #e50f7b 0%, #7920e0 50%, #1a52d4 100%);
-    --asl-grad-90:      linear-gradient(90deg, #FF1B8D 0%, #8B2FF8 50%, #2563F5 100%);
-    --asl-grad-soft:    linear-gradient(135deg, rgba(255,27,141,0.12) 0%, rgba(139,47,248,0.10) 50%, rgba(37,99,245,0.12) 100%);
+    --asl-grad:         var(--aslenix-gradient);
+    --asl-grad-h:       var(--aslenix-gradient);
+    --asl-grad-90:      linear-gradient(135deg, #FF4D9D 0%, #ED4AC2 30%, #9855FF 55%, #428EFF 80%, #3EB1FC 100%);
+    --asl-grad-soft:    linear-gradient(135deg, rgba(255,77,157,0.10) 0%, rgba(237,74,194,0.08) 30%, rgba(152,85,255,0.08) 55%, rgba(66,142,255,0.08) 80%, rgba(62,177,252,0.10) 100%);
 
     /* ── Background tints ──────────────────────────── */
-    --asl-pink-tint:    rgba(255, 27, 141, 0.07);
-    --asl-violet-tint:  rgba(139, 47, 248, 0.08);
-    --asl-blue-tint:    rgba(37, 99, 245, 0.07);
-    --asl-tint:         rgba(139, 47, 248, 0.07);
-    --asl-tint-10:      rgba(139, 47, 248, 0.10);
-    --asl-tint-15:      rgba(139, 47, 248, 0.15);
+    --asl-pink-tint:    rgba(255, 77, 157, 0.06);
+    --asl-magenta-tint: rgba(237, 74, 194, 0.06);
+    --asl-violet-tint:  rgba(152, 85, 255, 0.07);
+    --asl-blue-tint:    rgba(66, 142, 255, 0.06);
+    --asl-tint:         rgba(152, 85, 255, 0.06);
+    --asl-tint-10:      rgba(152, 85, 255, 0.09);
+    --asl-tint-15:      rgba(152, 85, 255, 0.13);
 
     /* ── Sidebar white bg ──────────────────────────── */
     --sidebar-bg:       #ffffff;
@@ -76,8 +96,8 @@ body {
     font-family: Inter, "Segoe UI", Arial, Helvetica, sans-serif;
     color: var(--text-primary);
     background:
-        radial-gradient(circle at 92% 5%,  rgba(255, 27, 141, 0.055), transparent 30%),
-        radial-gradient(circle at 5%  92%, rgba(37,  99, 245, 0.04),  transparent 30%),
+        radial-gradient(circle at 92% 5%,  rgba(255, 10, 120, 0.055), transparent 30%),
+        radial-gradient(circle at 5%  92%, rgba(0,   153, 247, 0.04),  transparent 30%),
         var(--app-bg);
     -webkit-font-smoothing: antialiased;
 }
@@ -193,13 +213,13 @@ button {
     background: transparent;
     box-shadow: none;
     transition: transform 0.28s ease, filter 0.28s ease;
-    filter: drop-shadow(0 6px 18px rgba(139, 47, 248, 0.35));
+    filter: drop-shadow(0 6px 18px rgba(122, 44, 255, 0.35));
 }
 
 .brand-logo img:hover,
 .brand-logo .aslenix-logo:hover {
     transform: scale(1.04);
-    filter: drop-shadow(0 8px 24px rgba(255, 27, 141, 0.45));
+    filter: drop-shadow(0 8px 24px rgba(255, 10, 120, 0.45));
 }
 
 
@@ -255,7 +275,7 @@ button {
 .sidebar-link.active {
     background: var(--asl-grad);
     color: #ffffff;
-    box-shadow: 0 8px 24px rgba(139, 47, 248, 0.35);
+    box-shadow: 0 8px 24px rgba(122, 44, 255, 0.35);
 }
 
 .sidebar-link.active::before {
@@ -663,9 +683,11 @@ main {
     border-radius: 50%;
     background:
         linear-gradient(135deg,
-            rgba(255, 27,  141, 0.13),
-            rgba(139, 47,  248, 0.11),
-            rgba(37,  99,  245, 0.13));
+            rgba(255, 10,  120, 0.12),
+            rgba(233, 0,   168, 0.10) 30%,
+            rgba(122, 44,  255, 0.10) 55%,
+            rgba(0,   108, 255, 0.10) 80%,
+            rgba(0,   153, 247, 0.12) 100%);
     filter: blur(10px);
     transform: rotate(-8deg);
 }
@@ -679,9 +701,10 @@ main {
     bottom: -55px;
     border-radius: 50%;
     background:
-        linear-gradient(90deg,
-            rgba(255, 27, 141, 0.08),
-            rgba(37, 99, 245, 0.09));
+        linear-gradient(135deg,
+            rgba(255, 10,  120, 0.08),
+            rgba(122, 44,  255, 0.08) 55%,
+            rgba(0,   153, 247, 0.08) 100%);
     filter: blur(8px);
 }
 
