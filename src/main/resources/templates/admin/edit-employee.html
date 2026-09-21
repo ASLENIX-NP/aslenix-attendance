@@ -252,6 +252,151 @@
             box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
         }
 
+        /* PHOTO UPLOAD */
+        .photo-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px dashed #d0d7e5;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .photo-upload-container:hover {
+            border-color: var(--aslenix-purple, #9855ff);
+            background: #fafbff;
+        }
+
+        .photo-preview-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .photo-preview-circle {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 77, 157, 0.12), rgba(66, 142, 255, 0.12));
+            border: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #64748b;
+        }
+
+        .photo-preview-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-placeholder-icon {
+            width: 28px;
+            height: 28px;
+            color: #8a96aa;
+        }
+
+        .photo-remove-btn {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #ef4444;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+            padding: 0;
+            transition: transform 0.15s ease;
+        }
+
+        .photo-remove-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .photo-remove-btn svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .photo-upload-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .photo-upload-label {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .photo-optional-tag {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8a96aa;
+        }
+
+        .photo-upload-hint {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .photo-action-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .photo-browse-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #d9e1ec;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .photo-browse-btn:hover {
+            border-color: var(--aslenix-purple, #9855ff);
+            color: var(--aslenix-purple, #9855ff);
+            box-shadow: 0 2px 8px rgba(152, 85, 255, 0.12);
+        }
+
+        .photo-filename {
+            font-size: 11.5px;
+            color: #8a96aa;
+            font-style: italic;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         @media (max-width: 650px) {
             header { padding: 0 16px; }
             main { padding: 0 14px; margin-top: 20px; }
@@ -260,6 +405,8 @@
             .form-group.full { grid-column: auto; }
             .buttons { flex-direction: column; }
             .cancel-btn, .save-btn { width: 100%; text-align: center; justify-content: center; }
+            .photo-upload-container { flex-direction: column; text-align: center; }
+            .photo-action-row { justify-content: center; flex-wrap: wrap; }
         }
     </style>
     <link rel="stylesheet" href="/css/admin-dashboard.css">
@@ -290,7 +437,52 @@
     </div>
 
     <div class="form-card">
-        <form th:action="@{/admin/employees/edit/{id}(id=${employee.id})}" th:object="${employee}" method="post">
+        <form th:action="@{/admin/employees/edit/{id}(id=${employee.id})}" th:object="${employee}" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="removePhoto" name="removePhoto" value="false">
+
+            <!-- PHOTO UPLOAD (OPTIONAL) -->
+            <div class="photo-upload-container">
+                <div class="photo-preview-wrapper">
+                    <div class="photo-preview-circle" id="photoPreviewCircle">
+                        <img id="photoPreviewImg"
+                             th:if="${employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                             th:src="@{${employee.photoUrl}}"
+                             alt="Employee Photo">
+                        <img id="photoPreviewImgNew" src="" alt="Employee Photo Preview" style="display: none;">
+                        <svg class="photo-placeholder-icon" id="photoPlaceholderIcon"
+                             th:style="${employee.photoUrl != null and !employee.photoUrl.isEmpty()} ? 'display: none;' : ''"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </div>
+                    <button type="button" class="photo-remove-btn" id="photoRemoveBtn"
+                            th:style="${employee.photoUrl != null and !employee.photoUrl.isEmpty()} ? 'display: flex;' : 'display: none;'"
+                            title="Remove photo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="photo-upload-meta">
+                    <label class="photo-upload-label">Employee Photo <span class="photo-optional-tag">(Optional)</span></label>
+                    <p class="photo-upload-hint">Upload a replacement portrait (max 10MB) or remove current photo.</p>
+                    <div class="photo-action-row">
+                        <label for="photoInput" class="photo-browse-btn">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span th:text="${employee.photoUrl != null and !employee.photoUrl.isEmpty()} ? 'Change Photo' : 'Choose Photo'">Choose Photo</span>
+                        </label>
+                        <input type="file" id="photoInput" name="photo" accept="image/png, image/jpeg, image/webp, image/gif" style="display: none;">
+                        <span class="photo-filename" id="photoFileName" th:text="${employee.photoUrl != null and !employee.photoUrl.isEmpty()} ? 'Current photo loaded' : 'No file selected'">No file selected</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-grid">
                 <!-- EMPLOYEE CODE -->
                 <div class="form-group">
@@ -428,6 +620,66 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nepaliDateInput) {
         nepaliDateInput.addEventListener("change", syncBsToAd);
         nepaliDateInput.addEventListener("input", syncBsToAd);
+    }
+
+    // PHOTO PREVIEW & REMOVAL
+    const photoInput = document.getElementById('photoInput');
+    const photoPreviewCircle = document.getElementById('photoPreviewCircle');
+    const photoPreviewImg = document.getElementById('photoPreviewImg');
+    const photoPreviewImgNew = document.getElementById('photoPreviewImgNew');
+    const photoPlaceholderIcon = document.getElementById('photoPlaceholderIcon');
+    const photoRemoveBtn = document.getElementById('photoRemoveBtn');
+    const photoFileName = document.getElementById('photoFileName');
+    const removePhotoInput = document.getElementById('removePhoto');
+
+    if (photoInput) {
+        photoInput.addEventListener('change', function () {
+            const file = this.files && this.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file (JPG, PNG, WEBP, or GIF).');
+                    this.value = '';
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size exceeds 10MB limit.');
+                    this.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    if (photoPreviewImg) photoPreviewImg.style.display = 'none';
+                    photoPreviewImgNew.src = e.target.result;
+                    photoPreviewImgNew.style.display = 'block';
+                    photoPlaceholderIcon.style.display = 'none';
+                    photoRemoveBtn.style.display = 'flex';
+                    photoFileName.textContent = file.name;
+                    photoFileName.style.fontStyle = 'normal';
+                    photoFileName.style.color = '#334155';
+                    photoPreviewCircle.style.borderColor = 'var(--aslenix-purple, #9855ff)';
+                    if (removePhotoInput) removePhotoInput.value = 'false';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (photoRemoveBtn) {
+        photoRemoveBtn.addEventListener('click', function () {
+            photoInput.value = '';
+            if (photoPreviewImg) {
+                photoPreviewImg.style.display = 'none';
+            }
+            photoPreviewImgNew.src = '';
+            photoPreviewImgNew.style.display = 'none';
+            photoPlaceholderIcon.style.display = 'block';
+            photoRemoveBtn.style.display = 'none';
+            photoFileName.textContent = 'Photo removed (will be cleared on save)';
+            photoFileName.style.fontStyle = 'italic';
+            photoFileName.style.color = '#ef4444';
+            photoPreviewCircle.style.borderColor = '#e2e8f0';
+            if (removePhotoInput) removePhotoInput.value = 'true';
+        });
     }
 });
 </script>

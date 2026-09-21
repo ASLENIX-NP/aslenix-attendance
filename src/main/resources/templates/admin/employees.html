@@ -1674,7 +1674,12 @@
                     <!-- EMPLOYEE IDENTITY ROW -->
                     <div class="qr-card-identity">
                         <div class="qr-avatar-circle">
-                            <span th:text="${(employee.firstName != null and !employee.firstName.isEmpty() ? #strings.substring(employee.firstName, 0, 1).toUpperCase() : 'E') + (employee.lastName != null and !employee.lastName.isEmpty() ? #strings.substring(employee.lastName, 0, 1).toUpperCase() : '')}">AA</span>
+                            <img th:if="${employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                                 th:src="@{${employee.photoUrl}}"
+                                 alt="Employee Photo"
+                                 class="qr-avatar-img">
+                            <span th:unless="${employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                                  th:text="${(employee.firstName != null and !employee.firstName.isEmpty() ? #strings.substring(employee.firstName, 0, 1).toUpperCase() : 'E') + (employee.lastName != null and !employee.lastName.isEmpty() ? #strings.substring(employee.lastName, 0, 1).toUpperCase() : '')}">AA</span>
                         </div>
                         <div class="qr-info-meta">
                             <h3 class="qr-employee-name" th:text="${(employee.firstName ?: '') + ' ' + (employee.lastName ?: '')}">Employee Name</h3>

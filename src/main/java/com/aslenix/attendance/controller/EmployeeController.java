@@ -7,6 +7,7 @@ import com.aslenix.attendance.entity.User;
 import com.aslenix.attendance.repository.DepartmentRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.repository.UserRepository;
+import com.aslenix.attendance.service.FileUploadService;
 import com.aslenix.attendance.service.QrCodeService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -27,19 +29,22 @@ public class EmployeeController {
     private final DepartmentRepository departmentRepository;
     private final PasswordEncoder passwordEncoder;
     private final QrCodeService qrCodeService;
+    private final FileUploadService fileUploadService;
 
     public EmployeeController(
             EmployeeRepository employeeRepository,
             UserRepository userRepository,
             DepartmentRepository departmentRepository,
             PasswordEncoder passwordEncoder,
-            QrCodeService qrCodeService) {
+            QrCodeService qrCodeService,
+            FileUploadService fileUploadService) {
 
         this.employeeRepository = employeeRepository;
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.passwordEncoder = passwordEncoder;
         this.qrCodeService = qrCodeService;
+        this.fileUploadService = fileUploadService;
     }
 
     // =========================
@@ -116,7 +121,8 @@ public class EmployeeController {
             @ModelAttribute Employee employee,
             @RequestParam String username,
             @RequestParam String password,
-            @RequestParam Long departmentId) {
+            @RequestParam Long departmentId,
+            @RequestParam(value = "photo", required = false) MultipartFile photoFile) {
 
         // =========================================================
         // CHECK USERNAME
@@ -200,6 +206,19 @@ public class EmployeeController {
         employee.setEnabled(true);
 
         // =========================================================
+        // OPTIONAL PROFILE PHOTO
+        // =========================================================
+
+        if (photoFile != null && !photoFile.isEmpty()) {
+            try {
+                String photoUrl = fileUploadService.storeEmployeePhoto(photoFile);
+                employee.setPhotoUrl(photoUrl);
+            } catch (Exception e) {
+                // Log and continue gracefully so employee creation isn't blocked
+            }
+        }
+
+        // =========================================================
         // SAVE EMPLOYEE
         // =========================================================
 
@@ -279,7 +298,9 @@ public class EmployeeController {
     public String updateEmployee(
             @PathVariable Long id,
             @ModelAttribute Employee employee,
-            @RequestParam Long departmentId) {
+            @RequestParam Long departmentId,
+            @RequestParam(value = "photo", required = false) MultipartFile photoFile,
+            @RequestParam(value = "removePhoto", required = false, defaultValue = "false") boolean removePhoto) {
 
         Employee existing = employeeRepository
                 .findById(id)
@@ -358,6 +379,27 @@ public class EmployeeController {
                 .orElseThrow();
 
         existing.setDepartment(department);
+
+        // =========================================================
+        // PROFILE PHOTO
+        // =========================================================
+
+        if (removePhoto) {
+            if (existing.getPhotoUrl() != null) {
+                fileUploadService.deleteEmployeePhoto(existing.getPhotoUrl());
+                existing.setPhotoUrl(null);
+            }
+        } else if (photoFile != null && !photoFile.isEmpty()) {
+            try {
+                if (existing.getPhotoUrl() != null) {
+                    fileUploadService.deleteEmployeePhoto(existing.getPhotoUrl());
+                }
+                String photoUrl = fileUploadService.storeEmployeePhoto(photoFile);
+                existing.setPhotoUrl(photoUrl);
+            } catch (Exception e) {
+                // Log and continue gracefully
+            }
+        }
 
         // =========================================================
         // SAVE

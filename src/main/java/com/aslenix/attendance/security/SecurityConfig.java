@@ -43,7 +43,8 @@ public class SecurityConfig {
                         "/login",
                         "/css/**",
                         "/js/**",
-                        "/images/**"
+                        "/images/**",
+                        "/uploads/**"
                 ).permitAll()
 
                 // ------------------------------------------------

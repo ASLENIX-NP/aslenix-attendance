@@ -81,8 +81,28 @@ th, td { border-bottom-color: var(--asl-line) !important; }
 tbody tr:hover { background: #f8fafc !important; }
 
 /* Primary actions and interactive state */
-.btn, .button, .submit-btn, .save-btn, .save-button, .leave-button, .download-button, .qr-button, .action-btn, .btn-add-employee, .btn-add-assignment, .btn-assign-task, .btn-save-modal, .btn-action-confirm, .btn-submit-review, .btn-process-scan, .btn-camera-scan, .btn-update-progress, .btn-update-wi-progress, .preset-primary, .check-out-button, .btn-action-edit { background: var(--aslenix-gradient) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 7px 16px rgba(255,77,157,.18) !important; }
-.btn:hover, .button:hover, .submit-btn:hover, .save-btn:hover, .save-button:hover, .leave-button:hover, .download-button:hover, .qr-button:hover, .action-btn:hover, .btn-add-employee:hover, .btn-add-assignment:hover, .btn-assign-task:hover, .btn-save-modal:hover, .btn-action-confirm:hover, .btn-submit-review:hover, .btn-process-scan:hover, .btn-camera-scan:hover, .btn-update-progress:hover, .btn-update-wi-progress:hover, .preset-primary:hover, .check-out-button:hover, .btn-action-edit:hover { filter: saturate(1.08) brightness(.97); transform: translateY(-1px); }
+/* Red checkout button */
+.check-out-button {
+    background: #ff4d4d !important;
+    color: #fff !important;
+}
+
+.check-out-button:hover {
+    filter: saturate(1.08) brightness(.97);
+    transform: translateY(-1px);
+}
+
+/* duplicate .check-out-button block removed */
+    background: #ff4d4d !important;
+    color: #fff !important;
+}
+
+.check-out-button:hover {
+    filter: saturate(1.08) brightness(.97);
+    transform: translateY(-1px);
+}
+.btn, .button, .submit-btn, .save-btn, .save-button, .leave-button, .download-button, .qr-button, .action-btn, .btn-add-employee, .btn-add-assignment, .btn-assign-task, .btn-save-modal, .btn-action-confirm, .btn-submit-review, .btn-process-scan, .btn-camera-scan, .btn-update-progress, .btn-update-wi-progress, .preset-primary, .btn-action-edit { background: var(--aslenix-gradient) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 7px 16px rgba(255,77,157,.18) !important; }
+.btn:hover, .button:hover, .submit-btn:hover, .save-btn:hover, .save-button:hover, .leave-button:hover, .download-button:hover, .qr-button:hover, .action-btn:hover, .btn-add-employee:hover, .btn-add-assignment:hover, .btn-assign-task:hover, .btn-save-modal:hover, .btn-action-confirm:hover, .btn-submit-review:hover, .btn-process-scan:hover, .btn-camera-scan:hover, .btn-update-progress:hover, .btn-update-wi-progress:hover, .preset-primary:hover, .btn-action-edit:hover { filter: saturate(1.08) brightness(.97); transform: translateY(-1px); }
 .btn:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid rgba(66,142,255,.35) !important; outline-offset: 2px !important; }
 .btn:disabled, button:disabled, .disabled { opacity: .48 !important; box-shadow: none !important; }
 .check-in-button { background: linear-gradient(120deg, #16775b, #1fa778) !important; }
@@ -115,3 +135,35 @@ tbody tr:hover { background: #f8fafc !important; }
   color: #ffffff !important;
   box-shadow: 0 4px 10px rgba(152, 85, 255, 0.25) !important;
 }
+
+/* Employee photo & avatar styling */
+.profile-avatar,
+.avatar,
+.employee-avatar,
+.employee-avatar-circle,
+.emp-avatar-circle,
+.assignee-avatar,
+.qr-avatar-circle {
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.profile-avatar img,
+.avatar img,
+.employee-avatar img,
+.employee-avatar-circle img,
+.emp-avatar-circle img,
+.assignee-avatar img,
+.qr-avatar-circle img,
+.qr-avatar-img,
+.header-avatar-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: inherit !important;
+  display: block !important;
+}
+

@@ -193,6 +193,7 @@ public class AdminCardReaderController {
         empData.put("hasCheckedIn", hasCheckedIn);
         empData.put("hasCheckedOut", hasCheckedOut);
         empData.put("avatar", initials);
+        empData.put("photoUrl", employee.getPhotoUrl());
         empData.put("maskedCard", masked);
         empData.put("lastVerifiedAt", LocalDateTime.now().format(DATETIME_FMT));
 

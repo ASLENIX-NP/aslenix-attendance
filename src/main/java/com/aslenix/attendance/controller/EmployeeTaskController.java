@@ -488,6 +488,7 @@ public class EmployeeTaskController {
                     String initials = (first.isEmpty() ? "" : first.substring(0, 1)) +
                             (last.isEmpty() ? "" : last.substring(0, 1));
                     empMap.put("initials", initials.toUpperCase());
+                    empMap.put("photoUrl", emp.getPhotoUrl());
                     assigneesList.add(empMap);
                 }
             }
@@ -503,6 +504,7 @@ public class EmployeeTaskController {
             String initials = (first.isEmpty() ? "" : first.substring(0, 1)) +
                     (last.isEmpty() ? "" : last.substring(0, 1));
             empMap.put("initials", initials.toUpperCase());
+            empMap.put("photoUrl", emp.getPhotoUrl());
             assigneesList.add(empMap);
         }
         map.put("assignees", assigneesList);

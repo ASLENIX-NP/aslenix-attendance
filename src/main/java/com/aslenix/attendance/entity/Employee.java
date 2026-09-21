@@ -106,6 +106,16 @@ public class Employee {
     private boolean enabled = true;
 
     // ============================================================
+    // PROFILE PHOTO
+    // ============================================================
+
+    @Column(
+            name = "photo_url",
+            length = 500
+    )
+    private String photoUrl;
+
+    // ============================================================
     // CONSTRUCTOR
     // ============================================================
 
@@ -250,5 +260,17 @@ public class Employee {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    // ============================================================
+    // PHOTO URL
+    // ============================================================
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }

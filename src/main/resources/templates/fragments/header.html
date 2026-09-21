@@ -36,10 +36,15 @@
         <div class="profile-wrapper">
             <button type="button" class="profile" id="profileButton" aria-label="Open profile menu"
                 aria-expanded="false">
-                <div class="profile-avatar" th:text="${employee != null and employee.firstName != null and !employee.firstName.isEmpty()
-            ? employee.firstName.substring(0,1).toUpperCase()
-            : 'E'}">
-                    E
+                <div class="profile-avatar">
+                    <img th:if="${employee != null and employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                         th:src="@{${employee.photoUrl}}"
+                         alt="Avatar"
+                         class="header-avatar-img">
+                    <span th:unless="${employee != null and employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                          th:text="${employee != null and employee.firstName != null and !employee.firstName.isEmpty()
+                                    ? employee.firstName.substring(0,1).toUpperCase()
+                                    : 'E'}">E</span>
                 </div>
                 <div class="profile-info">
                     <div class="profile-name" th:text="${employee != null ? (employee.firstName + ' ' + (employee.lastName != null ? employee.lastName : '')) : 'Employee'}">
