@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoring Settings · ASLENIX</title>
+    <link rel="stylesheet" th:href="@{/css/aslenix-theme.css}" href="/css/aslenix-theme.css">
+    <link rel="stylesheet" th:href="@{/css/performance.css}" href="/css/performance.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="~{fragments/performance-layout :: adminSidebar('performance')}"></div>
+
+    <div class="main-area">
+
+        <div th:replace="~{fragments/performance-layout :: adminHeader}"></div>
+
+        <main>
+
+            <div class="page-header">
+                <div>
+                    <div class="eyebrow">Configuration</div>
+                    <h1>Scoring settings</h1>
+                    <p class="subtitle">
+                        Every value used by the evaluation engine is configurable here. Nothing is hard-coded.
+                        Changes apply to <strong>future</strong> evaluations only — already stored monthly results stay exactly as calculated.
+                    </p>
+                </div>
+                <a th:href="@{/admin/performance}" class="btn btn-ghost">
+                    <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+                    Back to rankings
+                </a>
+            </div>
+
+            <div th:if="${successMessage}" class="perf-alert perf-alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="perf-alert perf-alert-error" th:text="${errorMessage}"></div>
+
+            <form method="post" th:action="@{/admin/performance/settings}" th:object="${settings}" id="settingsForm">
+                <input type="hidden" th:field="*{id}">
+
+                <!-- WEIGHTS -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div><h2>Score weights</h2><span>Must total exactly 100%</span></div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="weight-note" id="weightNote">
+                            Attendance + Task weights must equal exactly 100%. Current total:
+                            <strong id="weightTotal">100</strong>%.
+                        </div>
+                        <div class="settings-grid">
+                            <div class="settings-card">
+                                <h3>Attendance</h3>
+                                <div class="settings-row">
+                                    <label for="attendanceWeight">Attendance weight (%)</label>
+                                    <input type="number" id="attendanceWeight" th:field="*{attendanceWeight}" min="0" max="100" step="1" required>
+                                    <span class="hint">Share of the final score from attendance.</span>
+                                </div>
+                            </div>
+                            <div class="settings-card">
+                                <h3>Tasks</h3>
+                                <div class="settings-row">
+                                    <label for="taskWeight">Task weight (%)</label>
+                                    <input type="number" id="taskWeight" th:field="*{taskWeight}" min="0" max="100" step="1" required>
+                                    <span class="hint">Share of the final score from task performance.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATTENDANCE POINTS -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div><h2>Attendance scoring</h2><span>Applied to a base score of 100, then clamped to 0–100</span></div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="settings-grid">
+                            <div class="settings-card">
+                                <div class="settings-row">
+                                    <label for="lateDeductionPoints">Late check-in deduction (points each)</label>
+                                    <input type="number" id="lateDeductionPoints" th:field="*{lateDeductionPoints}" min="0" step="0.5" required>
+                                    <span class="hint">Subtracted per late check-in.</span>
+                                </div>
+                                <div class="settings-row">
+                                    <label for="earlyCheckInBonusPoints">Early check-in bonus (points each)</label>
+                                    <input type="number" id="earlyCheckInBonusPoints" th:field="*{earlyCheckInBonusPoints}" min="0" step="0.5" required>
+                                    <span class="hint">Added per check-in before the work start time.</span>
+                                </div>
+                            </div>
+                            <div class="settings-card">
+                                <div class="settings-row">
+                                    <label for="overtimeBonusPerHour">Overtime bonus (points per hour)</label>
+                                    <input type="number" id="overtimeBonusPerHour" th:field="*{overtimeBonusPerHour}" min="0" step="0.5" required>
+                                    <span class="hint">Added per overtime hour beyond scheduled hours.</span>
+                                </div>
+                                <div class="settings-row">
+                                    <label for="maxOvertimeBonusHours">Max overtime hours counted</label>
+                                    <input type="number" id="maxOvertimeBonusHours" th:field="*{maxOvertimeBonusHours}" min="0" step="1" required>
+                                    <span class="hint">0 means no cap. Prevents extreme overtime from dominating.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TASK POINTS -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div><h2>Task scoring</h2><span>Complexity points, deadline adjustments and normalization</span></div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="section-title">Complexity points (base per completed task)</div>
+                        <div class="settings-grid">
+                            <div class="settings-card">
+                                <div class="settings-row"><label for="smallPoints">Small</label>
+                                    <input type="number" id="smallPoints" th:field="*{smallPoints}" min="0" step="0.5" required></div>
+                                <div class="settings-row"><label for="mediumPoints">Medium</label>
+                                    <input type="number" id="mediumPoints" th:field="*{mediumPoints}" min="0" step="0.5" required></div>
+                            </div>
+                            <div class="settings-card">
+                                <div class="settings-row"><label for="largePoints">Large</label>
+                                    <input type="number" id="largePoints" th:field="*{largePoints}" min="0" step="0.5" required></div>
+                                <div class="settings-row"><label for="epicPoints">Epic</label>
+                                    <input type="number" id="epicPoints" th:field="*{epicPoints}" min="0" step="0.5" required></div>
+                            </div>
+                        </div>
+
+                        <div class="section-title" style="margin-top:20px;">Deadline performance</div>
+                        <div class="settings-grid">
+                            <div class="settings-card">
+                                <div class="settings-row"><label for="earlyCompletionBonusPoints">Completed early (bonus)</label>
+                                    <input type="number" id="earlyCompletionBonusPoints" th:field="*{earlyCompletionBonusPoints}" min="0" step="0.5" required></div>
+                                <div class="settings-row"><label for="onTimeCompletionPoints">Completed on time</label>
+                                    <input type="number" id="onTimeCompletionPoints" th:field="*{onTimeCompletionPoints}" min="0" step="0.5" required></div>
+                            </div>
+                            <div class="settings-card">
+                                <div class="settings-row"><label for="lateCompletionDeductionPoints">Completed late (deduction)</label>
+                                    <input type="number" id="lateCompletionDeductionPoints" th:field="*{lateCompletionDeductionPoints}" min="0" step="0.5" required></div>
+                                <div class="settings-row"><label for="taskPerfectScorePoints">Perfect-score target (raw points)</label>
+                                    <input type="number" id="taskPerfectScorePoints" th:field="*{taskPerfectScorePoints}" min="1" step="1" required>
+                                    <span class="hint">Raw task points that normalize to a task score of 100.</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:10px;align-items:center;margin-top:4px;">
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path></svg>
+                        Save settings
+                    </button>
+                    <span id="weightError" style="color:#b91c1c;font-size:12px;font-weight:700;display:none;">
+                        Weights must total exactly 100%.
+                    </span>
+                </div>
+            </form>
+
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{fragments/performance-layout :: adminScripts}"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var att = document.getElementById('attendanceWeight');
+        var task = document.getElementById('taskWeight');
+        var totalEl = document.getElementById('weightTotal');
+        var noteEl = document.getElementById('weightNote');
+        var errEl = document.getElementById('weightError');
+        var form = document.getElementById('settingsForm');
+
+        function refresh() {
+            var total = (parseInt(att.value, 10) || 0) + (parseInt(task.value, 10) || 0);
+            totalEl.textContent = total;
+            var ok = total === 100;
+            noteEl.style.background = ok ? '#f0fdf4' : '#fffbeb';
+            noteEl.style.color = ok ? '#15803d' : '#b45309';
+            noteEl.style.borderColor = ok ? '#bbf7d0' : '#fde68a';
+            errEl.style.display = ok ? 'none' : 'inline';
+            return ok;
+        }
+
+        att.addEventListener('input', refresh);
+        task.addEventListener('input', refresh);
+        refresh();
+
+        form.addEventListener('submit', function (e) {
+            if (!refresh()) {
+                e.preventDefault();
+                alert('Attendance weight + Task weight must equal exactly 100%.');
+            }
+        });
+    });
+</script>
+</body>
+</html>

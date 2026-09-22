@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee of the Month · ASLENIX</title>
+    <link rel="stylesheet" th:href="@{/css/aslenix-theme.css}" href="/css/aslenix-theme.css">
+    <link rel="stylesheet" th:href="@{/css/performance.css}" href="/css/performance.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="~{fragments/performance-layout :: adminSidebar('performance')}"></div>
+
+    <div class="main-area">
+
+        <div th:replace="~{fragments/performance-layout :: adminHeader}"></div>
+
+        <main>
+
+            <!-- PAGE HEADER -->
+            <div class="page-header">
+                <div>
+                    <div class="eyebrow">Performance</div>
+                    <h1>Employee of the Month</h1>
+                    <p class="subtitle">
+                        Automated monthly evaluation combining attendance (30%) and task performance (70%).
+                        Results are snapshotted permanently, so historical rankings never change when settings are updated.
+                    </p>
+                </div>
+                <form method="post" th:action="@{/admin/performance/evaluate}" style="display:flex;gap:8px;align-items:center;">
+                    <input type="hidden" name="year" th:value="${selectedYear}">
+                    <input type="hidden" name="month" th:value="${selectedMonth}">
+                    <button type="submit" class="btn btn-primary"
+                            onclick="return confirm('Re-run the evaluation for the selected month? Existing results for that month will be replaced.');">
+                        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg>
+                        Run evaluation
+                    </button>
+                </form>
+            </div>
+
+            <!-- FLASH MESSAGES -->
+            <div th:if="${successMessage}" class="perf-alert perf-alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="perf-alert perf-alert-error" th:text="${errorMessage}"></div>
+
+            <!-- FILTERS -->
+            <form class="perf-toolbar" method="get" th:action="@{/admin/performance}" id="filterForm" style="margin-bottom:22px;">
+                <input type="hidden" name="year" id="fYear" th:value="${selectedYear}">
+                <input type="hidden" name="month" id="fMonth" th:value="${selectedMonth}">
+
+                <div class="perf-field">
+                    <label for="monthSelect">Month</label>
+                    <select id="monthSelect" class="perf-select">
+                        <option th:each="m : ${months}"
+                                th:value="${m.year + '-' + m.month}"
+                                th:selected="${m.year == selectedYear and m.month == selectedMonth}"
+                                th:text="${m.label + (m.hasResults ? '' : '  ·  no data')}"></option>
+                    </select>
+                </div>
+
+                <div class="perf-field">
+                    <label for="employeeSelect">Employee</label>
+                    <select id="employeeSelect" name="employeeId" class="perf-select">
+                        <option value="">All employees</option>
+                        <option th:each="e : ${employees}"
+                                th:value="${e.id}"
+                                th:selected="${selectedEmployeeId != null and selectedEmployeeId == e.id}"
+                                th:text="${e.firstName + ' ' + e.lastName}"></option>
+                    </select>
+                </div>
+
+                <div class="perf-field">
+                    <label for="departmentSelect">Department</label>
+                    <select id="departmentSelect" name="departmentId" class="perf-select">
+                        <option value="">All departments</option>
+                        <option th:each="d : ${departments}"
+                                th:value="${d.id}"
+                                th:selected="${selectedDepartmentId != null and selectedDepartmentId == d.id}"
+                                th:text="${d.name}"></option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-ghost">Apply filters</button>
+                <a th:href="@{/admin/performance}" class="btn btn-ghost">Reset</a>
+            </form>
+
+            <!-- WINNER BANNER -->
+            <div th:if="${winner != null}" class="winner-banner">
+                <div class="winner-trophy">
+                    <svg viewBox="0 0 24 24"><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"></path><path d="M17 5h3v2a3 3 0 0 1-3 3"></path><path d="M7 5H4v2a3 3 0 0 0 3 3"></path></svg>
+                </div>
+                <div class="winner-info">
+                    <div class="winner-label">Employee of the Month · <span th:text="${selectedMonthLabel}"></span></div>
+                    <div class="winner-name" th:text="${winner.employeeName}">Winner Name</div>
+                    <div class="winner-meta">
+                        <span th:text="${winner.departmentName} ?: 'No department'">Department</span>
+                        <span th:if="${winner.tieBreakerUsed != null and winner.tieBreakerUsed != 'NONE'}">
+                            · Tie broken by: <strong th:text="${winner.tieBreakerUsed}"></strong>
+                        </span>
+                    </div>
+                </div>
+                <div class="winner-score">
+                    <div class="value" th:text="${#numbers.formatDecimal(winner.finalScore, 1, 2)}">0.00</div>
+                    <div class="max">/ 100 final score</div>
+                </div>
+            </div>
+
+            <div th:if="${winner == null and latestWinner != null}" class="perf-alert perf-alert-success">
+                No winner has been recorded for <strong th:text="${selectedMonthLabel}"></strong> yet.
+                The most recent winner is <strong th:text="${latestWinner.employeeName}"></strong>.
+                Run the evaluation above to calculate this month.
+            </div>
+
+            <!-- SUMMARY CARDS -->
+            <div class="perf-grid">
+                <div class="perf-card">
+                    <div class="label">Month</div>
+                    <div class="value" style="font-size:20px;" th:text="${selectedMonthLabel}">Month</div>
+                    <div class="desc">Evaluation period</div>
+                </div>
+                <div class="perf-card">
+                    <div class="label">Employees evaluated</div>
+                    <div class="value" th:text="${#lists.size(allResults)}">0</div>
+                    <div class="desc" th:text="${#lists.size(results)} + ' shown after filters'">0 shown</div>
+                </div>
+                <div class="perf-card">
+                    <div class="label">Top final score</div>
+                    <div class="value" th:text="${!results.isEmpty()} ? ${#numbers.formatDecimal(results[0].finalScore, 1, 2)} : '—'">0.00</div>
+                    <div class="desc">Highest ranked in view</div>
+                </div>
+                <div class="perf-card">
+                    <div class="label">Weights used</div>
+                    <div class="value" style="font-size:20px;" th:text="${settings.attendanceWeight} + '% / ' + ${settings.taskWeight} + '%'">30% / 70%</div>
+                    <div class="desc">Attendance / Tasks</div>
+                </div>
+            </div>
+
+            <!-- RANKINGS -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Rankings</h2>
+                        <span>Sorted by final score, then configured tie-breakers</span>
+                    </div>
+                    <a th:href="@{/admin/performance/settings}" class="btn btn-ghost">Scoring settings</a>
+                </div>
+
+                <div th:if="${results.isEmpty()}" class="empty-state">
+                    <h3>No results for this selection</h3>
+                    <p>Run the evaluation for <span th:text="${selectedMonthLabel}"></span>, or adjust the filters above.</p>
+                </div>
+
+                <div th:unless="${results.isEmpty()}" class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Attendance</th>
+                                <th>Tasks</th>
+                                <th>Final score</th>
+                                <th>Tasks done</th>
+                                <th>Late / Early CI</th>
+                                <th>OT hrs</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="s : ${results}">
+                                <td>
+                                    <span class="rank-badge"
+                                          th:classappend="${s.rank == 1} ? ' rank-1' : (${s.rank == 2} ? ' rank-2' : (${s.rank == 3} ? ' rank-3' : ''))"
+                                          th:text="${s.rank}">1</span>
+                                </td>
+                                <td>
+                                    <div class="employee-name" th:text="${s.employeeName}">Name</div>
+                                    <div class="employee-code" th:if="${s.employeeOfTheMonth}">🏆 Employee of the Month</div>
+                                </td>
+                                <td th:text="${s.departmentName} ?: '—'">Department</td>
+                                <td th:text="${#numbers.formatDecimal(s.attendanceScore, 1, 2)}">0.00</td>
+                                <td th:text="${#numbers.formatDecimal(s.taskScore, 1, 2)}">0.00</td>
+                                <td>
+                                    <span class="score-bar"><span class="score-fill" th:style="'width:' + ${s.finalScore} + '%'"></span></span>
+                                    <span class="score-value" th:text="${#numbers.formatDecimal(s.finalScore, 1, 2)}">0.00</span>
+                                </td>
+                                <td th:text="${s.tasksCompleted}">0</td>
+                                <td th:text="${s.lateCheckIns} + ' / ' + ${s.earlyCheckIns}">0 / 0</td>
+                                <td th:text="${#numbers.formatDecimal(s.overtimeHours, 1, 1)}">0</td>
+                                <td>
+                                    <a class="btn btn-ghost"
+                                       th:href="@{/admin/performance/employee/{id}(id=${s.employee.id}, year=${selectedYear}, month=${selectedMonth})}">
+                                        Details
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{fragments/performance-layout :: adminScripts}"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var monthSelect = document.getElementById('monthSelect');
+        var form = document.getElementById('filterForm');
+        if (monthSelect && form) {
+            monthSelect.addEventListener('change', function () {
+                var parts = monthSelect.value.split('-');
+                document.getElementById('fYear').value = parts[0];
+                document.getElementById('fMonth').value = parts[1];
+                form.submit();
+            });
+        }
+    });
+</script>
+</body>
+</html>

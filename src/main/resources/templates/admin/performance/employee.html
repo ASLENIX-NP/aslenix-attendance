@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Detail · ASLENIX</title>
+    <link rel="stylesheet" th:href="@{/css/aslenix-theme.css}" href="/css/aslenix-theme.css">
+    <link rel="stylesheet" th:href="@{/css/performance.css}" href="/css/performance.css">
+</head>
+<body>
+
+<div class="app-layout">
+
+    <div th:replace="~{fragments/performance-layout :: adminSidebar('performance')}"></div>
+
+    <div class="main-area">
+
+        <div th:replace="~{fragments/performance-layout :: adminHeader}"></div>
+
+        <main>
+
+            <div class="page-header">
+                <div>
+                    <div class="eyebrow">Performance detail</div>
+                    <h1 th:text="${employee.firstName + ' ' + employee.lastName}">Employee Name</h1>
+                    <p class="subtitle">
+                        <span th:text="${employee.position} ?: 'Employee'">Position</span>
+                        · <span th:text="${employee.department != null} ? ${employee.department.name} : 'No department'">Department</span>
+                        · <span th:text="${selectedMonthLabel}">Month</span>
+                    </p>
+                </div>
+                <a th:href="@{/admin/performance(year=${selectedYear}, month=${selectedMonth})}" class="btn btn-ghost">
+                    <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+                    Back to rankings
+                </a>
+            </div>
+
+            <div th:if="${errorMessage}" class="perf-alert perf-alert-error" th:text="${errorMessage}"></div>
+
+            <!-- MONTH SWITCHER -->
+            <form class="perf-toolbar" method="get" th:action="@{'/admin/performance/employee/' + ${employee.id}}" id="monthForm" style="margin-bottom:22px;">
+                <input type="hidden" name="year" id="fYear" th:value="${selectedYear}">
+                <input type="hidden" name="month" id="fMonth" th:value="${selectedMonth}">
+                <div class="perf-field">
+                    <label for="monthSelect">Evaluation month</label>
+                    <select id="monthSelect" class="perf-select">
+                        <option th:each="m : ${months}"
+                                th:value="${m.year + '-' + m.month}"
+                                th:selected="${m.year == selectedYear and m.month == selectedMonth}"
+                                th:text="${m.label + (m.hasResults ? '' : '  ·  no data')}"></option>
+                    </select>
+                </div>
+            </form>
+
+            <!-- NO DATA -->
+            <div th:if="${score == null}" class="panel">
+                <div class="empty-state">
+                    <h3>No evaluation for this month</h3>
+                    <p>This employee has no stored performance result for <span th:text="${selectedMonthLabel}"></span>.
+                        Run the evaluation from the rankings page.</p>
+                </div>
+            </div>
+
+            <div th:if="${score != null}">
+
+                <!-- OVERALL -->
+                <div class="perf-grid">
+                    <div class="perf-card">
+                        <div class="label">Final score</div>
+                        <div class="value" th:text="${#numbers.formatDecimal(score.finalScore, 1, 2)}">0.00</div>
+                        <div class="desc">Rank #<span th:text="${score.rank}">1</span> of the month</div>
+                    </div>
+                    <div class="perf-card">
+                        <div class="label">Attendance score</div>
+                        <div class="value" th:text="${#numbers.formatDecimal(score.attendanceScore, 1, 2)}">0.00</div>
+                        <div class="desc">Weight <span th:text="${score.attendanceWeightUsed}">30</span>%</div>
+                    </div>
+                    <div class="perf-card">
+                        <div class="label">Task score</div>
+                        <div class="value" th:text="${#numbers.formatDecimal(score.taskScore, 1, 2)}">0.00</div>
+                        <div class="desc">Weight <span th:text="${score.taskWeightUsed}">70</span>%</div>
+                    </div>
+                    <div class="perf-card">
+                        <div class="label">Status</div>
+                        <div class="value" style="font-size:18px;" th:text="${score.employeeOfTheMonth} ? '🏆 Winner' : 'Ranked'">Ranked</div>
+                        <div class="desc" th:if="${score.tieBreakerUsed != null and score.tieBreakerUsed != 'NONE'}"
+                             th:text="'Tie-breaker: ' + ${score.tieBreakerUsed}">Tie-breaker</div>
+                    </div>
+                </div>
+
+                <!-- FINAL CALCULATION -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div><h2>Final calculation</h2><span>Exactly how the final score was derived</span></div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="calc-box">
+                            <div class="calc-line">
+                                <span>Attendance score <span th:text="${#numbers.formatDecimal(score.attendanceScore, 1, 2)}"></span> × <span th:text="${score.attendanceWeightUsed}"></span>%</span>
+                                <span th:text="${#numbers.formatDecimal(score.attendanceScore * score.attendanceWeightUsed / 100.0, 1, 2)}">0.00</span>
+                            </div>
+                            <div class="calc-line">
+                                <span>Task score <span th:text="${#numbers.formatDecimal(score.taskScore, 1, 2)}"></span> × <span th:text="${score.taskWeightUsed}"></span>%</span>
+                                <span th:text="${#numbers.formatDecimal(score.taskScore * score.taskWeightUsed / 100.0, 1, 2)}">0.00</span>
+                            </div>
+                            <div class="calc-line calc-total">
+                                <span>Final score (clamped 0–100)</span>
+                                <span th:text="${#numbers.formatDecimal(score.finalScore, 1, 2)}">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATTENDANCE BREAKDOWN -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div><h2>Attendance breakdown</h2><span>Base 100, adjusted by the configured rules</span></div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="metric-grid" style="margin-bottom:18px;">
+                            <div class="metric-card"><div class="m-label">Days present</div><div class="m-value" th:text="${score.daysPresent}">0</div></div>
+                            <div class="metric-card"><div class="m-label">Late check-ins</div><div class="m-value" th:text="${score.lateCheckIns}">0</div></div>
+                            <div class="metric-card"><div class="m-label">Early check-ins</div><div class="m-value" th:text="${score.earlyCheckIns}">0</div></div>
+                            <div class="metric-card"><div class="m-label">Overtime hours</div><div class="m-value" th:text="${#numbers.formatDecimal(score.overtimeHours, 1, 1)}">0</div></div>
+                        </div>
+                        <div class="calc-box">
+                            <div class="calc-line"><span>Base score</span><span>100.00</span></div>
+                            <div class="calc-line">
+                                <span>Late check-ins: <span th:text="${score.lateCheckIns}"></span> × (<span th:text="${#numbers.formatDecimal(-settings.lateDeductionPoints, 1, 2)}"></span>)</span>
+                                <span class="neg" th:text="${#numbers.formatDecimal(score.lateCheckIns * -settings.lateDeductionPoints, 1, 2)}">0.00</span>
+                            </div>
+                            <div class="calc-line">
+                                <span>Early check-ins: <span th:text="${score.earlyCheckIns}"></span> × (+<span th:text="${#numbers.formatDecimal(settings.earlyCheckInBonusPoints, 1, 2)}"></span>)</span>
+                                <span class="pos" th:text="'+' + ${#numbers.formatDecimal(score.earlyCheckIns * settings.earlyCheckInBonusPoints, 1, 2)}">0.00</span>
+                            </div>
+                            <div class="calc-line">
+                                <span>Overtime: <span th:text="${#numbers.formatDecimal(score.overtimeHours, 1, 1)}"></span> hrs × (+<span th:text="${#numbers.formatDecimal(settings.overtimeBonusPerHour, 1, 2)}"></span>)</span>
+                                <span class="pos" th:text="'+' + ${#numbers.formatDecimal(score.overtimeHours * settings.overtimeBonusPerHour, 1, 2)}">0.00</span>
+                            </div>
+                            <div class="calc-line calc-total">
+                                <span>Attendance score (clamped 0–100)</span>
+                                <span th:text="${#numbers.formatDecimal(score.attendanceScore, 1, 2)}">0.00</span>
+                            </div>
+                        </div>
+                        <p class="hint" style="margin-top:10px;color:#94a3b8;font-size:11.5px;">
+                            <span th:if="${score.daysPresent == 0}">No attendance records for this month — attendance score defaults to 0.</span>
+                            <span th:if="${settings.maxOvertimeBonusHours > 0}">
+                                Overtime bonus is capped at <span th:text="${#numbers.formatDecimal(settings.maxOvertimeBonusHours, 1, 1)}"></span> hours.
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- TASK BREAKDOWN -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div><h2>Task performance breakdown</h2><span>Every completed work item and where its points came from</span></div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="metric-grid" style="margin-bottom:18px;">
+                            <div class="metric-card"><div class="m-label">Tasks completed</div><div class="m-value" th:text="${score.tasksCompleted}">0</div></div>
+                            <div class="metric-card"><div class="m-label">Small</div><div class="m-value" th:text="${score.smallCompleted}">0</div></div>
+                            <div class="metric-card"><div class="m-label">Medium</div><div class="m-value" th:text="${score.mediumCompleted}">0</div></div>
+                            <div class="metric-card"><div class="m-label">Large</div><div class="m-value" th:text="${score.largeCompleted}">0</div></div>
+                            <div class="metric-card"><div class="m-label">Epic</div><div class="m-value" th:text="${score.epicCompleted}">0</div></div>
+                            <div class="metric-card"><div class="m-label">Early / On-time / Late</div>
+                                <div class="m-value" style="font-size:16px;" th:text="${score.tasksEarly} + ' / ' + ${score.tasksOnTime} + ' / ' + ${score.tasksLate}">0 / 0 / 0</div></div>
+                        </div>
+
+                        <div th:if="${breakdown.isEmpty()}" class="empty-state">
+                            <h3>No completed tasks</h3>
+                            <p>No task work items were completed within <span th:text="${selectedMonthLabel}"></span> — task score is 0.</p>
+                        </div>
+
+                        <div th:unless="${breakdown.isEmpty()}" class="table-wrapper">
+                            <table class="breakdown-table">
+                                <thead>
+                                    <tr>
+                                        <th>Task</th>
+                                        <th>Complexity</th>
+                                        <th>Base</th>
+                                        <th>Deadline</th>
+                                        <th>Completed</th>
+                                        <th>Days</th>
+                                        <th>Adj.</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="b : ${breakdown}">
+                                        <td>
+                                            <div class="employee-name" th:text="${b.assignmentTitle} ?: ${b.taskTitle} ?: ('Task #' + ${b.taskAssignmentId})">Task</div>
+                                            <div class="employee-code" th:if="${b.taskAssignmentId != null}" th:text="'Assignment #' + ${b.taskAssignmentId}">#</div>
+                                        </td>
+                                        <td><span class="pill pill-cx" th:text="${b.complexity} ?: '—'">MEDIUM</span></td>
+                                        <td th:text="${#numbers.formatDecimal(b.basePoints, 1, 2)}">0.00</td>
+                                        <td>
+                                            <span class="pill"
+                                                  th:classappend="${b.deadlineOutcome == 'EARLY'} ? ' pill-early' : (${b.deadlineOutcome == 'LATE'} ? ' pill-late' : (${b.deadlineOutcome == 'ON_TIME'} ? ' pill-ontime' : ' pill-none'))"
+                                                  th:text="${b.deadlineOutcome} ?: 'NONE'">ON_TIME</span>
+                                        </td>
+                                        <td th:text="${b.completedAt != null} ? ${#temporals.format(b.completedAt, 'yyyy-MM-dd')} : '—'">—</td>
+                                        <td th:text="${b.daysDifference}">0</td>
+                                        <td>
+                                            <span th:class="${b.deadlineAdjustment > 0} ? 'pos' : (${b.deadlineAdjustment < 0} ? 'neg' : '')"
+                                                  th:style="${b.deadlineAdjustment > 0} ? 'color:#15803d;font-weight:750;' : (${b.deadlineAdjustment < 0} ? 'color:#b91c1c;font-weight:750;' : '')"
+                                                  th:text="${#numbers.formatDecimal(b.deadlineAdjustment, 1, 2)}">0.00</span>
+                                        </td>
+                                        <td><strong th:text="${#numbers.formatDecimal(b.totalPoints, 1, 2)}">0.00</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="calc-box" style="margin-top:18px;">
+                            <div class="calc-line"><span>Raw task points</span><span th:text="${#numbers.formatDecimal(score.rawTaskPoints, 1, 2)}">0.00</span></div>
+                            <div class="calc-line"><span>Perfect-score target</span><span th:text="${#numbers.formatDecimal(settings.taskPerfectScorePoints, 1, 2)}">100.00</span></div>
+                            <div class="calc-line calc-total">
+                                <span>Task score = raw ÷ target × 100 (clamped 0–100)</span>
+                                <span th:text="${#numbers.formatDecimal(score.taskScore, 1, 2)}">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="color:#94a3b8;font-size:11.5px;margin-top:8px;">
+                    Calculated at
+                    <span th:text="${score.calculatedAt != null} ? ${#temporals.format(score.calculatedAt, 'yyyy-MM-dd HH:mm')} : '—'">—</span>.
+                    These figures are stored permanently and will not change if scoring settings are edited later.
+                </p>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{fragments/performance-layout :: adminScripts}"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var monthSelect = document.getElementById('monthSelect');
+        var form = document.getElementById('monthForm');
+        if (monthSelect && form) {
+            monthSelect.addEventListener('change', function () {
+                var parts = monthSelect.value.split('-');
+                document.getElementById('fYear').value = parts[0];
+                document.getElementById('fMonth').value = parts[1];
+                form.submit();
+            });
+        }
+    });
+</script>
+</body>
+</html>
