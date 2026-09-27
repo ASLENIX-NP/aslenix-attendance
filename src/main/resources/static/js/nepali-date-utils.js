@@ -302,25 +302,8 @@
                     proto._aslenixPatched = true;
                     proto.positionDatePicker = function () {
                         if (!this.inputElement || !this.datePickerDiv) return;
-                        const rect = this.inputElement.getBoundingClientRect();
-                        const picker = this.datePickerDiv;
-                        picker.style.position = 'fixed';
-                        picker.style.zIndex = '100060';
-
-                        const pickerHeight = picker.offsetHeight || 280;
-                        const pickerWidth = picker.offsetWidth || 280;
-                        const spaceBelow = window.innerHeight - rect.bottom;
-                        let top = rect.bottom + 4;
-                        if (spaceBelow < pickerHeight && rect.top > pickerHeight) {
-                            top = rect.top - pickerHeight - 4;
-                        }
-                        let left = rect.left;
-                        if (left + pickerWidth > window.innerWidth) {
-                            left = window.innerWidth - pickerWidth - 16;
-                        }
-                        if (left < 8) left = 8;
-                        picker.style.top = Math.max(8, top) + 'px';
-                        picker.style.left = left + 'px';
+                        window._currentActiveDatePickerInput = this.inputElement;
+                        repositionPicker(this.inputElement, this.datePickerDiv);
                     };
                 }
                 if (typeof testInstance.destroy === 'function') {
@@ -331,38 +314,51 @@
             console.warn('ASLENIX DatePicker prototype patch:', e);
         }
 
-        // Global scroll & resize handler to keep open picker stuck to input even during modal scrolling
+        function repositionPicker(inputEl, pickerEl) {
+            if (!inputEl || !pickerEl) return;
+            const rect = inputEl.getBoundingClientRect();
+            pickerEl.style.setProperty('position', 'fixed', 'important');
+            pickerEl.style.setProperty('z-index', '100060', 'important');
+            pickerEl.style.setProperty('box-sizing', 'border-box', 'important');
+
+            const pickerHeight = pickerEl.offsetHeight || 320;
+            const pickerWidth = pickerEl.offsetWidth || 320;
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            let top = rect.bottom + 4;
+            if (spaceBelow < pickerHeight && rect.top > pickerHeight) {
+                top = rect.top - pickerHeight - 4;
+            }
+            if (top + pickerHeight > window.innerHeight) {
+                top = Math.max(8, window.innerHeight - pickerHeight - 8);
+            }
+            top = Math.max(8, top);
+
+            let left = rect.left;
+            if (left + pickerWidth > window.innerWidth) {
+                left = window.innerWidth - pickerWidth - 16;
+            }
+            left = Math.max(8, left);
+
+            pickerEl.style.setProperty('top', top + 'px', 'important');
+            pickerEl.style.setProperty('left', left + 'px', 'important');
+            pickerEl.style.setProperty('max-width', 'calc(100vw - 16px)', 'important');
+        }
+
+        // Global scroll & resize handler to keep open picker stuck to input and inside viewport
         if (!window._aslenixPickerScrollBound) {
             window._aslenixPickerScrollBound = true;
             window.addEventListener('scroll', function () {
                 const picker = document.querySelector('.ndp-container');
                 if (picker && window._currentActiveDatePickerInput) {
-                    const rect = window._currentActiveDatePickerInput.getBoundingClientRect();
-                    picker.style.position = 'fixed';
-                    picker.style.zIndex = '100060';
-                    const pickerHeight = picker.offsetHeight || 280;
-                    const pickerWidth = picker.offsetWidth || 280;
-                    const spaceBelow = window.innerHeight - rect.bottom;
-                    let top = rect.bottom + 4;
-                    if (spaceBelow < pickerHeight && rect.top > pickerHeight) {
-                        top = rect.top - pickerHeight - 4;
-                    }
-                    let left = rect.left;
-                    if (left + pickerWidth > window.innerWidth) {
-                        left = window.innerWidth - pickerWidth - 16;
-                    }
-                    if (left < 8) left = 8;
-                    picker.style.top = Math.max(8, top) + 'px';
-                    picker.style.left = left + 'px';
+                    repositionPicker(window._currentActiveDatePickerInput, picker);
                 }
             }, { passive: true, capture: true });
 
             window.addEventListener('resize', function () {
                 const picker = document.querySelector('.ndp-container');
                 if (picker && window._currentActiveDatePickerInput) {
-                    const rect = window._currentActiveDatePickerInput.getBoundingClientRect();
-                    picker.style.top = (rect.bottom + 4) + 'px';
-                    picker.style.left = rect.left + 'px';
+                    repositionPicker(window._currentActiveDatePickerInput, picker);
                 }
             }, { passive: true });
         }

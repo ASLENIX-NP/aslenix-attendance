@@ -150,6 +150,18 @@
     border-collapse: separate !important;
     border-spacing: 4px !important;
     margin-top: 4px !important;
+    table-layout: fixed !important;
+}
+
+.ndp-container thead,
+.ndp-container tbody,
+.ndp-container tr {
+    background: transparent !important;
+    border: none !important;
+}
+
+.ndp-container tbody tr:hover {
+    background: transparent !important;
 }
 
 .ndp-container .ndp-table th {
@@ -160,6 +172,8 @@
     color: #64748b !important;
     padding: 6px 0 !important;
     text-align: center !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 /* Saturday highlight in weekday headers */
@@ -170,6 +184,8 @@
 .ndp-container .ndp-table td {
     width: 36px !important;
     height: 34px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     color: #1e293b !important;
@@ -180,6 +196,8 @@
     vertical-align: middle !important;
     border: 1px solid transparent !important;
     background: transparent !important;
+    box-sizing: border-box !important;
+    line-height: 34px !important;
 }
 
 /* Saturday days highlight */

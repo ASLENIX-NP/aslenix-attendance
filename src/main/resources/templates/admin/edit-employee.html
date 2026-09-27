@@ -11,9 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;850&display=swap" rel="stylesheet">
 
     <!-- NEPALI DATE CONVERTER & PICKER -->
-    <link rel="stylesheet" href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/nepali-date-converter/dist/nepali-date-converter.umd.js"></script>
-    <script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js"></script>
+    <link rel="stylesheet" href="/css/nepali.datepicker.v5.0.6.min.css">
+    <script src="/js/nepali-date-converter.umd.js"></script>
+    <script src="/js/nepali.datepicker.v5.0.6.min.js"></script>
     <script src="/js/nepali-date-utils.js"></script>
 
     <link rel="stylesheet" href="/css/aslenix-theme.css">
@@ -555,15 +555,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const nepaliDateInput = document.getElementById("joiningDateBs");
     const actualDateInput = document.getElementById("joiningDate");
 
+    if (typeof window.patchNepaliDatePickerPrototype === 'function') {
+        window.patchNepaliDatePickerPrototype();
+    }
+
     if (nepaliDateInput && typeof nepaliDateInput.nepaliDatePicker === 'function') {
-        nepaliDateInput.nepaliDatePicker({
+        const inst = nepaliDateInput.nepaliDatePicker({
             ndpYear: true,
             ndpMonth: true,
             ndpYearCount: 100,
+            language: "english",
+            unicodeDate: false,
             onChange: function () {
                 syncBsToAd();
             }
         });
+        if (typeof window.bindDatePickerInteractions === 'function') {
+            window.bindDatePickerInteractions(nepaliDateInput, inst);
+        }
     }
 
     // Pre-fill existing date in BS

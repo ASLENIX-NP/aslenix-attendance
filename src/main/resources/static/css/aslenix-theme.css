@@ -82,27 +82,115 @@ th, td { border-bottom-color: var(--asl-line) !important; }
 tbody tr:hover { background: #f8fafc !important; }
 
 /* Primary actions and interactive state */
-/* Red checkout button */
-.check-out-button {
-    background: #ff4d4d !important;
-    color: #fff !important;
+/* =========================================================
+   ASLENIX SIGNATURE GLOSSY BUTTONS SYSTEM
+   Every button has specular highlights, 3D rim bevels, and lustrous glass/enamel shine
+   ========================================================= */
+
+/* Generic button baseline: gives ALL unclassed buttons a clean glossy enamel look */
+button, input[type="button"], input[type="reset"] {
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 48%, #f2f5fa 52%, #ebf0f7 100%);
+    border: 1px solid #cbd5e1;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #94a3b8;
+    color: #475569;
+    box-shadow: inset 0 1px 1px 0 #ffffff, inset 0 -1px 1px 0 rgba(15, 23, 42, 0.05), 0 2px 5px rgba(15, 23, 42, 0.05);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.check-out-button:hover {
-    filter: saturate(1.08) brightness(.97);
+button:hover, input[type="button"]:hover, input[type="reset"]:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #f5f8fd 48%, #ecf1f8 52%, #e2e8f2 100%);
+    border-color: #94a3b8;
+    color: #0f172a;
+    box-shadow: inset 0 1px 2px 0 #ffffff, 0 4px 12px rgba(15, 23, 42, 0.09);
     transform: translateY(-1px);
 }
 
-.btn, .button, .submit-btn, .save-btn, .save-button, .leave-button, .download-button, .qr-button, .action-btn, .btn-add-employee, .btn-add-assignment, .btn-assign-task, .btn-save-modal, .btn-action-confirm, .btn-submit-review, .btn-process-scan, .btn-camera-scan, .btn-update-progress, .btn-update-wi-progress, .preset-primary, .btn-action-edit { background: var(--aslenix-gradient) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 7px 16px rgba(255,77,157,.18) !important; }
-.btn:hover, .button:hover, .submit-btn:hover, .save-btn:hover, .save-button:hover, .leave-button:hover, .download-button:hover, .qr-button:hover, .action-btn:hover, .btn-add-employee:hover, .btn-add-assignment:hover, .btn-assign-task:hover, .btn-save-modal:hover, .btn-action-confirm:hover, .btn-submit-review:hover, .btn-process-scan:hover, .btn-camera-scan:hover, .btn-update-progress:hover, .btn-update-wi-progress:hover, .preset-primary:hover, .btn-action-edit:hover { filter: saturate(1.08) brightness(.97); transform: translateY(-1px); }
-.btn:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid rgba(66,142,255,.35) !important; outline-offset: 2px !important; }
-.btn:disabled, button:disabled, .disabled { opacity: .48 !important; box-shadow: none !important; }
-.check-in-button { background: linear-gradient(120deg, #16775b, #1fa778) !important; }
-.btn-cancel-modal, .cancel-btn, .back-btn, .btn-action-cancel { background: #fff !important; color: var(--asl-ink-soft) !important; border: 1px solid var(--asl-line) !important; box-shadow: none !important; }
+button:active, input[type="button"]:active, input[type="reset"]:active {
+    background: linear-gradient(180deg, #e9eef5 0%, #edf2f7 100%);
+    box-shadow: inset 0 2px 3px rgba(15, 23, 42, 0.12);
+    transform: translateY(0.5px);
+}
 
-/* =========================================================
-   ADMIN PORTAL HIGHLIGHTED BUTTONS (SOFT ELEGANT INDIGO STYLE)
-   ========================================================= */
+/* 1. ASLENIX Spectrum Glossy Primary Buttons */
+.btn, .button, .submit-btn, .save-btn, .save-button, .leave-button, .download-button,
+.qr-button, .action-btn, .btn-add-employee, .btn-add-assignment, .btn-assign-task,
+.btn-save-modal, .btn-action-confirm, .btn-submit-review, .btn-process-scan,
+.btn-camera-scan, .btn-update-progress, .btn-update-wi-progress, .preset-primary,
+.preset-save-ajax, .btn-action-edit, .attendance-button, .start-camera, .stop-camera,
+.btn-add-subtask-action, .btn-add-subtask-bottom, .subtask-btn-action, .qr-btn-edit,
+.qr-btn-download, .gov-btn-refresh, .btn-refresh-audit, .notification-retry-button,
+.btn-add-chip, .btn-update-subtask, button[type="submit"], input[type="submit"] {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.10) 100%),
+        linear-gradient(135deg, #FF4D9D 0%, #ED4AC2 30%, #9855FF 55%, #428EFF 80%, #3EB1FC 100%) !important;
+    background-color: #9855ff !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.55) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.20) !important;
+    border-radius: 11px !important;
+    box-shadow:
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.75),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.24),
+        0 4px 14px rgba(152, 85, 255, 0.28),
+        0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22) !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative !important;
+}
+
+.btn:hover, .button:hover, .submit-btn:hover, .save-btn:hover, .save-button:hover,
+.leave-button:hover, .download-button:hover, .qr-button:hover, .action-btn:hover,
+.btn-add-employee:hover, .btn-add-assignment:hover, .btn-assign-task:hover,
+.btn-save-modal:hover, .btn-action-confirm:hover, .btn-submit-review:hover,
+.btn-process-scan:hover, .btn-camera-scan:hover, .btn-update-progress:hover,
+.btn-update-wi-progress:hover, .preset-primary:hover, .preset-save-ajax:hover,
+.btn-action-edit:hover, .attendance-button:hover, .start-camera:hover, .stop-camera:hover,
+.btn-add-subtask-action:hover, .btn-add-subtask-bottom:hover, .subtask-btn-action:hover,
+.qr-btn-edit:hover, .qr-btn-download:hover, .gov-btn-refresh:hover, .btn-refresh-audit:hover,
+.notification-retry-button:hover, .btn-add-chip:hover, .btn-update-subtask:hover,
+button[type="submit"]:hover, input[type="submit"]:hover {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.18) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.06) 100%),
+        linear-gradient(135deg, #FF4D9D 0%, #ED4AC2 30%, #9855FF 55%, #428EFF 80%, #3EB1FC 100%) !important;
+    box-shadow:
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.90),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.28),
+        0 8px 22px rgba(152, 85, 255, 0.42),
+        0 2px 6px rgba(0, 0, 0, 0.16) !important;
+    transform: translateY(-1.5px) !important;
+    filter: brightness(1.03) saturate(1.08) !important;
+}
+
+.btn:active, .button:active, .submit-btn:active, .save-btn:active, .save-button:active,
+.leave-button:active, .download-button:active, .qr-button:active, .action-btn:active,
+.btn-add-employee:active, .btn-add-assignment:active, .btn-assign-task:active,
+.btn-save-modal:active, .btn-action-confirm:active, .btn-submit-review:active,
+.btn-process-scan:active, .btn-camera-scan:active, .btn-update-progress:active,
+.btn-update-wi-progress:active, .preset-primary:active, .preset-save-ajax:active,
+.btn-action-edit:active, .attendance-button:active, .start-camera:active, .stop-camera:active,
+.btn-add-subtask-action:active, .btn-add-subtask-bottom:active, .subtask-btn-action:active,
+.qr-btn-edit:active, .qr-btn-download:active, .gov-btn-refresh:active, .btn-refresh-audit:active,
+.notification-retry-button:active, .btn-add-chip:active, .btn-update-subtask:active,
+button[type="submit"]:active, input[type="submit"]:active {
+    box-shadow:
+        inset 0 2px 4px 0 rgba(0, 0, 0, 0.32),
+        0 2px 6px rgba(152, 85, 255, 0.22) !important;
+    transform: translateY(1px) !important;
+}
+
+.btn:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid rgba(66,142,255,.45) !important; outline-offset: 2px !important; }
+.btn:disabled, button:disabled, .disabled { opacity: .48 !important; box-shadow: none !important; filter: grayscale(0.2) !important; cursor: not-allowed !important; transform: none !important; }
+
+/* 2. Glossy Admin Highlighted Indigo Buttons */
 .admin-dashboard .btn-primary,
 .admin-dashboard .btn-assign-task,
 .admin-dashboard .btn-add-employee,
@@ -122,15 +210,29 @@ tbody tr:hover { background: #f8fafc !important; }
 .admin-dashboard .preset-primary,
 .admin-dashboard .preset-save-ajax,
 .admin-dashboard .btn-action-edit,
+.admin-dashboard .btn-add-chip,
+.admin-dashboard .btn-update-subtask,
 .admin-dashboard .filter-button,
 .admin-dashboard #btnOpenDirectEditModal {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.10) 100%),
+        linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
     background-color: #4f46e5 !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.22) !important;
-    transition: all 0.2s ease !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.55) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.22) !important;
+    border-radius: 11px !important;
+    box-shadow:
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.24),
+        0 4px 14px rgba(79, 70, 229, 0.28),
+        0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22) !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .admin-dashboard .btn-primary:hover,
@@ -152,17 +254,54 @@ tbody tr:hover { background: #f8fafc !important; }
 .admin-dashboard .preset-primary:hover,
 .admin-dashboard .preset-save-ajax:hover,
 .admin-dashboard .btn-action-edit:hover,
+.admin-dashboard .btn-add-chip:hover,
+.admin-dashboard .btn-update-subtask:hover,
 .admin-dashboard .filter-button:hover,
 .admin-dashboard #btnOpenDirectEditModal:hover {
-    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.16) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.06) 100%),
+        linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
     background-color: #4338ca !important;
-    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.32) !important;
-    transform: translateY(-1px) !important;
+    box-shadow:
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.90),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.28),
+        0 8px 22px rgba(79, 70, 229, 0.42),
+        0 2px 6px rgba(0, 0, 0, 0.16) !important;
+    transform: translateY(-1.5px) !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+    filter: brightness(1.03) saturate(1.06) !important;
 }
 
-/* Ensure all text and icons inside admin highlighted buttons are pure white */
+.admin-dashboard .btn-primary:active,
+.admin-dashboard .btn-assign-task:active,
+.admin-dashboard .btn-add-employee:active,
+.admin-dashboard .btn-add-assignment:active,
+.admin-dashboard .btn-save-modal:active,
+.admin-dashboard .save-btn:active,
+.admin-dashboard .save-button:active,
+.admin-dashboard .submit-btn:active,
+.admin-dashboard .action-btn:active,
+.admin-dashboard .btn-action-confirm:active,
+.admin-dashboard .btn-process-scan:active,
+.admin-dashboard .btn-camera-scan:active,
+.admin-dashboard .btn-check-reader:active,
+.admin-dashboard .btn-update-progress:active,
+.admin-dashboard .btn-update-wi-progress:active,
+.admin-dashboard .btn-submit-review:active,
+.admin-dashboard .preset-primary:active,
+.admin-dashboard .preset-save-ajax:active,
+.admin-dashboard .btn-action-edit:active,
+.admin-dashboard .btn-add-chip:active,
+.admin-dashboard .btn-update-subtask:active,
+.admin-dashboard .filter-button:active,
+.admin-dashboard #btnOpenDirectEditModal:active {
+    box-shadow:
+        inset 0 2px 4px 0 rgba(0, 0, 0, 0.32),
+        0 2px 6px rgba(79, 70, 229, 0.22) !important;
+    transform: translateY(1px) !important;
+}
+
 .admin-dashboard .btn-primary *,
 .admin-dashboard .btn-assign-task *,
 .admin-dashboard .btn-add-employee *,
@@ -182,6 +321,8 @@ tbody tr:hover { background: #f8fafc !important; }
 .admin-dashboard .preset-primary *,
 .admin-dashboard .preset-save-ajax *,
 .admin-dashboard .btn-action-edit *,
+.admin-dashboard .btn-add-chip *,
+.admin-dashboard .btn-update-subtask *,
 .admin-dashboard .filter-button *,
 .admin-dashboard #btnOpenDirectEditModal * {
     color: #ffffff !important;
@@ -207,113 +348,502 @@ tbody tr:hover { background: #f8fafc !important; }
 .admin-dashboard .preset-primary svg,
 .admin-dashboard .preset-save-ajax svg,
 .admin-dashboard .btn-action-edit svg,
+.admin-dashboard .btn-add-chip svg,
+.admin-dashboard .btn-update-subtask svg,
 .admin-dashboard .filter-button svg,
 .admin-dashboard #btnOpenDirectEditModal svg {
     stroke: #ffffff !important;
     color: #ffffff !important;
 }
 
-/* Preserve distinct functional & semantic buttons on admin side */
+/* 3. Glossy Emerald Green Approval & Check-In Buttons */
+.check-in-button,
+.btn-approve,
+.btn-action-approve,
+.btn-approve-subtask,
+.btn-submit-review-green,
+.qr-btn-enable,
 .admin-dashboard .btn-approve,
 .admin-dashboard .btn-action-approve,
-.admin-dashboard .btn-approve-subtask {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+.admin-dashboard .btn-approve-subtask,
+.admin-dashboard .btn-submit-review-green,
+.admin-dashboard .qr-btn-enable {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.10) 100%),
+        linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    background-color: #059669 !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.22) !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.55) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.22) !important;
+    border-radius: 11px !important;
+    box-shadow:
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.24),
+        0 4px 14px rgba(16, 185, 129, 0.28),
+        0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22) !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
+
+.check-in-button *,
+.btn-approve *,
+.btn-action-approve *,
+.btn-approve-subtask *,
+.btn-submit-review-green *,
+.qr-btn-enable *,
 .admin-dashboard .btn-approve *,
 .admin-dashboard .btn-action-approve *,
-.admin-dashboard .btn-approve-subtask * {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-}
-.admin-dashboard .btn-approve:hover,
-.admin-dashboard .btn-action-approve:hover,
-.admin-dashboard .btn-approve-subtask:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+.admin-dashboard .btn-approve-subtask *,
+.admin-dashboard .btn-submit-review-green *,
+.admin-dashboard .qr-btn-enable * {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
 }
 
+.check-in-button:hover,
+.btn-approve:hover,
+.btn-action-approve:hover,
+.btn-approve-subtask:hover,
+.btn-submit-review-green:hover,
+.qr-btn-enable:hover,
+.admin-dashboard .btn-approve:hover,
+.admin-dashboard .btn-action-approve:hover,
+.admin-dashboard .btn-approve-subtask:hover,
+.admin-dashboard .btn-submit-review-green:hover,
+.admin-dashboard .qr-btn-enable:hover {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.16) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.06) 100%),
+        linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    box-shadow:
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.90),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.28),
+        0 8px 22px rgba(16, 185, 129, 0.42),
+        0 2px 6px rgba(0, 0, 0, 0.16) !important;
+    transform: translateY(-1.5px) !important;
+}
+
+.check-in-button:active,
+.btn-approve:active,
+.btn-action-approve:active,
+.btn-approve-subtask:active,
+.btn-submit-review-green:active,
+.qr-btn-enable:active,
+.admin-dashboard .btn-approve:active,
+.admin-dashboard .btn-action-approve:active,
+.admin-dashboard .btn-approve-subtask:active,
+.admin-dashboard .btn-submit-review-green:active,
+.admin-dashboard .qr-btn-enable:active {
+    box-shadow:
+        inset 0 2px 4px 0 rgba(0, 0, 0, 0.32),
+        0 2px 6px rgba(16, 185, 129, 0.22) !important;
+    transform: translateY(1px) !important;
+}
+
+/* 4. Glossy Crimson / Rose Red Check-Out, Reject & Delete Buttons */
+.check-out-button,
+.btn-reject,
+.btn-action-reject,
+.btn-decline-subtask,
+.btn-delete,
+.btn-delete-task-modal,
+.btn-disconnect,
+.qr-btn-delete,
+.qr-btn-disable,
+.btn-remove-subtask-card,
 .admin-dashboard .btn-reject,
 .admin-dashboard .btn-action-reject,
 .admin-dashboard .btn-decline-subtask,
 .admin-dashboard .btn-delete,
 .admin-dashboard .btn-delete-task-modal,
 .admin-dashboard .qr-btn-delete,
-.admin-dashboard .btn-disconnect {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+.admin-dashboard .qr-btn-disable,
+.admin-dashboard .btn-disconnect,
+.admin-dashboard .btn-remove-subtask-card {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.10) 100%),
+        linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    background-color: #dc2626 !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
-    border-color: transparent !important;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.22) !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.55) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.22) !important;
+    border-radius: 11px !important;
+    box-shadow:
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.24),
+        0 4px 14px rgba(239, 68, 68, 0.28),
+        0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22) !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
+
+.check-out-button *,
+.btn-reject *,
+.btn-action-reject *,
+.btn-decline-subtask *,
+.btn-delete *,
+.btn-delete-task-modal *,
+.btn-disconnect *,
+.qr-btn-delete *,
+.qr-btn-disable *,
+.btn-remove-subtask-card *,
 .admin-dashboard .btn-reject *,
 .admin-dashboard .btn-action-reject *,
 .admin-dashboard .btn-decline-subtask *,
 .admin-dashboard .btn-delete *,
 .admin-dashboard .btn-delete-task-modal *,
 .admin-dashboard .qr-btn-delete *,
-.admin-dashboard .btn-disconnect * {
+.admin-dashboard .qr-btn-disable *,
+.admin-dashboard .btn-disconnect *,
+.admin-dashboard .btn-remove-subtask-card * {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
 }
+
+.check-out-button:hover,
+.btn-reject:hover,
+.btn-action-reject:hover,
+.btn-decline-subtask:hover,
+.btn-delete:hover,
+.btn-delete-task-modal:hover,
+.btn-disconnect:hover,
+.qr-btn-delete:hover,
+.qr-btn-disable:hover,
+.btn-remove-subtask-card:hover,
 .admin-dashboard .btn-reject:hover,
 .admin-dashboard .btn-action-reject:hover,
 .admin-dashboard .btn-decline-subtask:hover,
 .admin-dashboard .btn-delete:hover,
 .admin-dashboard .btn-delete-task-modal:hover,
 .admin-dashboard .qr-btn-delete:hover,
-.admin-dashboard .btn-disconnect:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+.admin-dashboard .qr-btn-disable:hover,
+.admin-dashboard .btn-disconnect:hover,
+.admin-dashboard .btn-remove-subtask-card:hover {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.16) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.06) 100%),
+        linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
+    box-shadow:
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.90),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.28),
+        0 8px 22px rgba(239, 68, 68, 0.42),
+        0 2px 6px rgba(0, 0, 0, 0.16) !important;
+    transform: translateY(-1.5px) !important;
 }
 
+.check-out-button:active,
+.btn-reject:active,
+.btn-action-reject:active,
+.btn-decline-subtask:active,
+.btn-delete:active,
+.btn-delete-task-modal:active,
+.btn-disconnect:active,
+.qr-btn-delete:active,
+.qr-btn-disable:active,
+.btn-remove-subtask-card:active,
+.admin-dashboard .btn-reject:active,
+.admin-dashboard .btn-action-reject:active,
+.admin-dashboard .btn-decline-subtask:active,
+.admin-dashboard .btn-delete:active,
+.admin-dashboard .btn-delete-task-modal:active,
+.admin-dashboard .qr-btn-delete:active,
+.admin-dashboard .qr-btn-disable:active,
+.admin-dashboard .btn-disconnect:active,
+.admin-dashboard .btn-remove-subtask-card:active {
+    box-shadow:
+        inset 0 2px 4px 0 rgba(0, 0, 0, 0.32),
+        0 2px 6px rgba(239, 68, 68, 0.22) !important;
+    transform: translateY(1px) !important;
+}
+
+/* 5. Glossy White Enamel / Frosted Glass Secondary & Cancel Buttons */
+.btn-cancel-modal,
+.cancel-btn,
+.back-btn,
+.btn-action-cancel,
+.btn-ghost,
+.preset-clear,
+.btn-milestone,
+.btn-subtask-history,
+.btn-total-counter,
+.photo-browse-btn,
+.camera-btn-close,
+.modal-close-btn,
+.toast-close-btn,
+.mark-all-read-button,
+.panel-link,
 .admin-dashboard .btn-cancel-modal,
 .admin-dashboard .cancel-btn,
 .admin-dashboard .back-btn,
 .admin-dashboard .btn-action-cancel,
-.admin-dashboard .btn-ghost {
-    background: #ffffff !important;
-    color: #64748b !important;
-    -webkit-text-fill-color: #64748b !important;
+.admin-dashboard .btn-ghost,
+.admin-dashboard .btn-milestone,
+.admin-dashboard .btn-subtask-history,
+.admin-dashboard .btn-total-counter,
+.admin-dashboard .photo-browse-btn,
+.admin-dashboard .camera-btn-close,
+.admin-dashboard .modal-close-btn,
+.admin-dashboard .toast-close-btn,
+.admin-dashboard .mark-all-read-button,
+.admin-dashboard .panel-link {
+    background:
+        linear-gradient(180deg, #ffffff 0%, #fbfcfe 48%, #f2f5fa 52%, #ebf0f7 100%) !important;
+    background-color: #ffffff !important;
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
     border: 1px solid #cbd5e1 !important;
-    box-shadow: none !important;
+    border-top: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #94a3b8 !important;
+    border-radius: 10px !important;
+    box-shadow:
+        inset 0 1px 1px 0 #ffffff,
+        inset 0 -1px 1px 0 rgba(15, 23, 42, 0.05),
+        0 2px 5px rgba(15, 23, 42, 0.05) !important;
+    cursor: pointer !important;
+    font-weight: 700 !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
+
+.btn-cancel-modal *,
+.cancel-btn *,
+.back-btn *,
+.btn-action-cancel *,
+.btn-ghost *,
+.preset-clear *,
+.btn-milestone *,
+.btn-subtask-history *,
+.btn-total-counter *,
+.photo-browse-btn *,
+.camera-btn-close *,
+.modal-close-btn *,
+.toast-close-btn *,
+.mark-all-read-button *,
+.panel-link *,
 .admin-dashboard .btn-cancel-modal *,
 .admin-dashboard .cancel-btn *,
 .admin-dashboard .back-btn *,
 .admin-dashboard .btn-action-cancel *,
-.admin-dashboard .btn-ghost * {
-    color: #64748b !important;
-    -webkit-text-fill-color: #64748b !important;
+.admin-dashboard .btn-ghost *,
+.admin-dashboard .btn-milestone *,
+.admin-dashboard .btn-subtask-history *,
+.admin-dashboard .btn-total-counter *,
+.admin-dashboard .photo-browse-btn *,
+.admin-dashboard .camera-btn-close *,
+.admin-dashboard .modal-close-btn *,
+.admin-dashboard .toast-close-btn *,
+.admin-dashboard .mark-all-read-button *,
+.admin-dashboard .panel-link * {
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
 }
+
+.btn-cancel-modal:hover,
+.cancel-btn:hover,
+.back-btn:hover,
+.btn-action-cancel:hover,
+.btn-ghost:hover,
+.preset-clear:hover,
+.btn-milestone:hover,
+.btn-subtask-history:hover,
+.btn-total-counter:hover,
+.photo-browse-btn:hover,
+.camera-btn-close:hover,
+.modal-close-btn:hover,
+.toast-close-btn:hover,
+.mark-all-read-button:hover,
+.panel-link:hover,
 .admin-dashboard .btn-cancel-modal:hover,
 .admin-dashboard .cancel-btn:hover,
 .admin-dashboard .back-btn:hover,
 .admin-dashboard .btn-action-cancel:hover,
-.admin-dashboard .btn-ghost:hover {
-    background: #f8fafc !important;
-    color: #334155 !important;
-    -webkit-text-fill-color: #334155 !important;
-    border-color: #94a3b8 !important;
-}
-
-.admin-dashboard .btn-milestone {
-    background: #f1f5f9 !important;
-    color: #475569 !important;
-    -webkit-text-fill-color: #475569 !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: none !important;
-}
-.admin-dashboard .btn-milestone:hover {
-    background: #e2e8f0 !important;
+.admin-dashboard .btn-ghost:hover,
+.admin-dashboard .btn-milestone:hover,
+.admin-dashboard .btn-subtask-history:hover,
+.admin-dashboard .btn-total-counter:hover,
+.admin-dashboard .photo-browse-btn:hover,
+.admin-dashboard .camera-btn-close:hover,
+.admin-dashboard .modal-close-btn:hover,
+.admin-dashboard .toast-close-btn:hover,
+.admin-dashboard .mark-all-read-button:hover,
+.admin-dashboard .panel-link:hover {
+    background:
+        linear-gradient(180deg, #ffffff 0%, #f5f8fd 48%, #ecf1f8 52%, #e2e8f2 100%) !important;
     color: #0f172a !important;
     -webkit-text-fill-color: #0f172a !important;
+    border-color: #94a3b8 !important;
+    border-top-color: #cbd5e1 !important;
+    border-bottom-color: #64748b !important;
+    box-shadow:
+        inset 0 1px 2px 0 #ffffff,
+        inset 0 -1px 1px 0 rgba(15, 23, 42, 0.08),
+        0 4px 12px rgba(15, 23, 42, 0.09) !important;
+    transform: translateY(-1px) !important;
 }
+
+.btn-cancel-modal:active,
+.cancel-btn:active,
+.back-btn:active,
+.btn-action-cancel:active,
+.btn-ghost:active,
+.preset-clear:active,
+.btn-milestone:active,
+.btn-subtask-history:active,
+.btn-total-counter:active,
+.photo-browse-btn:active,
+.camera-btn-close:active,
+.modal-close-btn:active,
+.toast-close-btn:active,
+.mark-all-read-button:active,
+.panel-link:active,
+.admin-dashboard .btn-cancel-modal:active,
+.admin-dashboard .cancel-btn:active,
+.admin-dashboard .back-btn:active,
+.admin-dashboard .btn-action-cancel:active,
+.admin-dashboard .btn-ghost:active,
+.admin-dashboard .btn-milestone:active,
+.admin-dashboard .btn-subtask-history:active,
+.admin-dashboard .btn-total-counter:active,
+.admin-dashboard .photo-browse-btn:active,
+.admin-dashboard .camera-btn-close:active,
+.admin-dashboard .modal-close-btn:active,
+.admin-dashboard .toast-close-btn:active,
+.admin-dashboard .mark-all-read-button:active,
+.admin-dashboard .panel-link:active {
+    background:
+        linear-gradient(180deg, #e9eef5 0%, #edf2f7 100%) !important;
+    box-shadow:
+        inset 0 2px 3px rgba(15, 23, 42, 0.12),
+        0 1px 2px rgba(15, 23, 42, 0.04) !important;
+    transform: translateY(0.5px) !important;
+}
+
+/* 6. Glossy Utility, Circle, Notification & Close Buttons */
+.notification-button {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 11px !important;
+    background:
+        linear-gradient(180deg, #ffffff 0%, #fbfcfe 48%, #f1f5f9 52%, #eef2f7 100%) !important;
+    border: 1px solid #cbd5e1 !important;
+    border-top-color: #e2e8f0 !important;
+    border-bottom-color: #94a3b8 !important;
+    color: #55627a !important;
+    box-shadow:
+        inset 0 1px 1px 0 #ffffff,
+        inset 0 -1px 1px 0 rgba(15, 23, 42, 0.05),
+        0 2px 8px rgba(25, 35, 65, 0.06) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.notification-button:hover {
+    background:
+        linear-gradient(180deg, #ffffff 0%, #f4f6fc 48%, #eaeef8 52%, #e0e7f5 100%) !important;
+    color: var(--aslenix-purple) !important;
+    border-color: #9855ff !important;
+    box-shadow:
+        inset 0 1px 1px 0 #ffffff,
+        0 4px 14px rgba(152, 85, 255, 0.22) !important;
+    transform: translateY(-1px) !important;
+}
+
+.cal-circle-btn {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(0, 0, 0, 0.08) 100%),
+        linear-gradient(135deg, #FF4D9D 0%, #9855FF 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    border-radius: 50% !important;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.70),
+        0 3px 10px rgba(152, 85, 255, 0.30) !important;
+    transition: all 0.2s ease !important;
+}
+
+.photo-remove-btn {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.00) 50%, rgba(0, 0, 0, 0.15) 100%),
+        #ef4444 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.70),
+        0 2px 8px rgba(239, 68, 68, 0.40) !important;
+    transition: transform 0.15s ease !important;
+}
+
+/* 7. Glossy Filter Pills & Presets */
+.filter-pill,
+.preset-btn,
+.modal-tab-btn {
+    background:
+        linear-gradient(180deg, #ffffff 0%, #fbfcfe 48%, #f2f5fa 52%, #ebf0f7 100%) !important;
+    border: 1px solid #cbd5e1 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #94a3b8 !important;
+    box-shadow:
+        inset 0 1px 1px 0 #ffffff,
+        0 2px 5px rgba(15, 23, 42, 0.05) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.filter-pill:hover,
+.preset-btn:hover,
+.modal-tab-btn:hover {
+    background:
+        linear-gradient(180deg, #ffffff 0%, #f5f8fd 48%, #ecf1f8 52%, #e2e8f2 100%) !important;
+    border-color: #94a3b8 !important;
+    box-shadow:
+        inset 0 1px 1.5px 0 #ffffff,
+        0 3px 8px rgba(15, 23, 42, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+.filter-pill.active,
+.preset-btn.active,
+.modal-tab-btn.active {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.10) 100%),
+        linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    box-shadow:
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.70),
+        0 4px 12px rgba(79, 70, 229, 0.32) !important;
+}
+
+/* 8. Glossy Nepali Date Picker Controls */
+.ndp-container .ndc-nav-button,
+.ndp-container .ndp-month-button,
+.ndp-container .ndp-year-button,
+.ndp-container .ndp-header .ndp-header-link {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 48%, #f2f5fa 52%, #ebf0f7 100%) !important;
+    border: 1px solid #cbd5e1 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #94a3b8 !important;
+    box-shadow: inset 0 1px 1px 0 #ffffff, 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ndp-container .ndc-nav-button:hover:not(.ndp-disabled),
+.ndp-container .ndp-month-button:hover:not(.ndp-selected):not(.ndp-disabled),
+.ndp-container .ndp-year-button:hover:not(.ndp-selected):not(.ndp-disabled),
+.ndp-container .ndp-header .ndp-header-link:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #f5f8fd 48%, #ecf1f8 52%, #e2e8f2 100%) !important;
+    border-color: #9855ff !important;
+    box-shadow: inset 0 1px 1.5px 0 #ffffff, 0 3px 8px rgba(152, 85, 255, 0.18) !important;
+    color: #4f46e5 !important;
+    transform: translateY(-0.5px) !important;
+}
+
 
 
 /* State language: neutral slate and soft blue/green/rose */
@@ -375,5 +905,26 @@ tbody tr:hover { background: #f8fafc !important; }
   object-fit: cover !important;
   border-radius: inherit !important;
   display: block !important;
+}
+
+
+/* Fix for Nepali Date Picker clipping/bleeding off screen */
+.ndp-container,
+#ndp-nepali-box,
+.nepali-datepicker,
+[role="dialog"][aria-label="Date Picker"] {
+    z-index: 100060 !important;
+    max-width: calc(100vw - 16px) !important;
+    box-sizing: border-box !important;
+}
+
+.ndp-container .ndp-table th,
+.ndp-container .ndp-table td {
+    border-bottom-color: transparent !important;
+    border-bottom: none !important;
+}
+
+.ndp-container .ndp-table td {
+    padding: 0 !important;
 }
 

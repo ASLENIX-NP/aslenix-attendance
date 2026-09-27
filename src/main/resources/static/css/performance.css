@@ -158,11 +158,80 @@ tbody tr:hover { background: #fbfcfe; }
 .perf-input:focus, .perf-select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
 
 /* BUTTONS */
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; font-size: 12.5px; font-weight: 800; cursor: pointer; border: 1px solid transparent; transition: all .18s ease; }
-.btn-primary { background: #4f46e5; color: #fff; }
-.btn-primary:hover { background: #4338ca; box-shadow: 0 6px 16px rgba(79,70,229,.28); }
-.btn-ghost { background: #fff; color: #4f46e5; border-color: #dfe5f0; }
-.btn-ghost:hover { background: #f1f4fd; border-color: #c7cdf0; }
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 11px;
+    font-size: 12.5px;
+    font-weight: 750;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+.btn-primary {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.10) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.10) 100%),
+        linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    background-color: #4f46e5;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    border-top: 1px solid rgba(255, 255, 255, 0.55);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.22);
+    box-shadow:
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.24),
+        0 4px 14px rgba(79, 70, 229, 0.28),
+        0 1px 3px rgba(0, 0, 0, 0.12);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+}
+.btn-primary:hover {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.16) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.06) 100%),
+        linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    transform: translateY(-1.5px);
+    box-shadow:
+        inset 0 1px 2px 0 rgba(255, 255, 255, 0.90),
+        inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.28),
+        0 8px 22px rgba(79, 70, 229, 0.42),
+        0 2px 6px rgba(0, 0, 0, 0.16);
+    filter: brightness(1.03) saturate(1.06);
+}
+.btn-primary:active {
+    box-shadow:
+        inset 0 2px 4px 0 rgba(0, 0, 0, 0.32),
+        0 2px 6px rgba(79, 70, 229, 0.22);
+    transform: translateY(1px);
+}
+.btn-ghost {
+    background:
+        linear-gradient(180deg, #ffffff 0%, #fbfcfe 48%, #f2f5fa 52%, #ebf0f7 100%);
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #94a3b8;
+    box-shadow:
+        inset 0 1px 1px 0 #ffffff,
+        inset 0 -1px 1px 0 rgba(15, 23, 42, 0.05),
+        0 2px 5px rgba(15, 23, 42, 0.05);
+}
+.btn-ghost:hover {
+    background:
+        linear-gradient(180deg, #ffffff 0%, #f5f8fd 48%, #ecf1f8 52%, #e2e8f2 100%);
+    border-color: #94a3b8;
+    color: #0f172a;
+    box-shadow:
+        inset 0 1px 2px 0 #ffffff,
+        0 4px 12px rgba(15, 23, 42, 0.09);
+    transform: translateY(-1px);
+}
+.btn-ghost:active {
+    background: linear-gradient(180deg, #e9eef5 0%, #edf2f7 100%);
+    box-shadow: inset 0 2px 3px rgba(15, 23, 42, 0.12);
+    transform: translateY(0.5px);
+}
 .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.9; }
 
 /* WINNER BANNER */
@@ -253,11 +322,22 @@ tbody tr:hover { background: #fbfcfe; }
 .notification-wrapper { position: relative; }
 .notification-button {
     position: relative; width: 40px; height: 40px; border-radius: 11px;
-    border: 1px solid #e7ebf3; background: #ffffff; color: #55627a;
-    display: grid; place-items: center; cursor: pointer; transition: all .2s ease;
-    box-shadow: 0 2px 8px rgba(25, 35, 65, 0.04);
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 48%, #f1f5f9 52%, #eef2f7 100%);
+    border: 1px solid #cbd5e1;
+    border-top-color: #e2e8f0;
+    border-bottom-color: #94a3b8;
+    color: #55627a;
+    display: grid; place-items: center; cursor: pointer;
+    box-shadow: inset 0 1px 1px 0 #ffffff, inset 0 -1px 1px 0 rgba(15, 23, 42, 0.05), 0 2px 8px rgba(25, 35, 65, 0.06);
+    transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.notification-button:hover { color: #4f46e5; border-color: #d8def0; background: #fbfbfe; transform: translateY(-1px); }
+.notification-button:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #f4f6fc 48%, #eaeef8 52%, #e0e7f5 100%);
+    color: #4f46e5;
+    border-color: #6366f1;
+    box-shadow: inset 0 1px 1px 0 #ffffff, 0 4px 14px rgba(79, 70, 229, 0.22);
+    transform: translateY(-1px);
+}
 .notification-button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .notification-dot {
     position: absolute; top: 5px; right: 5px; min-width: 8px; height: 8px; padding: 0 2px;
@@ -286,10 +366,25 @@ tbody tr:hover { background: #fbfcfe; }
 }
 .notification-header-count.show { display: inline-flex; }
 .mark-all-read-button {
-    border: 0; background: transparent; color: #4f46e5; font-size: 11px; font-weight: 750;
-    cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background .15s ease;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 48%, #f2f5fa 52%, #ebf0f7 100%);
+    border: 1px solid #cbd5e1;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #94a3b8;
+    color: #4f46e5;
+    font-size: 11px;
+    font-weight: 750;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 7px;
+    box-shadow: inset 0 1px 1px 0 #ffffff, 0 1px 3px rgba(15, 23, 42, 0.05);
+    transition: all .18s ease;
 }
-.mark-all-read-button:hover:not(:disabled) { background: #f1f4fd; }
+.mark-all-read-button:hover:not(:disabled) {
+    background: linear-gradient(180deg, #ffffff 0%, #f5f8fd 48%, #ecf1f8 52%, #e2e8f2 100%);
+    border-color: #6366f1;
+    box-shadow: inset 0 1px 1.5px 0 #ffffff, 0 2px 6px rgba(79, 70, 229, 0.15);
+    transform: translateY(-0.5px);
+}
 .mark-all-read-button:disabled { color: #a6b1c2; cursor: not-allowed; }
 .notification-dropdown-body { max-height: 380px; overflow-y: auto; background: #ffffff; }
 .notification-loading { padding: 28px 20px; display: flex; align-items: center; justify-content: center; gap: 10px; color: #7b879d; font-size: 12px; font-weight: 600; }

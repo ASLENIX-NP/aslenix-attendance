@@ -10,9 +10,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;850&display=swap" rel="stylesheet">
 
-    <!-- NEPALI DATE PICKER -->
-    <link rel="stylesheet" href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
-    <script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js"></script>
+    <!-- NEPALI DATE CONVERTER & PICKER -->
+    <link rel="stylesheet" href="/css/nepali.datepicker.v5.0.6.min.css">
+    <script src="/js/nepali-date-converter.umd.js"></script>
+    <script src="/js/nepali.datepicker.v5.0.6.min.js"></script>
+    <script src="/js/nepali-date-utils.js"></script>
 
     <link rel="stylesheet" href="/css/aslenix-theme.css">
     <style>
@@ -665,19 +667,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const nepaliDateInput = document.getElementById("joiningDateBs");
     const actualDateInput = document.getElementById("joiningDate");
 
-    if (nepaliDateInput && typeof nepaliDateInput.nepaliDatePicker === 'function') {
-        nepaliDateInput.nepaliDatePicker({
-            ndpYear: true,
-            ndpMonth: true,
-            ndpYearCount: 100
-        });
+    if (typeof window.patchNepaliDatePickerPrototype === 'function') {
+        window.patchNepaliDatePickerPrototype();
     }
 
     function convertNepaliNumbersToEnglish(value) {
         if (!value) return value;
         const nepaliNumbers = "०१२३४५६७८९";
         const englishNumbers = "0123456789";
-        return value.replace(/[०-९]/g, function (character) {
+        return String(value).replace(/[०-९]/g, function (character) {
             const index = nepaliNumbers.indexOf(character);
             return index >= 0 ? englishNumbers[index] : character;
         });
@@ -707,6 +705,25 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    if (nepaliDateInput && typeof nepaliDateInput.nepaliDatePicker === 'function') {
+        const inst = nepaliDateInput.nepaliDatePicker({
+            ndpYear: true,
+            ndpMonth: true,
+            ndpYearCount: 100,
+            language: "english",
+            unicodeDate: false,
+            onChange: function () {
+                let bsDate = nepaliDateInput.value.trim();
+                bsDate = convertNepaliNumbersToEnglish(bsDate);
+                nepaliDateInput.value = bsDate;
+                convertBsToAd(bsDate);
+            }
+        });
+        if (typeof window.bindDatePickerInteractions === 'function') {
+            window.bindDatePickerInteractions(nepaliDateInput, inst);
+        }
+    }
+
     if (nepaliDateInput) {
         nepaliDateInput.addEventListener("change", function () {
             let bsDate = nepaliDateInput.value.trim();
@@ -718,63 +735,15 @@ document.addEventListener("DOMContentLoaded", function () {
             nepaliDateInput.value = bsDate;
             convertBsToAd(bsDate);
         });
-    }
 
-    const nepaliMonths = {
-        "बैशाख": "Baisakh", "जेठ": "Jestha", "असार": "Asar", "आषाढ": "Asar",
-        "श्रावण": "Shrawan", "भाद्र": "Bhadra", "आश्विन": "Ashwin", "कार्तिक": "Kartik",
-        "मंसिर": "Mangsir", "पौष": "Poush", "माघ": "Magh", "फाल्गुण": "Falgun",
-        "फाल्गुन": "Falgun", "चैत्र": "Chaitra"
-    };
-
-    const nepaliDays = {
-        "आइत": "Sun", "सोम": "Mon", "मंगल": "Tue", "बुध": "Wed", "बिहि": "Thu", "शुक्र": "Fri", "शनि": "Sat",
-        "आइतबार": "Sunday", "सोमबार": "Monday", "मंगलबार": "Tuesday", "बुधबार": "Wednesday",
-        "बिहिबार": "Thursday", "बिहीबार": "Thursday", "शुक्रबार": "Friday", "शनिबार": "Saturday"
-    };
-
-    function translateDatePicker(root) {
-        if (!root) return;
-        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-        const textNodes = [];
-        let currentNode;
-        while (currentNode = walker.nextNode()) {
-            textNodes.push(currentNode);
-        }
-        textNodes.forEach(function (node) {
-            let text = node.nodeValue;
-            Object.keys(nepaliMonths).forEach(function (nepali) {
-                text = text.replace(new RegExp(nepali, "g"), nepaliMonths[nepali]);
-            });
-            Object.keys(nepaliDays).forEach(function (nepali) {
-                text = text.replace(new RegExp(nepali, "g"), nepaliDays[nepali]);
-            });
-            text = convertNepaliNumbersToEnglish(text);
-            node.nodeValue = text;
-        });
-    }
-
-    const observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            mutation.addedNodes.forEach(function (node) {
-                if (node.nodeType === Node.ELEMENT_NODE) {
-                    translateDatePicker(node);
-                }
-            });
-        });
-        translateDatePicker(document.body);
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    if (nepaliDateInput) {
-        nepaliDateInput.addEventListener("click", function () {
-            setTimeout(function () { translateDatePicker(document.body); }, 10);
-            setTimeout(function () { translateDatePicker(document.body); }, 100);
-        });
-
-        nepaliDateInput.addEventListener("focus", function () {
-            setTimeout(function () { translateDatePicker(document.body); }, 50);
+        nepaliDateInput.addEventListener("input", function () {
+            let bsDate = nepaliDateInput.value.trim();
+            if (!bsDate) {
+                actualDateInput.value = "";
+                return;
+            }
+            bsDate = convertNepaliNumbersToEnglish(bsDate);
+            convertBsToAd(bsDate);
         });
     }
 
