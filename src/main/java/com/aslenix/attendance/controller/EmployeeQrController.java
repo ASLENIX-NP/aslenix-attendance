@@ -3,6 +3,7 @@ package com.aslenix.attendance.controller;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.service.QrCodeService;
+import java.time.LocalDate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +66,11 @@ public class EmployeeQrController {
                 employee.getFirstName()
                         + " "
                         + employee.getLastName()
+        );
+
+        model.addAttribute(
+                "today",
+                LocalDate.now()
         );
 
         return "employee/profile";

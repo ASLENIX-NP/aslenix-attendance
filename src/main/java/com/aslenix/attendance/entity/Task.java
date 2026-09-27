@@ -59,7 +59,19 @@ public class Task {
     private Employee employee;
 
     // ============================================================
-    // MULTIPLE ASSIGNEES / TEAM LEADS
+    // TEAM LEADS
+    // ============================================================
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "task_team_leads",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
+    )
+    private Set<Employee> teamLeads = new HashSet<>();
+
+    // ============================================================
+    // MULTIPLE ASSIGNEES
     // ============================================================
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -71,7 +83,17 @@ public class Task {
     private Set<Employee> assignees = new HashSet<>();
 
     // ============================================================
-    // PRIORITY
+    // WEEKS REQUIRED (Determines number of subtasks)
+    // ============================================================
+
+    @Column(
+            name = "weeks_required",
+            nullable = false
+    )
+    private Integer weeksRequired = 1;
+
+    // ============================================================
+    // PRIORITY (LOW, MEDIUM, HIGH, URGENT)
     // ============================================================
 
     @Column(
@@ -91,15 +113,8 @@ public class Task {
     private String complexity = "MEDIUM";
 
     // ============================================================
-    // STATUS
+    // STATUS (TODO, IN_PROGRESS, READY_FOR_REVIEW, APPROVED)
     // ============================================================
-
-    /*
-     * TODO
-     * IN_PROGRESS
-     * READY_FOR_REVIEW / UNDER_REVIEW
-     * APPROVED / COMPLETED
-     */
 
     @Column(
             nullable = false,
@@ -108,7 +123,7 @@ public class Task {
     private String status = "TODO";
 
     // ============================================================
-    // PROGRESS
+    // TOTAL PROGRESS (Average of subtask progresses, read-only)
     // ============================================================
 
     @Column(
@@ -117,38 +132,22 @@ public class Task {
     private Integer progress = 0;
 
     // ============================================================
-    // DUE DATE & DEADLINES
+    // LEGACY DUE DATE & DEADLINES (Kept nullable for DB compatibility)
     // ============================================================
 
-    @Column(
-            name = "due_date"
-    )
+    @Column(name = "due_date")
     private LocalDate dueDate;
 
-    @Column(
-            name = "deadline"
-    )
+    @Column(name = "deadline")
     private LocalDate deadline;
 
-    @Column(
-            name = "deadline_bs",
-            length = 50
-    )
+    @Column(name = "deadline_bs", length = 50)
     private String deadlineBs;
 
-    @Column(
-            name = "deadline_time",
-            length = 20
-    )
+    @Column(name = "deadline_time", length = 20)
     private String deadlineTime;
 
-    // ============================================================
-    // TAGS (comma-separated, e.g. "frontend, urgent")
-    // ============================================================
-
-    @Column(
-            length = 255
-    )
+    @Column(length = 255)
     private String tags;
 
     // ============================================================
@@ -160,7 +159,7 @@ public class Task {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @OrderBy("id ASC")
+    @OrderBy("subtaskNumber ASC, id ASC")
     private List<TaskAssignment> assignments = new ArrayList<>();
 
     // ============================================================
@@ -176,86 +175,34 @@ public class Task {
     private List<TaskComment> comments = new ArrayList<>();
 
     // ============================================================
-    // EMPLOYEE COMPLETION NOTE
+    // REVIEW & COMPLETION METADATA
     // ============================================================
 
-    @Column(
-            name = "completion_note",
-            columnDefinition = "TEXT"
-    )
+    @Column(name = "completion_note", columnDefinition = "TEXT")
     private String completionNote;
 
-    // ============================================================
-    // COMPLETED AT
-    // ============================================================
-
-    @Column(
-            name = "completed_at"
-    )
+    @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
-    // ============================================================
-    // ADMIN REVIEW COMMENT
-    // ============================================================
-
-    @Column(
-            name = "review_comment",
-            columnDefinition = "TEXT"
-    )
+    @Column(name = "review_comment", columnDefinition = "TEXT")
     private String reviewComment;
 
-    // ============================================================
-    // REVIEW NOTE
-    // ============================================================
-
-    @Column(
-            name = "review_note",
-            columnDefinition = "TEXT"
-    )
+    @Column(name = "review_note", columnDefinition = "TEXT")
     private String reviewNote;
 
-    // ============================================================
-    // REVIEWED AT
-    // ============================================================
-
-    @Column(
-            name = "reviewed_at"
-    )
+    @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
 
-    // ============================================================
-    // APPROVED AT
-    // ============================================================
-
-    @Column(
-            name = "approved_at"
-    )
+    @Column(name = "approved_at")
     private LocalDateTime approvedAt;
 
-    // ============================================================
-    // CREATED / UPDATED
-    // ============================================================
-
-    @Column(
-            name = "created_at",
-            nullable = false
-    )
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(
-            name = "updated_at",
-            nullable = false
-    )
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // ============================================================
-    // LOCKED STATUS
-    // ============================================================
-
-    @Column(
-            name = "locked",
-            nullable = false
-    )
+    @Column(name = "locked", nullable = false)
     private boolean locked = false;
 
     // ============================================================
@@ -270,11 +217,9 @@ public class Task {
         this.progress = 0;
         this.priority = "MEDIUM";
         this.complexity = "MEDIUM";
+        this.weeksRequired = 1;
+        this.locked = false;
     }
-
-    // ============================================================
-    // AUTO UPDATE TIMESTAMP
-    // ============================================================
 
     @PreUpdate
     public void preUpdate() {
@@ -330,15 +275,38 @@ public class Task {
         }
     }
 
+    public Set<Employee> getTeamLeads() {
+        if (teamLeads == null) {
+            teamLeads = new HashSet<>();
+        }
+        return teamLeads;
+    }
+
+    public void setTeamLeads(Set<Employee> teamLeads) {
+        this.teamLeads = teamLeads != null ? teamLeads : new HashSet<>();
+    }
+
+    public void addTeamLead(Employee employee) {
+        if (employee != null) {
+            if (this.teamLeads == null) {
+                this.teamLeads = new HashSet<>();
+            }
+            this.teamLeads.add(employee);
+        }
+    }
+
     public Set<Employee> getAssignees() {
+        if (assignees == null) {
+            assignees = new HashSet<>();
+        }
         return assignees;
     }
 
     public void setAssignees(Set<Employee> assignees) {
-        this.assignees = assignees;
-        if (assignees != null && !assignees.isEmpty()) {
-            if (this.employee == null || !assignees.contains(this.employee)) {
-                this.employee = assignees.iterator().next();
+        this.assignees = assignees != null ? assignees : new HashSet<>();
+        if (this.assignees != null && !this.assignees.isEmpty()) {
+            if (this.employee == null || !this.assignees.contains(this.employee)) {
+                this.employee = this.assignees.iterator().next();
             }
         }
     }
@@ -355,45 +323,44 @@ public class Task {
         }
     }
 
-    public void removeAssignee(Employee employee) {
-        if (employee != null && this.assignees != null) {
-            this.assignees.remove(employee);
-            if (this.employee != null && this.employee.getId().equals(employee.getId())) {
-                this.employee = this.assignees.isEmpty() ? null : this.assignees.iterator().next();
-            }
-        }
+    public Integer getWeeksRequired() {
+        return weeksRequired != null && weeksRequired > 0 ? weeksRequired : 1;
+    }
+
+    public void setWeeksRequired(Integer weeksRequired) {
+        this.weeksRequired = weeksRequired != null && weeksRequired > 0 ? weeksRequired : 1;
     }
 
     public String getPriority() {
-        return priority;
+        return priority != null ? priority : "MEDIUM";
     }
 
     public void setPriority(String priority) {
-        this.priority = priority;
+        this.priority = priority != null ? priority : "MEDIUM";
     }
 
     public String getComplexity() {
-        return complexity;
+        return complexity != null ? complexity : "MEDIUM";
     }
 
     public void setComplexity(String complexity) {
-        this.complexity = complexity;
+        this.complexity = complexity != null ? complexity : "MEDIUM";
     }
 
     public String getStatus() {
-        return status;
+        return status != null ? status : "TODO";
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        this.status = status != null ? status : "TODO";
     }
 
     public Integer getProgress() {
-        return progress;
+        return progress != null ? progress : 0;
     }
 
     public void setProgress(Integer progress) {
-        this.progress = progress;
+        this.progress = progress != null ? Math.max(0, Math.min(100, progress)) : 0;
     }
 
     public LocalDate getDueDate() {
@@ -437,20 +404,23 @@ public class Task {
     }
 
     public List<TaskAssignment> getAssignments() {
+        if (assignments == null) {
+            assignments = new ArrayList<>();
+        }
         return assignments;
     }
 
     public void setAssignments(List<TaskAssignment> assignments) {
-        this.assignments = assignments;
+        this.assignments = assignments != null ? assignments : new ArrayList<>();
     }
 
     public void addAssignment(TaskAssignment assignment) {
         if (assignment != null) {
-            assignment.setTask(this);
             if (this.assignments == null) {
                 this.assignments = new ArrayList<>();
             }
             this.assignments.add(assignment);
+            assignment.setTask(this);
         }
     }
 
@@ -462,21 +432,14 @@ public class Task {
     }
 
     public List<TaskComment> getComments() {
+        if (comments == null) {
+            comments = new ArrayList<>();
+        }
         return comments;
     }
 
     public void setComments(List<TaskComment> comments) {
-        this.comments = comments;
-    }
-
-    public void addComment(TaskComment comment) {
-        if (comment != null) {
-            comment.setTask(this);
-            if (this.comments == null) {
-                this.comments = new ArrayList<>();
-            }
-            this.comments.add(comment);
-        }
+        this.comments = comments != null ? comments : new ArrayList<>();
     }
 
     public String getCompletionNote() {
@@ -544,7 +507,7 @@ public class Task {
     }
 
     public boolean isLocked() {
-        return locked || "APPROVED".equalsIgnoreCase(status);
+        return locked;
     }
 
     public void setLocked(boolean locked) {

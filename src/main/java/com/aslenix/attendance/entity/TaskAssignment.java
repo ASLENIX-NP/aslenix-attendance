@@ -22,35 +22,68 @@ public class TaskAssignment {
     @JsonIgnore
     private Task task;
 
+    // ============================================================
+    // SUBTASK / WEEK NUMBER (1..N)
+    // ============================================================
+
+    @Column(name = "subtask_number", nullable = false)
+    private Integer subtaskNumber = 1;
+
+    // ============================================================
+    // TITLE & ADMIN-PROVIDED WORK DESCRIPTION
+    // ============================================================
+
     @Column(nullable = false, length = 255)
-    private String title;
+    private String title = "Week 1";
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    // ============================================================
+    // ASSIGNED TEAM MEMBER
+    // ============================================================
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private Employee assignee;
 
-    /*
-     * Statuses:
-     * TODO
-     * IN_PROGRESS
-     * UNDER_REVIEW
-     * COMPLETED
-     * BLOCKED
-     * VERIFIED
-     * WAITING
-     */
+    // ============================================================
+    // STATUS (TODO, IN_PROGRESS, READY_FOR_REVIEW, APPROVED, DECLINED)
+    // ============================================================
+
     @Column(nullable = false, length = 30)
     private String status = "TODO";
 
-    /*
-     * Weight / Complexity:
-     * SMALL, MEDIUM, LARGE, EPIC
-     */
+    // ============================================================
+    // COMPLEXITY / WEIGHT (SMALL, MEDIUM, LARGE, EPIC)
+    // ============================================================
+
     @Column(length = 20)
     private String weight = "MEDIUM";
+
+    // ============================================================
+    // PROGRESS (0 to 100%, manually edited with mandatory note)
+    // ============================================================
+
+    @Column(name = "progress", nullable = false)
+    private Integer progress = 0;
+
+    // ============================================================
+    // REVIEW & DECLINE REASON
+    // ============================================================
+
+    @Column(name = "decline_reason", columnDefinition = "TEXT")
+    private String declineReason;
+
+    @Column(name = "locked", nullable = false)
+    private boolean locked = false;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
+
+    // ============================================================
+    // LEGACY / OPTIONAL DEADLINES
+    // ============================================================
 
     @Column(name = "deadline")
     private LocalDate deadline;
@@ -61,14 +94,15 @@ public class TaskAssignment {
     @Column(name = "deadline_time", length = 20)
     private String deadlineTime;
 
-    @Column(name = "progress", nullable = false)
-    private Integer progress = 0;
-
     @Column(name = "overdue_notified", nullable = false)
     private boolean overdueNotified = false;
 
     @Column(columnDefinition = "TEXT")
     private String note;
+
+    // ============================================================
+    // AUDIT HISTORIES (All progress edits require note)
+    // ============================================================
 
     @OneToMany(
             mappedBy = "assignment",
@@ -91,6 +125,8 @@ public class TaskAssignment {
         this.status = "TODO";
         this.weight = "MEDIUM";
         this.progress = 0;
+        this.subtaskNumber = 1;
+        this.locked = false;
         this.overdueNotified = false;
     }
 
@@ -101,7 +137,7 @@ public class TaskAssignment {
 
     public boolean isOverdue() {
         if (progress != null && progress >= 100) return false;
-        if ("COMPLETED".equalsIgnoreCase(status) || "VERIFIED".equalsIgnoreCase(status)) return false;
+        if ("APPROVED".equalsIgnoreCase(status) || "COMPLETED".equalsIgnoreCase(status) || "VERIFIED".equalsIgnoreCase(status)) return false;
         if (deadline == null) return false;
 
         LocalDate today = LocalDate.now();
@@ -133,6 +169,14 @@ public class TaskAssignment {
 
     public void setTask(Task task) {
         this.task = task;
+    }
+
+    public Integer getSubtaskNumber() {
+        return subtaskNumber != null ? subtaskNumber : 1;
+    }
+
+    public void setSubtaskNumber(Integer subtaskNumber) {
+        this.subtaskNumber = subtaskNumber != null ? subtaskNumber : 1;
     }
 
     public String getTitle() {
@@ -205,6 +249,30 @@ public class TaskAssignment {
 
     public void setProgress(Integer progress) {
         this.progress = progress != null ? Math.max(0, Math.min(100, progress)) : 0;
+    }
+
+    public String getDeclineReason() {
+        return declineReason;
+    }
+
+    public void setDeclineReason(String declineReason) {
+        this.declineReason = declineReason;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    public LocalDateTime getApprovedAt() {
+        return approvedAt;
+    }
+
+    public void setApprovedAt(LocalDateTime approvedAt) {
+        this.approvedAt = approvedAt;
     }
 
     public boolean isOverdueNotified() {

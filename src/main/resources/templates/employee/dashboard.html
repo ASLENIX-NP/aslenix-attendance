@@ -1292,6 +1292,16 @@
 
             box-shadow:
                 0 4px 12px rgba(70, 70, 190, .16);
+
+            overflow: hidden;
+        }
+
+        .header-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
         }
 
         .profile-info {
@@ -3988,7 +3998,8 @@
 
                         </svg>
 
-                        <span id="headerBsDate">
+                        <span id="headerBsDate"
+                              th:text="${today != null ? #temporals.format(today, 'EEEE, dd MMM yyyy') : 'Loading...'}">
                             Loading...
                         </span>
 
@@ -6079,32 +6090,35 @@
     </script>
 
     <script>
-
         /* =========================================================
-           CURRENT BS DATE IN HEADER
+           CURRENT AD DATE IN HEADER
         ========================================================= */
-
         document.addEventListener(
             'DOMContentLoaded',
             function () {
-
-                const headerDate =
-                    document.getElementById('headerBsDate');
-
-                if (
-                    headerDate &&
-                    typeof NepaliDate !== 'undefined'
-                ) {
+                const headerDate = document.getElementById('headerBsDate');
+                if (headerDate) {
                     try {
-                        headerDate.textContent =
-                            new NepaliDate(new Date()).format('DD MMM YYYY');
+                        const now = new Date();
+                        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        const dayOfWeek = days[now.getDay()];
+                        const day = String(now.getDate()).padStart(2, '0');
+                        const month = months[now.getMonth()];
+                        const year = now.getFullYear();
+                        headerDate.textContent = `${dayOfWeek}, ${day} ${month} ${year}`;
                     } catch (error) {
-                        headerDate.textContent = 'ASLENIX';
+                        const now = new Date();
+                        headerDate.textContent = now.toLocaleDateString('en-GB', {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
                     }
                 }
             }
         );
-
     </script>
 
     <script>

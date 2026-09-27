@@ -506,17 +506,27 @@
         }
 
         .profile-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #ffffff;
             color: #ffffff;
-            display: grid;
-            place-items: center;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: .5px;
-            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1.5px solid #e0e7ff;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+            flex-shrink: 0;
+        }
+
+        .profile-avatar img,
+        .header-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
         }
 
         .profile-info {
@@ -1295,8 +1305,8 @@
                             id="profileButton"
                             aria-label="Open profile menu"
                             aria-expanded="false">
-                        <div class="profile-avatar">
-                            A
+                        <div class="profile-avatar admin-avatar" style="background: #ffffff !important;">
+                            <img th:src="@{/images/aslenix.png}" src="/images/aslenix.png" alt="ASLENIX Admin" class="header-avatar-img">
                         </div>
                         <div class="profile-info">
                             <div class="profile-name">Administrator</div>
@@ -1675,12 +1685,60 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         notificationDropdownBody.innerHTML = notifications.map(item => `
-            <div style="padding: 12px 16px; border-bottom: 1px solid #f1f4f9; display: flex; flex-direction: column; gap: 4px; ${!item.read ? 'background: #fbfcfe;' : ''}">
+            <div class="notification-item${!item.read ? ' unread' : ''}" data-id="${item.id}" style="padding: 12px 16px; border-bottom: 1px solid #f1f4f9; display: flex; flex-direction: column; gap: 4px; cursor: ${!item.read ? 'pointer' : 'default'}; ${!item.read ? 'background: #fbfcfe;' : ''}">
                 <div style="font-size: 12.5px; font-weight: 750; color: #0f172a;">${item.title || 'Notification'}</div>
                 <div style="font-size: 11.5px; color: #5a667d;">${item.message || ''}</div>
-                <div style="font-size: 10px; color: #8a96aa; margin-top: 2px;">${item.createdAt ? (typeof convertAdToBsString === 'function' ? (convertAdToBsString(new Date(item.createdAt), 'DD MMM YYYY') + ' BS') : item.createdAt) : ''}</div>
+                <div style="font-size: 10px; color: #8a96aa; margin-top: 2px;">${item.time || (item.createdAt ? (typeof convertAdToBsString === 'function' ? (convertAdToBsString(new Date(item.createdAt), 'DD MMM YYYY') + ' BS') : item.createdAt) : '')}</div>
             </div>
         `).join('');
+
+        notificationDropdownBody.querySelectorAll('.notification-item.unread').forEach(el => {
+            el.addEventListener('click', function () {
+                markNotificationAsRead(el.getAttribute('data-id'), el);
+            });
+        });
+    }
+
+    function notifCsrfHeaders() {
+        const h = { 'Accept': 'application/json' };
+        const t = document.querySelector('meta[name="_csrf"]');
+        const n = document.querySelector('meta[name="_csrf_header"]');
+        if (t) h[n ? n.getAttribute('content') : 'X-CSRF-TOKEN'] = t.getAttribute('content');
+        return h;
+    }
+
+    async function markNotificationAsRead(id, item) {
+        if (id === null || id === undefined) return;
+        try {
+            const response = await fetch('/api/notifications/' + encodeURIComponent(id) + '/read', {
+                method: 'POST', headers: notifCsrfHeaders(), credentials: 'same-origin'
+            });
+            if (!response.ok) throw new Error('Failed to mark notification as read');
+            if (item) { item.classList.remove('unread'); item.style.background = ''; item.style.cursor = 'default'; }
+            await loadUnreadCount();
+        } catch (e) { console.error('Mark notification as read error:', e); }
+    }
+
+    async function markAllNotificationsAsRead() {
+        if (markAllReadButton) markAllReadButton.disabled = true;
+        try {
+            const response = await fetch('/api/notifications/read-all', {
+                method: 'POST', headers: notifCsrfHeaders(), credentials: 'same-origin'
+            });
+            if (!response.ok) throw new Error('Failed to mark all notifications as read');
+            updateBadge(0);
+            await loadNotifications();
+        } catch (e) {
+            console.error('Mark all notifications as read error:', e);
+            if (markAllReadButton) markAllReadButton.disabled = false;
+        }
+    }
+
+    if (markAllReadButton) {
+        markAllReadButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+            markAllNotificationsAsRead();
+        });
     }
 
     notificationButton.addEventListener('click', function (event) {

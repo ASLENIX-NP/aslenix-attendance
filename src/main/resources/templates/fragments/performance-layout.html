@@ -135,8 +135,8 @@
                     id="profileButton"
                     aria-label="Open profile menu"
                     aria-expanded="false">
-                <div class="profile-avatar">
-                    A
+                <div class="profile-avatar admin-avatar" style="background: #ffffff !important;">
+                    <img th:src="@{/images/aslenix.png}" src="/images/aslenix.png" alt="ASLENIX Admin" class="header-avatar-img">
                 </div>
                 <div class="profile-info">
                     <div class="profile-name">Administrator</div>
@@ -318,12 +318,73 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         notificationDropdownBody.innerHTML = notifications.map(item => `
-            <div style="padding: 12px 16px; border-bottom: 1px solid #f1f4f9; display: flex; flex-direction: column; gap: 4px; ${!item.read ? 'background: #fbfcfe;' : ''}">
+            <div class="notification-item${!item.read ? ' unread' : ''}" data-id="${item.id}" style="padding: 12px 16px; border-bottom: 1px solid #f1f4f9; display: flex; flex-direction: column; gap: 4px; cursor: ${!item.read ? 'pointer' : 'default'}; ${!item.read ? 'background: #fbfcfe;' : ''}">
                 <div style="font-size: 12.5px; font-weight: 750; color: #0f172a;">${item.title || 'Notification'}</div>
                 <div style="font-size: 11.5px; color: #5a667d;">${item.message || ''}</div>
-                <div style="font-size: 10px; color: #8a96aa; margin-top: 2px;">${item.createdAt || ''}</div>
+                <div style="font-size: 10px; color: #8a96aa; margin-top: 2px;">${item.time || ''}</div>
             </div>
         `).join('');
+
+        notificationDropdownBody.querySelectorAll('.notification-item.unread').forEach(el => {
+            el.addEventListener('click', function () {
+                const id = el.getAttribute('data-id');
+                markNotificationAsRead(id, el);
+            });
+        });
+    }
+
+    async function markNotificationAsRead(id, item) {
+        if (id === null || id === undefined) return;
+        try {
+            const headers = { 'Accept': 'application/json' };
+            const token = getCsrfToken();
+            if (token) headers[getCsrfHeader()] = token;
+
+            const response = await fetch('/api/notifications/' + encodeURIComponent(id) + '/read', {
+                method: 'POST',
+                headers: headers,
+                credentials: 'same-origin'
+            });
+            if (!response.ok) throw new Error('Failed to mark notification as read');
+
+            if (item) {
+                item.classList.remove('unread');
+                item.style.background = '';
+                item.style.cursor = 'default';
+            }
+            await loadUnreadCount();
+        } catch (e) {
+            console.error('Mark notification as read error:', e);
+        }
+    }
+
+    async function markAllNotificationsAsRead() {
+        if (markAllReadButton) markAllReadButton.disabled = true;
+        try {
+            const headers = { 'Accept': 'application/json' };
+            const token = getCsrfToken();
+            if (token) headers[getCsrfHeader()] = token;
+
+            const response = await fetch('/api/notifications/read-all', {
+                method: 'POST',
+                headers: headers,
+                credentials: 'same-origin'
+            });
+            if (!response.ok) throw new Error('Failed to mark all notifications as read');
+
+            updateBadge(0);
+            await loadNotifications();
+        } catch (e) {
+            console.error('Mark all notifications as read error:', e);
+            if (markAllReadButton) markAllReadButton.disabled = false;
+        }
+    }
+
+    if (markAllReadButton) {
+        markAllReadButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+            markAllNotificationsAsRead();
+        });
     }
 
     notificationButton.addEventListener('click', function (event) {

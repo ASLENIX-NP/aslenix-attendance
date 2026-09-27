@@ -93,7 +93,7 @@
             padding: 0 32px;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
             gap: 25px;
             background: rgba(255, 255, 255, 0.92);
             border-bottom: 1px solid rgba(228, 233, 245, 0.9);
@@ -106,7 +106,10 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 22px;
+            justify-content: flex-end;
+            gap: 18px;
+            min-width: 0;
+            margin-left: auto;
         }
 
         /* NOTIFICATIONS */
@@ -426,19 +429,21 @@
         .profile {
             display: flex;
             align-items: center;
-            gap: 11px;
-            padding: 4px 6px 4px 4px;
-            border-radius: 12px;
+            gap: 9px;
+            padding: 0;
+            padding-left: 4px;
             cursor: pointer;
-            border: 1px solid transparent;
+            border: 0;
             background: transparent;
+            font: inherit;
+            color: inherit;
             transition: all .2s ease;
         }
 
         .profile:hover {
-            background: #ffffff;
-            border-color: #e5eaf3;
-            box-shadow: 0 3px 12px rgba(25, 35, 65, 0.04);
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
         }
 
         .profile-avatar {
@@ -452,6 +457,15 @@
             font-weight: 800;
             background: linear-gradient(135deg, #6846d9, #394fe1);
             box-shadow: 0 4px 12px rgba(70, 70, 190, .16);
+            overflow: hidden;
+        }
+
+        .header-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
         }
 
         .profile-info {
@@ -550,12 +564,12 @@
 
         /* HEADER DATE */
         .header-date {
+            height: 35px;
+            padding-left: 17px;
+            border-left: 1px solid #e8edf4;
             display: flex;
             align-items: center;
             gap: 7px;
-            padding: 8px 12px;
-            border-radius: 9px;
-            background: #f2f5fb;
             color: #59657b;
             font-size: 10px;
             font-weight: 600;
@@ -588,16 +602,7 @@
             border-right: 1px solid #e4e9f3;
             box-shadow: 4px 0 24px rgba(15, 23, 42, 0.05);
             z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 99px;
+            overflow: hidden;
         }
 
         .sidebar-section-title {
@@ -628,7 +633,11 @@
             color: #536078;
             background: transparent;
             text-decoration: none;
-            transition: background .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+            transition:
+                background .2s ease,
+                color .2s ease,
+                transform .2s ease,
+                box-shadow .2s ease;
         }
 
         .sidebar-link:hover {
@@ -648,23 +657,27 @@
             content: "";
             position: absolute;
             left: 0;
-            top: 7px;
-            bottom: 7px;
-            width: 4px;
-            border-radius: 0 4px 4px 0;
-            background: linear-gradient(180deg, #5b6cf0, #394ae0);
+            top: 10px;
+            bottom: 10px;
+            width: 3.5px;
+            border-radius: 0 6px 6px 0;
+            background: linear-gradient(180deg, #4f46e5, #6366f1, #8b5cf6);
+            box-shadow: 0 2px 10px rgba(104, 69, 220, 0.28);
         }
 
         .sidebar-icon {
-            width: 38px;
-            height: 38px;
-            flex-shrink: 0;
+            width: 37px;
+            height: 37px;
+            flex: 0 0 37px;
             display: grid;
             place-items: center;
-            border-radius: 10px;
-            background: #eef2fa;
-            color: #5d6b82;
-            transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+            border-radius: 9px;
+            background: #f4f6fb;
+            color: #68748b;
+            transition:
+                background .2s ease,
+                color .2s ease,
+                transform .2s ease;
         }
 
         .sidebar-icon svg {
@@ -672,38 +685,33 @@
             height: 18px;
             fill: none;
             stroke: currentColor;
-            stroke-width: 1.8;
+            stroke-width: 1.9;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
 
         .sidebar-link:hover .sidebar-icon {
-            background: #e5e9f8;
-            color: #4338ca;
+            background: #e9edff;
+            color: #5364e8;
         }
 
         .sidebar-link.active .sidebar-icon {
-            background: linear-gradient(135deg, #4f62ea, #3346dc);
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(67, 85, 230, 0.35);
-        }
-
-        .sidebar-link.active .sidebar-icon svg {
-            stroke-width: 2.1;
+            background: linear-gradient(135deg, #eeeaff, #eaf1ff);
+            color: #4f46e5;
+            box-shadow: 0 3px 8px rgba(83, 101, 223, 0.08);
         }
 
         .sidebar-text {
+            min-width: 0;
             display: flex;
             flex-direction: column;
             gap: 2px;
-            min-width: 0;
         }
 
         .sidebar-text strong {
-            color: #0f172a;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: .1px;
+            color: inherit;
+            font-size: 13px;
+            font-weight: 700;
             white-space: nowrap;
         }
 
@@ -1482,8 +1490,12 @@
             <a th:href="@{/employee/tasks}" class="sidebar-link">
                 <div class="sidebar-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M9 11l3 3L22 4"></path>
-                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        <rect x="5" y="3" width="14" height="18" rx="2"></rect>
+                        <path d="M9 3V2h6v1"></path>
+                        <path d="M8 8h8"></path>
+                        <path d="m8 12 1.5 1.5L12 11"></path>
+                        <path d="M13 13h3"></path>
+                        <path d="M8 17h8"></path>
                     </svg>
                 </div>
                 <div class="sidebar-text">
@@ -1501,7 +1513,9 @@
                         <path d="M8 2v4"></path>
                         <path d="M3 10h18"></path>
                         <path d="M8 14h3"></path>
-                        <path d="M8 18h6"></path>
+                        <path d="M8 18h2"></path>
+                        <path d="M15 14h2"></path>
+                        <path d="M15 18h2"></path>
                     </svg>
                 </div>
                 <div class="sidebar-text">
@@ -1569,10 +1583,15 @@
                 <div class="profile-wrapper">
                     <button type="button" class="profile" id="profileButton" aria-label="Open profile menu"
                         aria-expanded="false">
-                        <div class="profile-avatar" th:text="${employee != null and employee.firstName != null and !employee.firstName.isEmpty()
-                    ? employee.firstName.substring(0,1).toUpperCase()
-                    : 'E'}">
-                            E
+                        <div class="profile-avatar">
+                            <img th:if="${employee != null and employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                                 th:src="@{${employee.photoUrl}}"
+                                 alt="Avatar"
+                                 class="header-avatar-img">
+                            <span th:unless="${employee != null and employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                                  th:text="${employee != null and employee.firstName != null and !employee.firstName.isEmpty()
+                                            ? employee.firstName.substring(0,1).toUpperCase()
+                                            : 'E'}">E</span>
                         </div>
                         <div class="profile-info">
                             <div class="profile-name" th:text="${employee != null ? (employee.firstName + ' ' + (employee.lastName != null ? employee.lastName : '')) : 'Employee'}">
@@ -1615,7 +1634,8 @@
                         <path d="M8 2v4"></path>
                         <path d="M3 10h18"></path>
                     </svg>
-                    <span id="headerBsDate">Loading...</span>
+                    <span id="headerBsDate"
+                          th:text="${today != null ? #temporals.format(today, 'EEEE, dd MMM yyyy') : 'Loading...'}">Loading...</span>
                 </div>
 
             </div>
@@ -2323,15 +2343,28 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<!-- BS DATE IN HEADER -->
+<!-- AD DATE IN HEADER -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const headerDate = document.getElementById('headerBsDate');
-    if (headerDate && typeof NepaliDate !== 'undefined') {
+    if (headerDate) {
         try {
-            headerDate.textContent = new NepaliDate(new Date()).format('DD MMM YYYY');
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const dayOfWeek = days[now.getDay()];
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            headerDate.textContent = `${dayOfWeek}, ${day} ${month} ${year}`;
         } catch (error) {
-            headerDate.textContent = 'ASLENIX';
+            const now = new Date();
+            headerDate.textContent = now.toLocaleDateString('en-GB', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
         }
     }
 });

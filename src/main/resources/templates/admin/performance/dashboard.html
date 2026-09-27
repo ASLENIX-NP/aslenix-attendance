@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Employee of the Month · ASLENIX</title>
     <link rel="stylesheet" th:href="@{/css/aslenix-theme.css}" href="/css/aslenix-theme.css">
     <link rel="stylesheet" th:href="@{/css/performance.css}" href="/css/performance.css">
 </head>
-<body>
+<body class="admin-dashboard">
 
 <div class="app-layout">
 

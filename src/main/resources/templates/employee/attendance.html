@@ -1243,6 +1243,16 @@
 
             box-shadow:
                 0 4px 12px rgba(70, 70, 190, .16);
+
+            overflow: hidden;
+        }
+
+        .header-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
         }
 
         .profile-info {
@@ -3830,10 +3840,15 @@
                         <button type="button" class="profile" id="profileButton" aria-label="Open profile menu"
                             aria-expanded="false">
 
-                            <div class="profile-avatar" th:text="${employee.firstName != null and !employee.firstName.isEmpty()
-                        ? employee.firstName.substring(0,1).toUpperCase()
-                        : 'E'}">
-                                E
+                            <div class="profile-avatar">
+                                <img th:if="${employee != null and employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                                     th:src="@{${employee.photoUrl}}"
+                                     alt="Avatar"
+                                     class="header-avatar-img">
+                                <span th:unless="${employee != null and employee.photoUrl != null and !employee.photoUrl.isEmpty()}"
+                                      th:text="${employee != null and employee.firstName != null and !employee.firstName.isEmpty()
+                                                ? employee.firstName.substring(0,1).toUpperCase()
+                                                : 'E'}">E</span>
                             </div>
 
                             <div class="profile-info">

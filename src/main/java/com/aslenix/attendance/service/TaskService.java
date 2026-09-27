@@ -1,5 +1,6 @@
 package com.aslenix.attendance.service;
 
+import com.aslenix.attendance.dto.SubtaskInputDto;
 import com.aslenix.attendance.entity.Employee;
 import com.aslenix.attendance.entity.Role;
 import com.aslenix.attendance.entity.Task;
@@ -68,7 +69,7 @@ public class TaskService {
     }
 
     // ============================================================
-    // GET TASK
+    // GET TASK BY ID
     // ============================================================
 
     @Transactional(readOnly = true)
@@ -81,35 +82,252 @@ public class TaskService {
     }
 
     // ============================================================
-    // CREATE TASK (Single Employee - Backwards Compatible)
+    // CREATE TASK (WEEKLY SUBTASK STRUCTURE)
     // ============================================================
 
     public Task createTask(
             String title,
             String description,
-            Employee employee,
+            String complexity,
             String priority,
-            LocalDate dueDate
+            Integer weeksRequired,
+            List<Employee> teamLeads,
+            List<Employee> assignees,
+            List<SubtaskInputDto> subtasks
     ) {
-        List<Employee> assignees = employee != null ? List.of(employee) : List.of();
-        return createTask(title, description, assignees, priority, "MEDIUM", dueDate, null, null, null, null);
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Task title is required.");
+        }
+
+        int weeks = (weeksRequired != null && weeksRequired > 0) ? weeksRequired : 1;
+
+        if (subtasks == null || subtasks.size() != weeks) {
+            throw new IllegalArgumentException("The number of subtasks (" + (subtasks != null ? subtasks.size() : 0)
+                    + ") must match the exact number of Weeks Required (" + weeks + ").");
+        }
+
+        // Validate that admin provided actual details for every subtask
+        for (int i = 0; i < subtasks.size(); i++) {
+            SubtaskInputDto st = subtasks.get(i);
+            int weekNum = (st.getWeekNumber() != null && st.getWeekNumber() > 0) ? st.getWeekNumber() : (i + 1);
+            if (st.getDescription() == null || st.getDescription().trim().isEmpty()) {
+                throw new IllegalArgumentException("Work details/description is mandatory for Week " + weekNum + ". Please describe the required work.");
+            }
+        }
+
+        Task task = new Task();
+        task.setTaskCode(generateTaskCode());
+        task.setTitle(title.trim());
+        task.setDescription(description != null && !description.trim().isEmpty() ? description.trim() : null);
+        task.setComplexity(normalizeComplexity(complexity));
+        task.setPriority(normalizePriority(priority));
+        task.setWeeksRequired(weeks);
+        task.setStatus("TODO");
+        task.setProgress(0);
+        task.setLocked(false);
+
+        if (teamLeads != null && !teamLeads.isEmpty()) {
+            task.setTeamLeads(new HashSet<>(teamLeads));
+        }
+
+        if (assignees != null && !assignees.isEmpty()) {
+            task.setAssignees(new HashSet<>(assignees));
+            task.setEmployee(assignees.get(0));
+        } else if (teamLeads != null && !teamLeads.isEmpty()) {
+            task.setEmployee(teamLeads.get(0));
+        } else {
+            List<Employee> allEmployees = employeeRepository.findAll();
+            if (!allEmployees.isEmpty()) {
+                task.setEmployee(allEmployees.get(0));
+            }
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        task.setCreatedAt(now);
+        task.setUpdatedAt(now);
+
+        Task savedTask = taskRepository.save(task);
+
+        // Create the exact N subtasks
+        for (int i = 0; i < subtasks.size(); i++) {
+            SubtaskInputDto dto = subtasks.get(i);
+            int weekNum = i + 1;
+            String stTitle = (dto.getTitle() != null && !dto.getTitle().trim().isEmpty())
+                    ? dto.getTitle().trim()
+                    : ("Week " + weekNum);
+
+            Employee subAssignee = null;
+            if (dto.getAssigneeId() != null) {
+                subAssignee = employeeRepository.findById(dto.getAssigneeId()).orElse(null);
+            }
+            if (subAssignee == null && assignees != null && !assignees.isEmpty()) {
+                subAssignee = assignees.get(i % assignees.size());
+            }
+
+            TaskAssignment assignment = new TaskAssignment();
+            assignment.setTask(savedTask);
+            assignment.setSubtaskNumber(weekNum);
+            assignment.setTitle(stTitle);
+            assignment.setDescription(dto.getDescription().trim());
+            assignment.setAssignee(subAssignee);
+            assignment.setStatus("TODO");
+            assignment.setProgress(0);
+            assignment.setWeight(savedTask.getComplexity());
+            assignment.setLocked(false);
+
+            TaskAssignment savedAssignment = taskAssignmentRepository.save(assignment);
+            savedTask.getAssignments().add(savedAssignment);
+
+            // Notify assigned employee
+            if (subAssignee != null) {
+                try {
+                    notificationService.createNotification(
+                            subAssignee,
+                            "New Assignment: " + stTitle,
+                            "You have been assigned to " + stTitle + " (" + savedTask.getTitle() + "): " + dto.getDescription().trim(),
+                            "TASK_ASSIGNED"
+                    );
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        recalculateTaskProgressFromAssignments(savedTask);
+        return taskRepository.save(savedTask);
     }
 
-    public Task createTask(
+    // ============================================================
+    // UPDATE TASK (WEEKLY SUBTASK STRUCTURE)
+    // ============================================================
+
+    public Task updateTask(
+            Long id,
             String title,
             String description,
-            Employee employee,
+            String complexity,
             String priority,
-            LocalDate dueDate,
-            LocalDate deadline
+            Integer weeksRequired,
+            List<Employee> teamLeads,
+            List<Employee> assignees,
+            List<SubtaskInputDto> subtasks
     ) {
-        List<Employee> assignees = employee != null ? List.of(employee) : List.of();
-        return createTask(title, description, assignees, priority, "MEDIUM", dueDate, deadline, null, null, null);
+        Task task = getTask(id);
+
+        if (task.isLocked()) {
+            throw new IllegalStateException("Task is approved and locked. Modifications are not allowed.");
+        }
+
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Task title is required.");
+        }
+
+        int weeks = (weeksRequired != null && weeksRequired > 0) ? weeksRequired : task.getWeeksRequired();
+
+        if (subtasks != null && !subtasks.isEmpty()) {
+            if (subtasks.size() != weeks) {
+                throw new IllegalArgumentException("The number of subtasks (" + subtasks.size()
+                        + ") must match the exact number of Weeks Required (" + weeks + ").");
+            }
+            for (int i = 0; i < subtasks.size(); i++) {
+                SubtaskInputDto st = subtasks.get(i);
+                int weekNum = (st.getWeekNumber() != null && st.getWeekNumber() > 0) ? st.getWeekNumber() : (i + 1);
+                if (st.getDescription() == null || st.getDescription().trim().isEmpty()) {
+                    throw new IllegalArgumentException("Work details/description is mandatory for Week " + weekNum + ".");
+                }
+            }
+        }
+
+        task.setTitle(title.trim());
+        task.setDescription(description != null && !description.trim().isEmpty() ? description.trim() : null);
+        task.setComplexity(normalizeComplexity(complexity));
+        task.setPriority(normalizePriority(priority));
+        task.setWeeksRequired(weeks);
+
+        if (teamLeads != null) {
+            task.getTeamLeads().clear();
+            task.getTeamLeads().addAll(teamLeads);
+        }
+
+        if (assignees != null) {
+            task.getAssignees().clear();
+            task.getAssignees().addAll(assignees);
+            if (!assignees.isEmpty()) {
+                task.setEmployee(assignees.get(0));
+            }
+        }
+
+        // Synchronize subtasks if provided
+        if (subtasks != null && !subtasks.isEmpty()) {
+            List<TaskAssignment> currentAssignments = new ArrayList<>(task.getAssignments());
+            currentAssignments.sort(Comparator.comparing(a -> a.getSubtaskNumber() != null ? a.getSubtaskNumber() : 0));
+
+            for (int i = 0; i < subtasks.size(); i++) {
+                SubtaskInputDto dto = subtasks.get(i);
+                int weekNum = i + 1;
+                String stTitle = (dto.getTitle() != null && !dto.getTitle().trim().isEmpty())
+                        ? dto.getTitle().trim()
+                        : ("Week " + weekNum);
+
+                Employee subAssignee = null;
+                if (dto.getAssigneeId() != null) {
+                    subAssignee = employeeRepository.findById(dto.getAssigneeId()).orElse(null);
+                }
+
+                // Match existing assignment by weekNum or index
+                TaskAssignment existing = currentAssignments.stream()
+                        .filter(a -> a.getSubtaskNumber() != null && a.getSubtaskNumber() == weekNum)
+                        .findFirst()
+                        .orElse(i < currentAssignments.size() ? currentAssignments.get(i) : null);
+
+                if (existing != null) {
+                    // Update existing subtask while preserving its individual progress and status
+                    existing.setSubtaskNumber(weekNum);
+                    existing.setTitle(stTitle);
+                    existing.setDescription(dto.getDescription().trim());
+                    existing.setAssignee(subAssignee);
+                    existing.setWeight(task.getComplexity());
+                    taskAssignmentRepository.save(existing);
+                } else {
+                    // Create new subtask for added week
+                    TaskAssignment newAssignment = new TaskAssignment();
+                    newAssignment.setTask(task);
+                    newAssignment.setSubtaskNumber(weekNum);
+                    newAssignment.setTitle(stTitle);
+                    newAssignment.setDescription(dto.getDescription().trim());
+                    newAssignment.setAssignee(subAssignee);
+                    newAssignment.setStatus("TODO");
+                    newAssignment.setProgress(0);
+                    newAssignment.setWeight(task.getComplexity());
+                    newAssignment.setLocked(false);
+                    TaskAssignment saved = taskAssignmentRepository.save(newAssignment);
+                    task.getAssignments().add(saved);
+                }
+            }
+
+            // If weeks was reduced, remove excess subtasks
+            if (currentAssignments.size() > subtasks.size()) {
+                for (int i = subtasks.size(); i < currentAssignments.size(); i++) {
+                    TaskAssignment toRemove = currentAssignments.get(i);
+                    task.removeAssignment(toRemove);
+                    taskAssignmentRepository.delete(toRemove);
+                }
+            }
+        }
+
+        recalculateTaskProgressFromAssignments(task);
+        task.setUpdatedAt(LocalDateTime.now());
+        return taskRepository.save(task);
     }
 
     // ============================================================
-    // CREATE TASK (Multi-Assignee & Full Metadata)
+    // BACKWARDS-COMPATIBLE CREATE / UPDATE OVERLOADS
     // ============================================================
+
+    public Task createTask(String title, String description, Employee employee, String priority, LocalDate dueDate) {
+        List<Employee> assignees = employee != null ? List.of(employee) : List.of();
+        List<SubtaskInputDto> subtasks = List.of(new SubtaskInputDto(1, "Week 1", description != null ? description : title, employee != null ? employee.getId() : null));
+        return createTask(title, description, "MEDIUM", priority, 1, List.of(), assignees, subtasks);
+    }
 
     public Task createTask(
             String title,
@@ -125,81 +343,9 @@ public class TaskService {
             String deadlineTime,
             String tags
     ) {
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Task title is required.");
-        }
-
-        Task task = new Task();
-        task.setTaskCode(generateTaskCode());
-        task.setTitle(title.trim());
-        task.setDescription(description == null ? null : description.trim());
-
-        if (assignees != null && !assignees.isEmpty()) {
-            task.setAssignees(new HashSet<>(assignees));
-            task.setEmployee(assignees.get(0));
-        } else {
-            List<Employee> allEmployees = employeeRepository.findAll();
-            if (!allEmployees.isEmpty()) {
-                task.setEmployee(allEmployees.get(0));
-            }
-        }
-
-        task.setPriority(normalizePriority(priority));
-        task.setComplexity(normalizeComplexity(complexity));
-
-        int p = progress != null ? Math.max(0, Math.min(100, progress)) : 0;
-        task.setProgress(p);
-
-        String initialStatus = "TODO";
-        if (status != null && !status.trim().isEmpty()) {
-            String norm = status.trim().toUpperCase();
-            if ("UNDER_REVIEW".equals(norm)) norm = "READY_FOR_REVIEW";
-            if ("COMPLETED".equals(norm)) norm = "APPROVED";
-            initialStatus = norm;
-        } else {
-            if (p >= 100) initialStatus = "READY_FOR_REVIEW";
-            else if (p > 0) initialStatus = "IN_PROGRESS";
-        }
-        task.setStatus(initialStatus);
-        if ("APPROVED".equals(initialStatus)) {
-            task.setLocked(true);
-            task.setProgress(100);
-            task.setCompletedAt(LocalDateTime.now());
-            task.setApprovedAt(LocalDateTime.now());
-        }
-
-        task.setDueDate(dueDate);
-        task.setDeadline(deadline);
-        String cleanBs = (deadlineBs != null && !deadlineBs.trim().isEmpty() && !deadlineBs.contains("undefined")) ? deadlineBs.trim() : null;
-        task.setDeadlineBs(cleanBs);
-        task.setDeadlineTime(deadlineTime != null && !deadlineTime.trim().isEmpty() ? deadlineTime.trim() : null);
-        task.setTags(tags != null && !tags.trim().isEmpty() ? tags.trim() : null);
-
-        LocalDateTime now = LocalDateTime.now();
-        task.setCreatedAt(now);
-        task.setUpdatedAt(now);
-
-        return taskRepository.save(task);
+        List<SubtaskInputDto> subtasks = List.of(new SubtaskInputDto(1, "Week 1", description != null ? description : title, (assignees != null && !assignees.isEmpty()) ? assignees.get(0).getId() : null));
+        return createTask(title, description, complexity, priority, 1, List.of(), assignees, subtasks);
     }
-
-    public Task createTask(
-            String title,
-            String description,
-            List<Employee> assignees,
-            String priority,
-            String complexity,
-            LocalDate dueDate,
-            LocalDate deadline,
-            String deadlineBs,
-            String deadlineTime,
-            String tags
-    ) {
-        return createTask(title, description, assignees, priority, complexity, "TODO", 0, dueDate, deadline, deadlineBs, deadlineTime, tags);
-    }
-
-    // ============================================================
-    // UPDATE TASK (Multi-Assignee & Full Metadata)
-    // ============================================================
 
     public Task updateTask(
             Long id,
@@ -217,120 +363,8 @@ public class TaskService {
             String tags
     ) {
         Task task = getTask(id);
-
-        if (task.isLocked()) {
-            throw new IllegalStateException("Task is approved and locked. Modifications are not allowed.");
-        }
-
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Task title is required.");
-        }
-
-        task.setTitle(title.trim());
-        task.setDescription(description == null ? null : description.trim());
-
-        if (assignees != null) {
-            task.getAssignees().clear();
-            task.getAssignees().addAll(assignees);
-            if (!assignees.isEmpty()) {
-                task.setEmployee(assignees.get(0));
-            } else if (task.getEmployee() == null) {
-                List<Employee> allEmployees = employeeRepository.findAll();
-                if (!allEmployees.isEmpty()) {
-                    task.setEmployee(allEmployees.get(0));
-                }
-            }
-        }
-
-        if (status != null && !status.trim().isEmpty()) {
-            String normStatus = status.trim().toUpperCase();
-            if (normStatus.equals("UNDER_REVIEW")) normStatus = "READY_FOR_REVIEW";
-            if (normStatus.equals("COMPLETED")) normStatus = "APPROVED";
-            task.setStatus(normStatus);
-            if ("APPROVED".equals(normStatus)) {
-                task.setLocked(true);
-                task.setProgress(100);
-                if (task.getCompletedAt() == null) task.setCompletedAt(LocalDateTime.now());
-                if (task.getApprovedAt() == null) task.setApprovedAt(LocalDateTime.now());
-            }
-        }
-
-        task.setPriority(normalizePriority(priority));
-        task.setComplexity(normalizeComplexity(complexity));
-
-        if (task.getAssignments() != null && !task.getAssignments().isEmpty()) {
-            recalculateTaskProgressFromAssignments(task);
-        } else if (progress != null) {
-            int p = Math.max(0, Math.min(100, progress));
-            task.setProgress(p);
-            if (!"APPROVED".equals(task.getStatus())) {
-                if (p >= 100) {
-                    task.setStatus("READY_FOR_REVIEW");
-                    if (task.getCompletedAt() == null) task.setCompletedAt(LocalDateTime.now());
-                } else if (p == 0) {
-                    task.setStatus("TODO");
-                } else if ("TODO".equals(task.getStatus())) {
-                    task.setStatus("IN_PROGRESS");
-                }
-            }
-        }
-
-        task.setDueDate(dueDate);
-        task.setDeadline(deadline);
-        String cleanBs = (deadlineBs != null && !deadlineBs.trim().isEmpty() && !deadlineBs.contains("undefined")) ? deadlineBs.trim() : null;
-        task.setDeadlineBs(cleanBs);
-        task.setDeadlineTime(deadlineTime != null && !deadlineTime.trim().isEmpty() ? deadlineTime.trim() : null);
-        task.setTags(tags != null && !tags.trim().isEmpty() ? tags.trim() : null);
-
-        task.setUpdatedAt(LocalDateTime.now());
-
-        return taskRepository.save(task);
+        return updateTask(id, title, description, complexity, priority, task.getWeeksRequired(), new ArrayList<>(task.getTeamLeads()), assignees, null);
     }
-
-    public Task updateTask(
-            Long id,
-            String title,
-            String description,
-            Employee employee,
-            String priority,
-            LocalDate dueDate
-    ) {
-        List<Employee> assignees = employee != null ? List.of(employee) : null;
-        return updateTask(id, title, description, assignees, null, priority, "MEDIUM", null, dueDate, null, null, null, null);
-    }
-
-    public Task updateTask(
-            Long id,
-            String title,
-            String description,
-            Employee employee,
-            String priority,
-            LocalDate dueDate,
-            LocalDate deadline
-    ) {
-        List<Employee> assignees = employee != null ? List.of(employee) : null;
-        return updateTask(id, title, description, assignees, null, priority, "MEDIUM", null, dueDate, deadline, null, null, null);
-    }
-
-    public Task updateTask(
-            Long id,
-            String title,
-            String description,
-            Employee employee,
-            String status,
-            String priority,
-            Integer progress,
-            LocalDate dueDate,
-            LocalDate deadline,
-            String tags
-    ) {
-        List<Employee> assignees = employee != null ? List.of(employee) : null;
-        return updateTask(id, title, description, assignees, status, priority, "MEDIUM", progress, dueDate, deadline, null, null, tags);
-    }
-
-    // ============================================================
-    // UPDATE TASK (EMPLOYEE EDITABLE FIELDS ONLY)
-    // ============================================================
 
     public Task updateTaskByEmployee(
             Long id,
@@ -352,34 +386,307 @@ public class TaskService {
             throw new IllegalStateException("Task is approved and locked. Modifications are not allowed.");
         }
 
-        if (status != null && !status.trim().isEmpty()) {
-            String norm = status.trim().toUpperCase();
-            if (norm.equals("UNDER_REVIEW")) norm = "READY_FOR_REVIEW";
-            if (!"APPROVED".equals(norm)) {
-                task.setStatus(norm);
-            }
+        if (title != null && !title.trim().isEmpty()) {
+            task.setTitle(title.trim());
+        }
+        if (description != null) {
+            task.setDescription(description.trim());
         }
 
-        if (progress != null) {
-            int p = Math.max(0, Math.min(100, progress));
-            task.setProgress(p);
-            if (p >= 100) {
-                task.setStatus("READY_FOR_REVIEW");
-                if (task.getCompletedAt() == null) task.setCompletedAt(LocalDateTime.now());
-            } else if (p == 0 && !"APPROVED".equals(task.getStatus())) {
-                task.setStatus("TODO");
-            } else if (p > 0 && !"APPROVED".equals(task.getStatus()) && !"READY_FOR_REVIEW".equals(task.getStatus())) {
-                task.setStatus("IN_PROGRESS");
-            }
-        }
-
+        recalculateTaskProgressFromAssignments(task);
         task.setUpdatedAt(LocalDateTime.now());
-
         return taskRepository.save(task);
     }
 
     // ============================================================
-    // WORK ASSIGNMENTS (Sub-tasks)
+    // WORK ITEM / SUBTASK PROGRESS UPDATE (MANUAL WITH MANDATORY NOTE)
+    // ============================================================
+
+    public TaskAssignment updateAssignmentProgress(Long assignmentId, Integer newProgress, String updateNote, Employee updatedBy) {
+        TaskAssignment assignment = taskAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Subtask not found: " + assignmentId));
+
+        Task task = assignment.getTask();
+        if (task != null && task.isLocked()) {
+            throw new IllegalStateException("Task is approved and locked. Subtasks cannot be modified.");
+        }
+        if (assignment.isLocked()) {
+            throw new IllegalStateException("Subtask is approved and locked. It cannot be modified.");
+        }
+
+        if (newProgress == null || newProgress < 0 || newProgress > 100) {
+            throw new IllegalArgumentException("Progress must be between 0 and 100.");
+        }
+
+        // Mandatory description check on EVERY progress update
+        if (updateNote == null || updateNote.trim().isEmpty()) {
+            throw new IllegalArgumentException("A description/update note is mandatory when changing subtask progress.");
+        }
+
+        // Ownership / permission check: only the assigned employee can update progress
+        if (updatedBy != null && updatedBy.getUser() != null && updatedBy.getUser().getRole() == Role.EMPLOYEE) {
+            boolean isAssignee = assignment.getAssignee() != null && assignment.getAssignee().getId().equals(updatedBy.getId());
+            if (!isAssignee) {
+                throw new SecurityException("This subtask is not assigned to you. You can only view it, not update it.");
+            }
+        }
+
+        int oldProgress = assignment.getProgress() != null ? assignment.getProgress() : 0;
+        int nextProgress = newProgress;
+
+        TaskAssignmentHistory history = new TaskAssignmentHistory(
+                assignment,
+                oldProgress,
+                nextProgress,
+                updateNote.trim(),
+                updatedBy
+        );
+        taskAssignmentHistoryRepository.save(history);
+        assignment.addHistory(history);
+
+        assignment.setProgress(nextProgress);
+
+        if (nextProgress == 0) {
+            assignment.setStatus("TODO");
+        } else if (nextProgress > 0 && ("TODO".equalsIgnoreCase(assignment.getStatus()) || "DECLINED".equalsIgnoreCase(assignment.getStatus()))) {
+            assignment.setStatus("IN_PROGRESS");
+        }
+
+        TaskAssignment saved = taskAssignmentRepository.save(assignment);
+
+        if (task != null) {
+            recalculateTaskProgressFromAssignments(task);
+            taskRepository.save(task);
+        }
+
+        return saved;
+    }
+
+    // ============================================================
+    // SUBMIT SUBTASK FOR REVIEW (EMPLOYEE -> ADMIN)
+    // ============================================================
+
+    public TaskAssignment submitAssignmentForReview(Long assignmentId, String note, Employee updatedBy) {
+        TaskAssignment assignment = taskAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Subtask not found: " + assignmentId));
+
+        Task task = assignment.getTask();
+        if (task != null && task.isLocked()) {
+            throw new IllegalStateException("Task is approved and locked.");
+        }
+        if (assignment.isLocked()) {
+            throw new IllegalStateException("Subtask is already approved and locked.");
+        }
+
+        // Ownership / permission check: only the assigned employee can submit for review
+        if (updatedBy != null && updatedBy.getUser() != null && updatedBy.getUser().getRole() == Role.EMPLOYEE) {
+            boolean isAssignee = assignment.getAssignee() != null && assignment.getAssignee().getId().equals(updatedBy.getId());
+            if (!isAssignee) {
+                throw new SecurityException("This subtask is not assigned to you. You can only view it, not update it.");
+            }
+        }
+
+        if (note == null || note.trim().isEmpty()) {
+            throw new IllegalArgumentException("A description/note is mandatory when submitting for review.");
+        }
+
+        if (assignment.getProgress() == null || assignment.getProgress() < 100) {
+            throw new IllegalStateException("Subtask progress must be 100% before submitting for review.");
+        }
+
+        assignment.setProgress(100);
+        assignment.setStatus("READY_FOR_REVIEW");
+
+        TaskAssignmentHistory history = new TaskAssignmentHistory(
+                assignment,
+                assignment.getProgress(),
+                100,
+                "Submitted for Review: " + note.trim(),
+                updatedBy
+        );
+        taskAssignmentHistoryRepository.save(history);
+        assignment.addHistory(history);
+
+        TaskAssignment saved = taskAssignmentRepository.save(assignment);
+
+        // Notify Admins
+        try {
+            String author = updatedBy != null ? (updatedBy.getFirstName() + " " + (updatedBy.getLastName() != null ? updatedBy.getLastName() : "")).trim() : "Employee";
+            notificationService.createAdminNotification(
+                    updatedBy,
+                    "Subtask Ready for Review",
+                    author + " has submitted " + assignment.getTitle() + " (" + (task != null ? task.getTitle() : "Task") + ") for review: " + note.trim(),
+                    "TASK_REVIEW"
+            );
+        } catch (Exception ignored) {
+        }
+
+        if (task != null) {
+            recalculateTaskProgressFromAssignments(task);
+            taskRepository.save(task);
+        }
+
+        return saved;
+    }
+
+    // ============================================================
+    // ADMIN APPROVE SUBTASK
+    // ============================================================
+
+    public TaskAssignment approveAssignment(Long assignmentId, Employee adminUser) {
+        TaskAssignment assignment = taskAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Subtask not found: " + assignmentId));
+
+        Task task = assignment.getTask();
+        assignment.setStatus("APPROVED");
+        assignment.setLocked(true);
+        assignment.setApprovedAt(LocalDateTime.now());
+        assignment.setDeclineReason(null);
+        assignment.setProgress(100);
+
+        TaskAssignmentHistory history = new TaskAssignmentHistory(
+                assignment,
+                100,
+                100,
+                "Approved by administrator.",
+                adminUser
+        );
+        taskAssignmentHistoryRepository.save(history);
+        assignment.addHistory(history);
+
+        TaskAssignment saved = taskAssignmentRepository.save(assignment);
+
+        // Notify assigned employee
+        if (assignment.getAssignee() != null) {
+            try {
+                notificationService.createNotification(
+                        assignment.getAssignee(),
+                        "Subtask Approved: " + assignment.getTitle(),
+                        "Great work! Your subtask '" + assignment.getTitle() + "' for task '"
+                                + (task != null ? task.getTitle() : "") + "' has been approved by the administrator.",
+                        "TASK_APPROVED"
+                );
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (task != null) {
+            recalculateTaskProgressFromAssignments(task);
+            taskRepository.save(task);
+        }
+
+        return saved;
+    }
+
+    // ============================================================
+    // ADMIN DECLINE SUBTASK
+    // ============================================================
+
+    public TaskAssignment declineAssignment(Long assignmentId, String declineReason, Employee adminUser) {
+        TaskAssignment assignment = taskAssignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Subtask not found: " + assignmentId));
+
+        if (declineReason == null || declineReason.trim().isEmpty()) {
+            throw new IllegalArgumentException("A decline reason/description is strictly mandatory when declining work.");
+        }
+
+        Task task = assignment.getTask();
+        assignment.setStatus("DECLINED");
+        assignment.setDeclineReason(declineReason.trim());
+        assignment.setLocked(false);
+
+        TaskAssignmentHistory history = new TaskAssignmentHistory(
+                assignment,
+                assignment.getProgress(),
+                assignment.getProgress(),
+                "Declined by administrator: " + declineReason.trim(),
+                adminUser
+        );
+        taskAssignmentHistoryRepository.save(history);
+        assignment.addHistory(history);
+
+        TaskAssignment saved = taskAssignmentRepository.save(assignment);
+
+        // Notify assigned employee
+        if (assignment.getAssignee() != null) {
+            try {
+                notificationService.createNotification(
+                        assignment.getAssignee(),
+                        "Subtask Declined: " + assignment.getTitle(),
+                        "Your subtask '" + assignment.getTitle() + "' requires adjustments. Reason: " + declineReason.trim(),
+                        "TASK_DECLINED"
+                );
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (task != null) {
+            recalculateTaskProgressFromAssignments(task);
+            taskRepository.save(task);
+        }
+
+        return saved;
+    }
+
+    // ============================================================
+    // RECALCULATE TASK PROGRESS FROM SUBTASKS
+    // Formula: Total Progress = round(Sum(subtask.progress) / N)
+    // ============================================================
+
+    public void recalculateTaskProgressFromAssignments(Task task) {
+        if (task == null || task.getAssignments() == null || task.getAssignments().isEmpty()) {
+            return;
+        }
+
+        double total = 0;
+        int count = task.getAssignments().size();
+        boolean allApproved = true;
+
+        for (TaskAssignment a : task.getAssignments()) {
+            if (a == null) {
+                continue;
+            }
+            int p = a.getProgress() != null ? a.getProgress() : 0;
+            total += p;
+            if (!"APPROVED".equalsIgnoreCase(a.getStatus())) {
+                allApproved = false;
+            }
+        }
+
+        int avg = (int) Math.round(total / count);
+        avg = Math.max(0, Math.min(100, avg));
+        task.setProgress(avg);
+
+        if (allApproved && count > 0) {
+            task.setStatus("APPROVED");
+            task.setLocked(true);
+            task.setProgress(100);
+            if (task.getCompletedAt() == null) {
+                task.setCompletedAt(LocalDateTime.now());
+            }
+            if (task.getApprovedAt() == null) {
+                task.setApprovedAt(LocalDateTime.now());
+            }
+        } else if (avg >= 100 && !"APPROVED".equals(task.getStatus())) {
+            task.setStatus("READY_FOR_REVIEW");
+            if (task.getCompletedAt() == null) {
+                task.setCompletedAt(LocalDateTime.now());
+            }
+        } else if (avg > 0 && "TODO".equals(task.getStatus())) {
+            task.setStatus("IN_PROGRESS");
+        }
+    }
+
+    // ============================================================
+    // CANNOT MANUALLY UPDATE TOTAL TASK PROGRESS
+    // ============================================================
+
+    public Task updateProgress(Long id, Employee employee, Integer progress) {
+        throw new UnsupportedOperationException("Task total progress cannot be manually changed. It is automatically calculated from its subtasks.");
+    }
+
+    // ============================================================
+    // SUBTASK MANAGEMENT
     // ============================================================
 
     public TaskAssignment addAssignment(
@@ -397,47 +704,32 @@ public class TaskService {
     ) {
         Task task = getTask(taskId);
         if (task.isLocked()) {
-            throw new IllegalStateException("Task is approved and locked. Work items cannot be added.");
+            throw new IllegalStateException("Task is approved and locked. Subtasks cannot be added.");
         }
         if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Assignment title is required.");
-        }
-
-        if (assignee != null) {
-            boolean isTaskAssignee = (task.getAssignees() != null && task.getAssignees().stream().anyMatch(a -> a != null && a.getId().equals(assignee.getId())))
-                    || (task.getEmployee() != null && task.getEmployee().getId().equals(assignee.getId()));
-            if (!isTaskAssignee) {
-                throw new IllegalArgumentException("Work items can only be assigned to a team member assigned to this task.");
-            }
+            throw new IllegalArgumentException("Subtask title is required.");
         }
 
         TaskAssignment assignment = new TaskAssignment();
         assignment.setTask(task);
+        assignment.setSubtaskNumber(task.getAssignments().size() + 1);
         assignment.setTitle(title.trim());
         assignment.setDescription(description != null && !description.trim().isEmpty() ? description.trim() : null);
         assignment.setAssignee(assignee);
-        assignment.setDeadline(deadline);
-        String cleanBs = (deadlineBs != null && !deadlineBs.trim().isEmpty() && !deadlineBs.contains("undefined")) ? deadlineBs.trim() : null;
-        assignment.setDeadlineBs(cleanBs);
-        assignment.setDeadlineTime(deadlineTime != null && !deadlineTime.trim().isEmpty() ? deadlineTime.trim() : null);
+        assignment.setWeight(weight != null && !weight.trim().isEmpty() ? weight.trim().toUpperCase() : task.getComplexity());
 
         int p = progress != null ? Math.max(0, Math.min(100, progress)) : 0;
         assignment.setProgress(p);
-        assignment.setStatus(status != null && !status.trim().isEmpty() ? status.trim().toUpperCase() : (p >= 100 ? "COMPLETED" : (p > 0 ? "IN_PROGRESS" : "TODO")));
-        assignment.setWeight(weight != null && !weight.trim().isEmpty() ? weight.trim().toUpperCase() : "MEDIUM");
-        assignment.setNote(note != null && !note.trim().isEmpty() ? note.trim() : null);
+        assignment.setStatus(status != null && !status.trim().isEmpty() ? status.trim().toUpperCase() : (p >= 100 ? "READY_FOR_REVIEW" : (p > 0 ? "IN_PROGRESS" : "TODO")));
 
         TaskAssignment saved = taskAssignmentRepository.save(assignment);
         task.getAssignments().add(saved);
+        task.setWeeksRequired(task.getAssignments().size());
 
         recalculateTaskProgressFromAssignments(task);
         taskRepository.save(task);
 
         return saved;
-    }
-
-    public TaskAssignment addAssignment(Long taskId, String title, Employee assignee, String status, String weight, String note) {
-        return addAssignment(taskId, title, null, assignee, null, null, null, 0, status, weight, note);
     }
 
     public TaskAssignment updateAssignment(
@@ -455,11 +747,11 @@ public class TaskService {
     ) {
         Task task = getTask(taskId);
         if (task.isLocked()) {
-            throw new IllegalStateException("Task is approved and locked. Work items cannot be modified.");
+            throw new IllegalStateException("Task is approved and locked. Subtasks cannot be modified.");
         }
 
         TaskAssignment assignment = taskAssignmentRepository.findById(assignmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Assignment not found: " + assignmentId));
+                .orElseThrow(() -> new IllegalArgumentException("Subtask not found: " + assignmentId));
 
         if (title != null && !title.trim().isEmpty()) {
             assignment.setTitle(title.trim());
@@ -468,31 +760,13 @@ public class TaskService {
             assignment.setDescription(description.trim().isEmpty() ? null : description.trim());
         }
         if (assignee != null) {
-            boolean isTaskAssignee = (task.getAssignees() != null && task.getAssignees().stream().anyMatch(a -> a != null && a.getId().equals(assignee.getId())))
-                    || (task.getEmployee() != null && task.getEmployee().getId().equals(assignee.getId()));
-            if (!isTaskAssignee) {
-                throw new IllegalArgumentException("Work items can only be assigned to a team member assigned to this task.");
-            }
             assignment.setAssignee(assignee);
-        }
-        if (deadline != null) {
-            assignment.setDeadline(deadline);
-        }
-        if (deadlineBs != null) {
-            String cleanBs = (!deadlineBs.trim().isEmpty() && !deadlineBs.contains("undefined")) ? deadlineBs.trim() : null;
-            assignment.setDeadlineBs(cleanBs);
-        }
-        if (deadlineTime != null) {
-            assignment.setDeadlineTime(deadlineTime.trim().isEmpty() ? null : deadlineTime.trim());
         }
         if (status != null && !status.trim().isEmpty()) {
             assignment.setStatus(status.trim().toUpperCase());
         }
         if (weight != null && !weight.trim().isEmpty()) {
             assignment.setWeight(weight.trim().toUpperCase());
-        }
-        if (note != null) {
-            assignment.setNote(note.trim().isEmpty() ? null : note.trim());
         }
 
         TaskAssignment saved = taskAssignmentRepository.save(assignment);
@@ -503,18 +777,17 @@ public class TaskService {
 
     public TaskAssignment updateAssignmentStatus(Long assignmentId, String status) {
         TaskAssignment assignment = taskAssignmentRepository.findById(assignmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Assignment not found: " + assignmentId));
+                .orElseThrow(() -> new IllegalArgumentException("Subtask not found: " + assignmentId));
 
         if (assignment.getTask() != null && assignment.getTask().isLocked()) {
-            throw new IllegalStateException("Task is approved and locked. Work items cannot be modified.");
+            throw new IllegalStateException("Task is approved and locked.");
         }
 
         String targetStatus = status != null ? status.trim().toUpperCase() : "TODO";
         assignment.setStatus(targetStatus);
-        if ("COMPLETED".equalsIgnoreCase(targetStatus) || "VERIFIED".equalsIgnoreCase(targetStatus)) {
+        if ("APPROVED".equalsIgnoreCase(targetStatus) || "COMPLETED".equalsIgnoreCase(targetStatus)) {
             assignment.setProgress(100);
-        } else if ("TODO".equalsIgnoreCase(targetStatus) && assignment.getProgress() >= 100) {
-            assignment.setProgress(0);
+            assignment.setLocked("APPROVED".equalsIgnoreCase(targetStatus));
         }
 
         TaskAssignment saved = taskAssignmentRepository.save(assignment);
@@ -527,76 +800,18 @@ public class TaskService {
         return saved;
     }
 
-    public TaskAssignment updateAssignmentProgress(Long assignmentId, Integer newProgress, String updateNote, Employee updatedBy) {
-        TaskAssignment assignment = taskAssignmentRepository.findById(assignmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Assignment not found: " + assignmentId));
-
-        Task task = assignment.getTask();
-        if (task != null && task.isLocked()) {
-            throw new IllegalStateException("Task is approved and locked. Work items cannot be modified.");
-        }
-
-        if (newProgress == null || newProgress < 0 || newProgress > 100) {
-            throw new IllegalArgumentException("Progress must be between 0 and 100.");
-        }
-
-        // Ownership check: If updatedBy is an employee, they must be the assignee
-        if (updatedBy != null && updatedBy.getUser() != null && updatedBy.getUser().getRole() == Role.EMPLOYEE) {
-            if (assignment.getAssignee() == null || !assignment.getAssignee().getId().equals(updatedBy.getId())) {
-                throw new SecurityException("You are only allowed to update your own assigned work items.");
-            }
-        }
-
-        int oldProgress = assignment.getProgress() != null ? assignment.getProgress() : 0;
-        int nextProgress = newProgress;
-
-        // Progress change requires non-empty description/update note
-        if (nextProgress != oldProgress) {
-            if (updateNote == null || updateNote.trim().isEmpty()) {
-                throw new IllegalArgumentException("A description/update note is mandatory when changing progress.");
-            }
-
-            TaskAssignmentHistory history = new TaskAssignmentHistory(
-                    assignment,
-                    oldProgress,
-                    nextProgress,
-                    updateNote.trim(),
-                    updatedBy
-            );
-            taskAssignmentHistoryRepository.save(history);
-            assignment.addHistory(history);
-        }
-
-        assignment.setProgress(nextProgress);
-        if (nextProgress >= 100) {
-            assignment.setStatus("COMPLETED");
-        } else if (nextProgress == 0) {
-            assignment.setStatus("TODO");
-        } else if ("TODO".equalsIgnoreCase(assignment.getStatus())) {
-            assignment.setStatus("IN_PROGRESS");
-        }
-
-        TaskAssignment saved = taskAssignmentRepository.save(assignment);
-
-        if (task != null) {
-            recalculateTaskProgressFromAssignments(task);
-            taskRepository.save(task);
-        }
-
-        return saved;
-    }
-
     public void deleteAssignment(Long taskId, Long assignmentId) {
         Task task = getTask(taskId);
         if (task.isLocked()) {
-            throw new IllegalStateException("Task is approved and locked. Work items cannot be deleted.");
+            throw new IllegalStateException("Task is approved and locked. Subtasks cannot be deleted.");
         }
 
         TaskAssignment assignment = taskAssignmentRepository.findById(assignmentId)
-                .orElseThrow(() -> new IllegalArgumentException("Assignment not found: " + assignmentId));
+                .orElseThrow(() -> new IllegalArgumentException("Subtask not found: " + assignmentId));
 
         task.removeAssignment(assignment);
         taskAssignmentRepository.delete(assignment);
+        task.setWeeksRequired(Math.max(1, task.getAssignments().size()));
 
         recalculateTaskProgressFromAssignments(task);
         taskRepository.save(task);
@@ -607,272 +822,17 @@ public class TaskService {
         return taskAssignmentHistoryRepository.findByAssignmentIdOrderByCreatedAtDesc(assignmentId);
     }
 
-    public void recalculateTaskProgressFromAssignments(Task task) {
-        if (task == null || task.getAssignments() == null || task.getAssignments().isEmpty()) {
-            return;
-        }
-        if (task.isLocked()) {
-            return;
-        }
-
-        double total = 0;
-        for (TaskAssignment a : task.getAssignments()) {
-            int p = a.getProgress() != null ? a.getProgress() : ("COMPLETED".equalsIgnoreCase(a.getStatus()) || "VERIFIED".equalsIgnoreCase(a.getStatus()) ? 100 : 0);
-            total += p;
-        }
-
-        int avg = (int) Math.round(total / task.getAssignments().size());
-        avg = Math.max(0, Math.min(100, avg));
-        task.setProgress(avg);
-
-        if (avg >= 100 && !"APPROVED".equals(task.getStatus())) {
-            task.setStatus("READY_FOR_REVIEW");
-            if (task.getCompletedAt() == null) {
-                task.setCompletedAt(LocalDateTime.now());
-            }
-        } else if (avg > 0 && "TODO".equals(task.getStatus())) {
-            task.setStatus("IN_PROGRESS");
-        }
-    }
-
     // ============================================================
-    // OVERDUE WORK ITEM NOTIFICATIONS
+    // DELETE TASK
     // ============================================================
 
-    @Scheduled(fixedRate = 300000)
-    public int checkAndNotifyOverdueWorkItems() {
-        List<TaskAssignment> unnotified = taskAssignmentRepository.findByOverdueNotifiedFalseAndDeadlineIsNotNull();
-        if (unnotified.isEmpty()) {
-            return 0;
-        }
-
-        LocalDate today = LocalDate.now();
-        LocalTime nowTime = LocalTime.now();
-        List<Employee> admins = employeeRepository.findByUserRole(Role.ADMIN);
-        if (admins == null || admins.isEmpty()) {
-            return 0;
-        }
-
-        int count = 0;
-        for (TaskAssignment a : unnotified) {
-            if (a.getTask() == null || a.getTask().isLocked()) {
-                continue;
-            }
-            if (a.getProgress() != null && a.getProgress() >= 100) {
-                continue;
-            }
-            if ("COMPLETED".equalsIgnoreCase(a.getStatus()) || "VERIFIED".equalsIgnoreCase(a.getStatus())) {
-                continue;
-            }
-
-            boolean overdue = false;
-            if (a.getDeadline().isBefore(today)) {
-                overdue = true;
-            } else if (a.getDeadline().isEqual(today) && a.getDeadlineTime() != null && !a.getDeadlineTime().trim().isEmpty()) {
-                try {
-                    LocalTime t = LocalTime.parse(a.getDeadlineTime().trim());
-                    if (nowTime.isAfter(t)) {
-                        overdue = true;
-                    }
-                } catch (Exception ignored) {
-                }
-            }
-
-            if (overdue) {
-                String assigneeName = a.getAssignee() != null ?
-                        (a.getAssignee().getFirstName() + " " + (a.getAssignee().getLastName() != null ? a.getAssignee().getLastName() : "")).trim() :
-                        "Unassigned";
-                String taskTitle = a.getTask().getTitle();
-                String deadlineDisplay = (a.getDeadlineBs() != null && !a.getDeadlineBs().isEmpty()) ? (a.getDeadlineBs() + " BS") : a.getDeadline().toString();
-                String title = "Overdue Work Item: " + a.getTitle();
-                String message = "Work item '" + a.getTitle() + "' in task '" + taskTitle + "' assigned to " + assigneeName + " is overdue (Deadline: " + deadlineDisplay + ").";
-
-                for (Employee admin : admins) {
-                    notificationService.createNotification(admin, title, message, "TASK_OVERDUE");
-                }
-                a.setOverdueNotified(true);
-                taskAssignmentRepository.save(a);
-                count++;
-            }
-        }
-        return count;
-    }
-
-    // ============================================================
-    // DISCUSSION COMMENTS
-    // ============================================================
-
-    public TaskComment addComment(Long taskId, String authorName, String authorRole, String content) {
-        Task task = getTask(taskId);
-        if (content == null || content.trim().isEmpty()) {
-            throw new IllegalArgumentException("Comment content cannot be empty.");
-        }
-
-        TaskComment comment = new TaskComment(task, authorName != null ? authorName.trim() : "Anonymous",
-                authorRole != null ? authorRole.trim() : "EMPLOYEE", content.trim());
-
-        TaskComment saved = taskCommentRepository.save(comment);
-        task.getComments().add(saved);
-        taskRepository.save(task);
-        return saved;
-    }
-
-    // ============================================================
-    // START TASK
-    // ============================================================
-
-    public Task startTask(Long id, Employee employee) {
+    public void deleteTask(Long id) {
         Task task = getTask(id);
-        verifyEmployeeOwnership(task, employee);
-
-        if (task.isLocked()) {
-            throw new IllegalStateException("Approved and locked tasks cannot be started.");
-        }
-
-        task.setStatus("IN_PROGRESS");
-        if (task.getProgress() == null || task.getProgress() < 1) {
-            task.setProgress(1);
-        }
-        task.setUpdatedAt(LocalDateTime.now());
-        return taskRepository.save(task);
+        taskRepository.delete(task);
     }
 
     // ============================================================
-    // UPDATE PROGRESS
-    // ============================================================
-
-    public Task updateProgress(Long id, Employee employee, Integer progress) {
-        Task task = getTask(id);
-        verifyEmployeeOwnership(task, employee);
-
-        if (task.isLocked()) {
-            throw new IllegalStateException("Approved and locked tasks cannot be modified.");
-        }
-
-        if (progress == null || progress < 0 || progress > 100) {
-            throw new IllegalArgumentException("Progress must be between 0 and 100.");
-        }
-
-        task.setProgress(progress);
-        if (progress == 0) {
-            task.setStatus("TODO");
-        } else if (progress >= 100) {
-            task.setProgress(100);
-            task.setStatus("READY_FOR_REVIEW");
-            if (task.getCompletedAt() == null) task.setCompletedAt(LocalDateTime.now());
-        } else {
-            task.setStatus("IN_PROGRESS");
-        }
-
-        task.setUpdatedAt(LocalDateTime.now());
-        return taskRepository.save(task);
-    }
-
-    // ============================================================
-    // DRAG & DROP MOVE (EMPLOYEE)
-    // ============================================================
-
-    public Task moveTask(Long id, Employee employee, String newStatus) {
-        Task task = getTask(id);
-        verifyEmployeeOwnership(task, employee);
-
-        if (newStatus == null || newStatus.trim().isEmpty()) {
-            throw new IllegalArgumentException("Task status is required.");
-        }
-
-        String status = newStatus.trim().toUpperCase();
-        if (status.equals("UNDER_REVIEW")) status = "READY_FOR_REVIEW";
-
-        if (task.isLocked()) {
-            throw new IllegalStateException("Approved and locked tasks cannot be moved.");
-        }
-        if ("APPROVED".equals(status)) {
-            throw new SecurityException("Employees cannot approve tasks.");
-        }
-
-        if (!status.equals("TODO") && !status.equals("IN_PROGRESS") && !status.equals("READY_FOR_REVIEW")) {
-            throw new IllegalArgumentException("Invalid task status.");
-        }
-
-        if ("TODO".equals(status)) {
-            task.setStatus("TODO");
-            task.setProgress(0);
-            task.setCompletedAt(null);
-        } else if ("IN_PROGRESS".equals(status)) {
-            task.setStatus("IN_PROGRESS");
-            if (task.getProgress() == null || task.getProgress() <= 0 || task.getProgress() >= 100) {
-                task.setProgress(1);
-            }
-            task.setCompletedAt(null);
-        } else if ("READY_FOR_REVIEW".equals(status)) {
-            task.setProgress(100);
-            task.setStatus("READY_FOR_REVIEW");
-            if (task.getCompletedAt() == null) {
-                task.setCompletedAt(LocalDateTime.now());
-            }
-        }
-
-        task.setUpdatedAt(LocalDateTime.now());
-        return taskRepository.save(task);
-    }
-
-    // ============================================================
-    // DRAG & DROP MOVE (ADMIN)
-    // ============================================================
-
-    public Task moveTaskByAdmin(Long id, String newStatus) {
-        Task task = getTask(id);
-
-        if (newStatus == null || newStatus.trim().isEmpty()) {
-            throw new IllegalArgumentException("Task status is required.");
-        }
-
-        String status = newStatus.trim().toUpperCase();
-        if (status.equals("UNDER_REVIEW")) status = "READY_FOR_REVIEW";
-        if (status.equals("COMPLETED")) status = "APPROVED";
-
-        if (task.isLocked() && !"APPROVED".equals(status)) {
-            throw new IllegalStateException("Task is approved and locked. It cannot be moved through the normal board.");
-        }
-
-        if (!status.equals("TODO") && !status.equals("IN_PROGRESS") && !status.equals("READY_FOR_REVIEW") && !status.equals("APPROVED")) {
-            throw new IllegalArgumentException("Invalid task status: " + status);
-        }
-
-        if ("TODO".equals(status)) {
-            task.setStatus("TODO");
-            task.setProgress(0);
-            task.setCompletedAt(null);
-        } else if ("IN_PROGRESS".equals(status)) {
-            task.setStatus("IN_PROGRESS");
-            if (task.getProgress() == null || task.getProgress() <= 0 || task.getProgress() >= 100) {
-                task.setProgress(1);
-            }
-            task.setCompletedAt(null);
-        } else if ("READY_FOR_REVIEW".equals(status)) {
-            task.setStatus("READY_FOR_REVIEW");
-            task.setProgress(100);
-            if (task.getCompletedAt() == null) {
-                task.setCompletedAt(LocalDateTime.now());
-            }
-        } else if ("APPROVED".equals(status)) {
-            task.setStatus("APPROVED");
-            task.setLocked(true);
-            task.setProgress(100);
-            LocalDateTime now = LocalDateTime.now();
-            task.setReviewedAt(now);
-            task.setApprovedAt(now);
-            if (task.getCompletedAt() == null) {
-                task.setCompletedAt(now);
-            }
-        }
-
-        task.setUpdatedAt(LocalDateTime.now());
-        return taskRepository.save(task);
-    }
-
-    // ============================================================
-    // SUBMIT FOR REVIEW
+    // TASK REVIEW & SUBMISSION (PARENT TASK LEVEL)
     // ============================================================
 
     public Task submitForReview(Long id, Employee employee, String completionNote) {
@@ -880,170 +840,170 @@ public class TaskService {
         verifyEmployeeOwnership(task, employee);
 
         if (task.isLocked()) {
-            throw new IllegalStateException("This task is approved and locked.");
+            throw new IllegalStateException("Approved and locked tasks cannot be submitted again.");
         }
 
-        task.setProgress(100);
         task.setStatus("READY_FOR_REVIEW");
-        task.setCompletionNote(completionNote == null ? null : completionNote.trim());
+        task.setCompletionNote(completionNote);
         task.setCompletedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
-        return taskRepository.save(task);
-    }
 
-    // ============================================================
-    // APPROVE TASK
-    // ============================================================
+        Task saved = taskRepository.save(task);
 
-    public Task approveTask(Long id, String reviewNote) {
-        Task task = getTask(id);
-        if ("APPROVED".equals(task.getStatus()) && task.isLocked()) {
-            return task;
+        try {
+            notificationService.createAdminNotification(
+                    employee,
+                    "Task Submitted for Review",
+                    employee.getFirstName() + " " + employee.getLastName() + " submitted task: " + task.getTitle(),
+                    "TASK_REVIEW"
+            );
+        } catch (Exception ignored) {
         }
 
-        task.setStatus("APPROVED");
-        task.setLocked(true);
-        task.setProgress(100);
-        task.setReviewNote(reviewNote == null ? null : reviewNote.trim());
-        task.setReviewComment(reviewNote == null ? null : reviewNote.trim());
+        return saved;
+    }
+
+    public Task reviewTask(Long id, String action, String reviewNote) {
+        Task task = getTask(id);
+
+        if (task.isLocked()) {
+            throw new IllegalStateException("Task is already approved and locked.");
+        }
+
         LocalDateTime now = LocalDateTime.now();
         task.setReviewedAt(now);
-        task.setApprovedAt(now);
+        task.setReviewNote(reviewNote);
+        task.setReviewComment(reviewNote);
+
+        if ("APPROVE".equalsIgnoreCase(action)) {
+            task.setStatus("APPROVED");
+            task.setProgress(100);
+            task.setLocked(true);
+            task.setApprovedAt(now);
+
+            // Approve all child subtasks as well
+            for (TaskAssignment a : task.getAssignments()) {
+                a.setStatus("APPROVED");
+                a.setProgress(100);
+                a.setLocked(true);
+                a.setApprovedAt(now);
+                taskAssignmentRepository.save(a);
+            }
+
+            if (task.getEmployee() != null) {
+                try {
+                    notificationService.createNotification(
+                            task.getEmployee(),
+                            "Task Approved!",
+                            "Your task '" + task.getTitle() + "' has been approved by admin.",
+                            "TASK_APPROVED"
+                    );
+                } catch (Exception ignored) {
+                }
+            }
+        } else if ("REJECT".equalsIgnoreCase(action)) {
+            task.setStatus("IN_PROGRESS");
+            task.setLocked(false);
+
+            if (task.getEmployee() != null) {
+                try {
+                    notificationService.createNotification(
+                            task.getEmployee(),
+                            "Task Review: Changes Requested",
+                            "Your task '" + task.getTitle() + "' requires changes. Note: " + (reviewNote != null ? reviewNote : "None"),
+                            "TASK_REJECTED"
+                    );
+                } catch (Exception ignored) {
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Action must be APPROVE or REJECT.");
+        }
+
         task.setUpdatedAt(now);
-        if (task.getCompletedAt() == null) {
-            task.setCompletedAt(now);
-        }
         return taskRepository.save(task);
     }
 
     // ============================================================
-    // REJECT TASK
+    // COMMENTS
     // ============================================================
 
-    public Task rejectTask(Long id, String reviewNote) {
-        Task task = getTask(id);
-        if (task.isLocked()) {
-            throw new IllegalStateException("An approved and locked task cannot be rejected.");
+    public TaskComment addComment(Long taskId, String authorName, String authorRole, String commentText) {
+        Task task = getTask(taskId);
+        if (commentText == null || commentText.trim().isEmpty()) {
+            throw new IllegalArgumentException("Comment text cannot be empty.");
         }
 
-        task.setStatus("IN_PROGRESS");
-        if (task.getProgress() == null || task.getProgress() >= 100) {
-            task.setProgress(90);
+        TaskComment comment = new TaskComment(
+                task,
+                authorName != null ? authorName : "System",
+                authorRole != null ? authorRole : "EMPLOYEE",
+                commentText.trim()
+        );
+
+        TaskComment saved = taskCommentRepository.save(comment);
+        task.getComments().add(saved);
+        return saved;
+    }
+
+    public TaskComment addComment(Long taskId, Employee author, String commentText) {
+        String authorName = "Administrator";
+        String role = "ADMIN";
+        if (author != null) {
+            authorName = (author.getFirstName() + " " + (author.getLastName() != null ? author.getLastName() : "")).trim();
+            if (author.getUser() != null && author.getUser().getRole() != null) {
+                role = author.getUser().getRole().name();
+            }
         }
-
-        task.setReviewNote(reviewNote == null ? null : reviewNote.trim());
-        task.setReviewComment(reviewNote == null ? null : reviewNote.trim());
-        task.setReviewedAt(LocalDateTime.now());
-        task.setUpdatedAt(LocalDateTime.now());
-        return taskRepository.save(task);
-    }
-
-    // ============================================================
-    // DELETE TASK
-    // ============================================================
-
-    public void deleteTask(Long id) {
-        Task task = getTask(id);
-        if (task.isLocked()) {
-            throw new IllegalStateException("An approved and locked task cannot be deleted.");
-        }
-        taskRepository.delete(task);
-    }
-
-    // ============================================================
-    // COUNTS
-    // ============================================================
-
-    @Transactional(readOnly = true)
-    public long countEmployeeTasks(Employee employee) {
-        if (employee == null) return 0;
-        return taskRepository.countTasksForEmployee(employee);
+        return addComment(taskId, authorName, role, commentText);
     }
 
     @Transactional(readOnly = true)
-    public long countEmployeeTasksByStatus(Employee employee, String status) {
-        if (employee == null || status == null) return 0;
-        return taskRepository.countTasksForEmployeeAndStatus(employee, status.trim().toUpperCase());
-    }
-
-    @Transactional(readOnly = true)
-    public long countTasksByStatus(String status) {
-        if (status == null) return 0;
-        return taskRepository.countByStatus(status.trim().toUpperCase());
-    }
-
-    @Transactional(readOnly = true)
-    public long countTodoTasks() {
-        return countTasksByStatus("TODO");
-    }
-
-    @Transactional(readOnly = true)
-    public long countInProgressTasks() {
-        return countTasksByStatus("IN_PROGRESS");
-    }
-
-    @Transactional(readOnly = true)
-    public long countReadyForReviewTasks() {
-        return countTasksByStatus("READY_FOR_REVIEW");
-    }
-
-    @Transactional(readOnly = true)
-    public long countApprovedTasks() {
-        return countTasksByStatus("APPROVED");
-    }
-
-    // ============================================================
-    // VERIFY EMPLOYEE OWNERSHIP
-    // ============================================================
-
-    private void verifyEmployeeOwnership(Task task, Employee employee) {
-        if (employee == null || employee.getId() == null) {
-            throw new IllegalArgumentException("Employee is required.");
-        }
-
-        boolean isPrimary = task.getEmployee() != null && employee.getId().equals(task.getEmployee().getId());
-        boolean isAssignee = task.getAssignees() != null && task.getAssignees().stream()
-                .anyMatch(a -> a != null && employee.getId().equals(a.getId()));
-
-        if (!isPrimary && !isAssignee) {
-            throw new SecurityException("You are not authorized to modify this task.");
-        }
+    public List<TaskComment> getTaskComments(Long taskId) {
+        Task task = getTask(taskId);
+        return taskCommentRepository.findByTaskOrderByCreatedAtAsc(task);
     }
 
     // ============================================================
     // HELPERS
     // ============================================================
 
+    private String generateTaskCode() {
+        return "TSK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
     private String normalizePriority(String priority) {
-        if (priority == null || priority.trim().isEmpty()) {
-            return "MEDIUM";
-        }
-        String normalized = priority.trim().toUpperCase();
-        if (!normalized.equals("LOW") && !normalized.equals("MEDIUM") && !normalized.equals("HIGH") && !normalized.equals("URGENT")) {
-            return "MEDIUM";
-        }
-        return normalized;
+        if (priority == null) return "MEDIUM";
+        String p = priority.trim().toUpperCase();
+        return switch (p) {
+            case "LOW", "HIGH", "URGENT" -> p;
+            default -> "MEDIUM";
+        };
     }
 
     private String normalizeComplexity(String complexity) {
-        if (complexity == null || complexity.trim().isEmpty()) {
-            return "MEDIUM";
-        }
-        String normalized = complexity.trim().toUpperCase();
-        if (!normalized.equals("SMALL") && !normalized.equals("MEDIUM") && !normalized.equals("LARGE") && !normalized.equals("EPIC")) {
-            return "MEDIUM";
-        }
-        return normalized;
+        if (complexity == null) return "MEDIUM";
+        String c = complexity.trim().toUpperCase();
+        return switch (c) {
+            case "SMALL", "LARGE", "EPIC" -> c;
+            default -> "MEDIUM";
+        };
     }
 
-    private String generateTaskCode() {
-        String code;
-        do {
-            code = "TASK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-            final String generatedCode = code;
-            if (taskRepository.findAll().stream().noneMatch(task -> generatedCode.equals(task.getTaskCode()))) {
-                return generatedCode;
-            }
-        } while (true);
+    private void verifyEmployeeOwnership(Task task, Employee employee) {
+        if (employee == null) {
+            throw new SecurityException("Employee context is missing.");
+        }
+        boolean isPrimary = task.getEmployee() != null && employee.getId().equals(task.getEmployee().getId());
+        boolean isAssignee = task.getAssignees() != null && task.getAssignees().stream()
+                .anyMatch(a -> a != null && a.getId().equals(employee.getId()));
+        boolean isTeamLead = task.getTeamLeads() != null && task.getTeamLeads().stream()
+                .anyMatch(tl -> tl != null && tl.getId().equals(employee.getId()));
+        boolean isSubtaskAssignee = task.getAssignments() != null && task.getAssignments().stream()
+                .anyMatch(a -> a.getAssignee() != null && a.getAssignee().getId().equals(employee.getId()));
+
+        if (!isPrimary && !isAssignee && !isTeamLead && !isSubtaskAssignee) {
+            throw new SecurityException("You do not have permission to modify this task.");
+        }
     }
 }

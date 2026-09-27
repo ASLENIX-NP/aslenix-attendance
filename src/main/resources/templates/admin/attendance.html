@@ -506,17 +506,27 @@
         }
 
         .profile-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #ffffff;
             color: #ffffff;
-            display: grid;
-            place-items: center;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: .5px;
-            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1.5px solid #e0e7ff;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+            flex-shrink: 0;
+        }
+
+        .profile-avatar img,
+        .header-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
         }
 
         .profile-info {
@@ -1378,8 +1388,8 @@
                             id="profileButton"
                             aria-label="Open profile menu"
                             aria-expanded="false">
-                        <div class="profile-avatar">
-                            A
+                        <div class="profile-avatar admin-avatar" style="background: #ffffff !important;">
+                            <img th:src="@{/images/aslenix.png}" src="/images/aslenix.png" alt="ASLENIX Admin" class="header-avatar-img">
                         </div>
                         <div class="profile-info">
                             <div class="profile-name">Administrator</div>
@@ -1594,7 +1604,7 @@
                     </div>
 
                     <div>
-                        <button type="button" id="btnOpenDirectEditModal" class="btn-action-edit" style="padding: 8px 16px; font-size: 12.5px; background: var(--aslenix-gradient); color: #ffffff; border: none; border-radius: 10px; font-weight: 700; box-shadow: 0 4px 12px rgba(255, 10, 120, 0.25);">
+                        <button type="button" id="btnOpenDirectEditModal" class="btn-action-edit" style="padding: 8px 16px; font-size: 12.5px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; border: none; border-radius: 10px; font-weight: 700; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.22);">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -1952,12 +1962,60 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         notificationDropdownBody.innerHTML = notifications.map(item => `
-            <div style="padding: 12px 16px; border-bottom: 1px solid #f1f4f9; display: flex; flex-direction: column; gap: 4px; ${!item.read ? 'background: #fbfcfe;' : ''}">
+            <div class="notification-item${!item.read ? ' unread' : ''}" data-id="${item.id}" style="padding: 12px 16px; border-bottom: 1px solid #f1f4f9; display: flex; flex-direction: column; gap: 4px; cursor: ${!item.read ? 'pointer' : 'default'}; ${!item.read ? 'background: #fbfcfe;' : ''}">
                 <div style="font-size: 12.5px; font-weight: 750; color: #0f172a;">${item.title || 'Notification'}</div>
                 <div style="font-size: 11.5px; color: #5a667d;">${item.message || ''}</div>
-                <div style="font-size: 10px; color: #8a96aa; margin-top: 2px;">${item.createdAt ? (typeof convertAdToBsString === 'function' ? (convertAdToBsString(new Date(item.createdAt), 'DD MMM YYYY') + ' BS') : item.createdAt) : ''}</div>
+                <div style="font-size: 10px; color: #8a96aa; margin-top: 2px;">${item.time || (item.createdAt ? (typeof convertAdToBsString === 'function' ? (convertAdToBsString(new Date(item.createdAt), 'DD MMM YYYY') + ' BS') : item.createdAt) : '')}</div>
             </div>
         `).join('');
+
+        notificationDropdownBody.querySelectorAll('.notification-item.unread').forEach(el => {
+            el.addEventListener('click', function () {
+                markNotificationAsRead(el.getAttribute('data-id'), el);
+            });
+        });
+    }
+
+    function notifCsrfHeaders() {
+        const h = { 'Accept': 'application/json' };
+        const t = document.querySelector('meta[name="_csrf"]');
+        const n = document.querySelector('meta[name="_csrf_header"]');
+        if (t) h[n ? n.getAttribute('content') : 'X-CSRF-TOKEN'] = t.getAttribute('content');
+        return h;
+    }
+
+    async function markNotificationAsRead(id, item) {
+        if (id === null || id === undefined) return;
+        try {
+            const response = await fetch('/api/notifications/' + encodeURIComponent(id) + '/read', {
+                method: 'POST', headers: notifCsrfHeaders(), credentials: 'same-origin'
+            });
+            if (!response.ok) throw new Error('Failed to mark notification as read');
+            if (item) { item.classList.remove('unread'); item.style.background = ''; item.style.cursor = 'default'; }
+            await loadUnreadCount();
+        } catch (e) { console.error('Mark notification as read error:', e); }
+    }
+
+    async function markAllNotificationsAsRead() {
+        if (markAllReadButton) markAllReadButton.disabled = true;
+        try {
+            const response = await fetch('/api/notifications/read-all', {
+                method: 'POST', headers: notifCsrfHeaders(), credentials: 'same-origin'
+            });
+            if (!response.ok) throw new Error('Failed to mark all notifications as read');
+            updateBadge(0);
+            await loadNotifications();
+        } catch (e) {
+            console.error('Mark all notifications as read error:', e);
+            if (markAllReadButton) markAllReadButton.disabled = false;
+        }
+    }
+
+    if (markAllReadButton) {
+        markAllReadButton.addEventListener('click', function (event) {
+            event.stopPropagation();
+            markAllNotificationsAsRead();
+        });
     }
 
     notificationButton.addEventListener('click', function (event) {
@@ -2264,7 +2322,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
                 <button type="button" onclick="closeDirectEditModal()" style="padding: 10px 18px; border-radius: 10px; border: 1px solid #e2e8f0; background: #ffffff; color: #64748b; font-weight: 700; font-size: 13px; cursor: pointer;">Cancel</button>
-                <button type="submit" style="padding: 10px 22px; border-radius: 10px; border: none; background: var(--aslenix-gradient); color: #ffffff; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(255, 10, 120, 0.25);">Save Attendance</button>
+                <button type="submit" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.22);">Save Attendance</button>
             </div>
         </form>
     </div>

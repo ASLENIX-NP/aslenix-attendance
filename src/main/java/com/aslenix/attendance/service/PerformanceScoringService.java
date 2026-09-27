@@ -19,18 +19,15 @@ import java.util.List;
 /**
  * Employee of the Month scoring engine.
  *
- * The algorithm is intentionally modular: attendance scoring, task scoring and
- * ranking are separate steps, and every numeric rule lives in
- * {@link PerformanceSettings} so it can be changed from the admin panel without
- * touching this code.
- *
  * Final score = attendanceScore * attendanceWeight% + taskScore * taskWeight%,
  * always clamped to [0, 100].
+ *
+ * Task scoring is directly integrated with approved subtasks.
  */
 @Service
 public class PerformanceScoringService {
 
-    private static final List<String> COMPLETED_STATUSES = List.of("COMPLETED", "VERIFIED");
+    private static final List<String> COMPLETED_STATUSES = List.of("COMPLETED", "APPROVED", "VERIFIED");
 
     private final EmployeeRepository employeeRepository;
     private final AttendanceRepository attendanceRepository;
@@ -136,9 +133,7 @@ public class PerformanceScoringService {
             scoreRepository.deleteAll(existing);
             scoreRepository.flush();
         }
-        // Flush the winner delete before saving the new one: Hibernate orders
-        // inserts before deletes within a flush, which would otherwise violate
-        // the unique (eval_year, eval_month) constraint on re-evaluation.
+
         winnerRepository.findByEvalYearAndEvalMonth(year, month).ifPresent(w -> {
             winnerRepository.delete(w);
             winnerRepository.flush();
@@ -332,7 +327,6 @@ public class PerformanceScoringService {
                 daysDifference = 0;
                 outcome.tasksNoDeadline++;
             } else {
-                // Positive => completed early, negative => completed late.
                 daysDifference = ChronoUnit.DAYS.between(completedDate, deadline);
                 if (daysDifference > 0) {
                     result = "EARLY";
@@ -380,10 +374,14 @@ public class PerformanceScoringService {
     }
 
     /**
-     * Completion timestamp for a work item: the earliest history entry that
-     * reached 100% progress, falling back to the assignment's last update.
+     * Completion timestamp for a work item: if approvedAt is set, that is the official
+     * approved completion date. Otherwise, falls back to the earliest history entry
+     * that reached 100% progress, or last update.
      */
     private LocalDateTime resolveCompletionDate(TaskAssignment assignment) {
+        if (assignment.getApprovedAt() != null) {
+            return assignment.getApprovedAt();
+        }
         List<TaskAssignmentHistory> histories =
                 taskAssignmentHistoryRepository.findByAssignmentIdOrderByCreatedAtDesc(assignment.getId());
 
@@ -422,10 +420,6 @@ public class PerformanceScoringService {
         return s.getLargeCompleted() + s.getEpicCompleted();
     }
 
-    /**
-     * Records which criterion separated the winner from the runner-up.
-     * Returns "NONE" when the winner is the unique top scorer.
-     */
     private String resolveTieBreakerLabel(EmployeePerformanceScore top, EmployeePerformanceScore runnerUp) {
         if (runnerUp == null || notEqual(top.getFinalScore(), runnerUp.getFinalScore())) {
             return "NONE";
@@ -470,7 +464,6 @@ public class PerformanceScoringService {
                             + round(winner.getFinalScore()) + "/100).",
                     "EMPLOYEE_OF_THE_MONTH");
         } catch (Exception ignored) {
-            // Notifications are best-effort and must never fail the evaluation.
         }
     }
 

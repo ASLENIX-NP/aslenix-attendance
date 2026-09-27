@@ -56,6 +56,7 @@ body { background: radial-gradient(ellipse 75% 45% at 100% 0, rgba(152,85,255,.0
 .notification-button { width: 40px !important; height: 40px !important; border-radius: 11px !important; border: 1px solid #e7ebf3 !important; background: #ffffff !important; color: #55627a !important; box-shadow: 0 2px 8px rgba(25, 35, 65, 0.04) !important; }
 .notification-button:hover { color: var(--aslenix-purple) !important; border-color: #d8def0 !important; background: #fbfbfe !important; transform: translateY(-1px) !important; }
 .profile-avatar { width: 36px !important; height: 36px !important; border-radius: 50% !important; background: var(--aslenix-gradient) !important; color: #ffffff !important; font-size: 13px !important; font-weight: 800 !important; box-shadow: 0 4px 12px rgba(152, 85, 255, .18) !important; }
+.profile-avatar:has(img), .profile-avatar.admin-avatar, .sidebar-user-avatar:has(img), .sidebar-user-avatar.admin-avatar { background: #ffffff !important; border: 1.5px solid rgba(152, 85, 255, 0.25) !important; box-shadow: 0 2px 8px rgba(25, 35, 65, 0.08) !important; }
 .header-date { height: 35px !important; padding-left: 17px !important; border-left: 1px solid #e8edf4 !important; color: #59657b !important; font-size: 10px !important; font-weight: 600 !important; }
 .header-date svg { width: 15px !important; height: 15px !important; stroke-width: 1.7 !important; }
 .search-box, .filter-select, .form-input, .form-select, .form-textarea, .device-input, .review-input, .scan-text-input, input:not([type="hidden"]), select, textarea { background: #fff !important; border-color: var(--asl-line) !important; color: var(--asl-ink) !important; }
@@ -92,21 +93,228 @@ tbody tr:hover { background: #f8fafc !important; }
     transform: translateY(-1px);
 }
 
-/* duplicate .check-out-button block removed */
-    background: #ff4d4d !important;
-    color: #fff !important;
-}
-
-.check-out-button:hover {
-    filter: saturate(1.08) brightness(.97);
-    transform: translateY(-1px);
-}
 .btn, .button, .submit-btn, .save-btn, .save-button, .leave-button, .download-button, .qr-button, .action-btn, .btn-add-employee, .btn-add-assignment, .btn-assign-task, .btn-save-modal, .btn-action-confirm, .btn-submit-review, .btn-process-scan, .btn-camera-scan, .btn-update-progress, .btn-update-wi-progress, .preset-primary, .btn-action-edit { background: var(--aslenix-gradient) !important; color: #fff !important; border-color: transparent !important; box-shadow: 0 7px 16px rgba(255,77,157,.18) !important; }
 .btn:hover, .button:hover, .submit-btn:hover, .save-btn:hover, .save-button:hover, .leave-button:hover, .download-button:hover, .qr-button:hover, .action-btn:hover, .btn-add-employee:hover, .btn-add-assignment:hover, .btn-assign-task:hover, .btn-save-modal:hover, .btn-action-confirm:hover, .btn-submit-review:hover, .btn-process-scan:hover, .btn-camera-scan:hover, .btn-update-progress:hover, .btn-update-wi-progress:hover, .preset-primary:hover, .btn-action-edit:hover { filter: saturate(1.08) brightness(.97); transform: translateY(-1px); }
 .btn:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid rgba(66,142,255,.35) !important; outline-offset: 2px !important; }
 .btn:disabled, button:disabled, .disabled { opacity: .48 !important; box-shadow: none !important; }
 .check-in-button { background: linear-gradient(120deg, #16775b, #1fa778) !important; }
 .btn-cancel-modal, .cancel-btn, .back-btn, .btn-action-cancel { background: #fff !important; color: var(--asl-ink-soft) !important; border: 1px solid var(--asl-line) !important; box-shadow: none !important; }
+
+/* =========================================================
+   ADMIN PORTAL HIGHLIGHTED BUTTONS (SOFT ELEGANT INDIGO STYLE)
+   ========================================================= */
+.admin-dashboard .btn-primary,
+.admin-dashboard .btn-assign-task,
+.admin-dashboard .btn-add-employee,
+.admin-dashboard .btn-add-assignment,
+.admin-dashboard .btn-save-modal,
+.admin-dashboard .save-btn,
+.admin-dashboard .save-button,
+.admin-dashboard .submit-btn,
+.admin-dashboard .action-btn,
+.admin-dashboard .btn-action-confirm,
+.admin-dashboard .btn-process-scan,
+.admin-dashboard .btn-camera-scan,
+.admin-dashboard .btn-check-reader,
+.admin-dashboard .btn-update-progress,
+.admin-dashboard .btn-update-wi-progress,
+.admin-dashboard .btn-submit-review,
+.admin-dashboard .preset-primary,
+.admin-dashboard .preset-save-ajax,
+.admin-dashboard .btn-action-edit,
+.admin-dashboard .filter-button,
+.admin-dashboard #btnOpenDirectEditModal {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    background-color: #4f46e5 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.22) !important;
+    transition: all 0.2s ease !important;
+}
+
+.admin-dashboard .btn-primary:hover,
+.admin-dashboard .btn-assign-task:hover,
+.admin-dashboard .btn-add-employee:hover,
+.admin-dashboard .btn-add-assignment:hover,
+.admin-dashboard .btn-save-modal:hover,
+.admin-dashboard .save-btn:hover,
+.admin-dashboard .save-button:hover,
+.admin-dashboard .submit-btn:hover,
+.admin-dashboard .action-btn:hover,
+.admin-dashboard .btn-action-confirm:hover,
+.admin-dashboard .btn-process-scan:hover,
+.admin-dashboard .btn-camera-scan:hover,
+.admin-dashboard .btn-check-reader:hover,
+.admin-dashboard .btn-update-progress:hover,
+.admin-dashboard .btn-update-wi-progress:hover,
+.admin-dashboard .btn-submit-review:hover,
+.admin-dashboard .preset-primary:hover,
+.admin-dashboard .preset-save-ajax:hover,
+.admin-dashboard .btn-action-edit:hover,
+.admin-dashboard .filter-button:hover,
+.admin-dashboard #btnOpenDirectEditModal:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+    background-color: #4338ca !important;
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.32) !important;
+    transform: translateY(-1px) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Ensure all text and icons inside admin highlighted buttons are pure white */
+.admin-dashboard .btn-primary *,
+.admin-dashboard .btn-assign-task *,
+.admin-dashboard .btn-add-employee *,
+.admin-dashboard .btn-add-assignment *,
+.admin-dashboard .btn-save-modal *,
+.admin-dashboard .save-btn *,
+.admin-dashboard .save-button *,
+.admin-dashboard .submit-btn *,
+.admin-dashboard .action-btn *,
+.admin-dashboard .btn-action-confirm *,
+.admin-dashboard .btn-process-scan *,
+.admin-dashboard .btn-camera-scan *,
+.admin-dashboard .btn-check-reader *,
+.admin-dashboard .btn-update-progress *,
+.admin-dashboard .btn-update-wi-progress *,
+.admin-dashboard .btn-submit-review *,
+.admin-dashboard .preset-primary *,
+.admin-dashboard .preset-save-ajax *,
+.admin-dashboard .btn-action-edit *,
+.admin-dashboard .filter-button *,
+.admin-dashboard #btnOpenDirectEditModal * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+.admin-dashboard .btn-primary svg,
+.admin-dashboard .btn-assign-task svg,
+.admin-dashboard .btn-add-employee svg,
+.admin-dashboard .btn-add-assignment svg,
+.admin-dashboard .btn-save-modal svg,
+.admin-dashboard .save-btn svg,
+.admin-dashboard .save-button svg,
+.admin-dashboard .submit-btn svg,
+.admin-dashboard .action-btn svg,
+.admin-dashboard .btn-action-confirm svg,
+.admin-dashboard .btn-process-scan svg,
+.admin-dashboard .btn-camera-scan svg,
+.admin-dashboard .btn-check-reader svg,
+.admin-dashboard .btn-update-progress svg,
+.admin-dashboard .btn-update-wi-progress svg,
+.admin-dashboard .btn-submit-review svg,
+.admin-dashboard .preset-primary svg,
+.admin-dashboard .preset-save-ajax svg,
+.admin-dashboard .btn-action-edit svg,
+.admin-dashboard .filter-button svg,
+.admin-dashboard #btnOpenDirectEditModal svg {
+    stroke: #ffffff !important;
+    color: #ffffff !important;
+}
+
+/* Preserve distinct functional & semantic buttons on admin side */
+.admin-dashboard .btn-approve,
+.admin-dashboard .btn-action-approve,
+.admin-dashboard .btn-approve-subtask {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.22) !important;
+}
+.admin-dashboard .btn-approve *,
+.admin-dashboard .btn-action-approve *,
+.admin-dashboard .btn-approve-subtask * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+.admin-dashboard .btn-approve:hover,
+.admin-dashboard .btn-action-approve:hover,
+.admin-dashboard .btn-approve-subtask:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+.admin-dashboard .btn-reject,
+.admin-dashboard .btn-action-reject,
+.admin-dashboard .btn-decline-subtask,
+.admin-dashboard .btn-delete,
+.admin-dashboard .btn-delete-task-modal,
+.admin-dashboard .qr-btn-delete,
+.admin-dashboard .btn-disconnect {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.22) !important;
+}
+.admin-dashboard .btn-reject *,
+.admin-dashboard .btn-action-reject *,
+.admin-dashboard .btn-decline-subtask *,
+.admin-dashboard .btn-delete *,
+.admin-dashboard .btn-delete-task-modal *,
+.admin-dashboard .qr-btn-delete *,
+.admin-dashboard .btn-disconnect * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+.admin-dashboard .btn-reject:hover,
+.admin-dashboard .btn-action-reject:hover,
+.admin-dashboard .btn-decline-subtask:hover,
+.admin-dashboard .btn-delete:hover,
+.admin-dashboard .btn-delete-task-modal:hover,
+.admin-dashboard .qr-btn-delete:hover,
+.admin-dashboard .btn-disconnect:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+.admin-dashboard .btn-cancel-modal,
+.admin-dashboard .cancel-btn,
+.admin-dashboard .back-btn,
+.admin-dashboard .btn-action-cancel,
+.admin-dashboard .btn-ghost {
+    background: #ffffff !important;
+    color: #64748b !important;
+    -webkit-text-fill-color: #64748b !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+}
+.admin-dashboard .btn-cancel-modal *,
+.admin-dashboard .cancel-btn *,
+.admin-dashboard .back-btn *,
+.admin-dashboard .btn-action-cancel *,
+.admin-dashboard .btn-ghost * {
+    color: #64748b !important;
+    -webkit-text-fill-color: #64748b !important;
+}
+.admin-dashboard .btn-cancel-modal:hover,
+.admin-dashboard .cancel-btn:hover,
+.admin-dashboard .back-btn:hover,
+.admin-dashboard .btn-action-cancel:hover,
+.admin-dashboard .btn-ghost:hover {
+    background: #f8fafc !important;
+    color: #334155 !important;
+    -webkit-text-fill-color: #334155 !important;
+    border-color: #94a3b8 !important;
+}
+
+.admin-dashboard .btn-milestone {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+}
+.admin-dashboard .btn-milestone:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
+}
+
 
 /* State language: neutral slate and soft blue/green/rose */
 .badge, .status, .status-badge, .status-pill, .tag-pill, .priority-badge, .attendance-action-status { border-radius: 999px !important; }
@@ -136,14 +344,15 @@ tbody tr:hover { background: #f8fafc !important; }
   box-shadow: 0 4px 10px rgba(152, 85, 255, 0.25) !important;
 }
 
-/* Employee photo & avatar styling */
+/* Admin & Employee photo & avatar styling */
 .profile-avatar,
 .avatar,
 .employee-avatar,
 .employee-avatar-circle,
 .emp-avatar-circle,
 .assignee-avatar,
-.qr-avatar-circle {
+.qr-avatar-circle,
+.sidebar-user-avatar {
   position: relative !important;
   overflow: hidden !important;
   display: flex !important;
@@ -159,7 +368,8 @@ tbody tr:hover { background: #f8fafc !important; }
 .assignee-avatar img,
 .qr-avatar-circle img,
 .qr-avatar-img,
-.header-avatar-img {
+.header-avatar-img,
+.sidebar-user-avatar img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;

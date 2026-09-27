@@ -90,9 +90,13 @@ button, input, select, textarea { font-family: inherit; }
     border-radius: 12px; border: 1px solid #e7ebf3; background: #fff; cursor: pointer;
 }
 .profile-avatar {
-    width: 32px; height: 32px; border-radius: 9px;
-    background: linear-gradient(135deg,#4f46e5,#6366f1); color: #fff;
-    display: grid; place-items: center; font-size: 13px; font-weight: 800;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #ffffff; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;
+    overflow: hidden; border: 1.5px solid #e0e7ff; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+}
+.profile-avatar img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;
 }
 .profile-name { color: #0f172a; font-size: 12.5px; font-weight: 800; }
 .profile-role { color: #8b97ac; font-size: 10.5px; font-weight: 600; }
@@ -300,10 +304,11 @@ tbody tr:hover { background: #fbfcfe; }
 }
 .profile:hover { border-color: #d8def0; background: #fbfbfe; box-shadow: 0 4px 14px rgba(25, 35, 65, 0.07); }
 .profile-avatar {
-    width: 32px; height: 32px; border-radius: 9px;
-    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color: #ffffff;
-    display: grid; place-items: center; font-size: 13px; font-weight: 800; letter-spacing: .5px;
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #ffffff; color: #ffffff;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; letter-spacing: .5px;
+    overflow: hidden; border: 1.5px solid #e0e7ff;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
 }
 .profile-info { text-align: left; }
 .profile-name { color: #0f172a; font-size: 12.5px; font-weight: 800; line-height: 1.2; }

@@ -7,6 +7,7 @@ import com.aslenix.attendance.entity.User;
 import com.aslenix.attendance.repository.DepartmentRepository;
 import com.aslenix.attendance.repository.EmployeeRepository;
 import com.aslenix.attendance.repository.UserRepository;
+import com.aslenix.attendance.service.EmployeeDeletionService;
 import com.aslenix.attendance.service.FileUploadService;
 import com.aslenix.attendance.service.QrCodeService;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -30,6 +32,7 @@ public class EmployeeController {
     private final PasswordEncoder passwordEncoder;
     private final QrCodeService qrCodeService;
     private final FileUploadService fileUploadService;
+    private final EmployeeDeletionService employeeDeletionService;
 
     public EmployeeController(
             EmployeeRepository employeeRepository,
@@ -37,7 +40,8 @@ public class EmployeeController {
             DepartmentRepository departmentRepository,
             PasswordEncoder passwordEncoder,
             QrCodeService qrCodeService,
-            FileUploadService fileUploadService) {
+            FileUploadService fileUploadService,
+            EmployeeDeletionService employeeDeletionService) {
 
         this.employeeRepository = employeeRepository;
         this.userRepository = userRepository;
@@ -45,6 +49,7 @@ public class EmployeeController {
         this.passwordEncoder = passwordEncoder;
         this.qrCodeService = qrCodeService;
         this.fileUploadService = fileUploadService;
+        this.employeeDeletionService = employeeDeletionService;
     }
 
     // =========================
@@ -462,6 +467,32 @@ public class EmployeeController {
         }
 
         employeeRepository.save(employee);
+
+        return "redirect:/admin/employees";
+    }
+
+    // =========================
+    // DELETE EMPLOYEE
+    // =========================
+
+    @PostMapping("/delete/{id}")
+    public String deleteEmployee(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+
+        boolean deleted = employeeDeletionService.deleteEmployee(id);
+
+        if (deleted) {
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Employee deleted permanently."
+            );
+        } else {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Employee not found."
+            );
+        }
 
         return "redirect:/admin/employees";
     }

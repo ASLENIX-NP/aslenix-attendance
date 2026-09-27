@@ -17,12 +17,17 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findAllByOrderByCreatedAtDesc();
 
     // ============================================================
-    // EMPLOYEE TASKS (Single & Multi-Assignee)
+    // EMPLOYEE TASKS (Assignees, Team Leads, Primary, or Subtask Assignee)
     // ============================================================
 
     List<Task> findByEmployeeOrderByCreatedAtDesc(Employee employee);
 
-    @Query("SELECT DISTINCT t FROM Task t LEFT JOIN t.assignees a WHERE t.employee = :employee OR a = :employee ORDER BY t.createdAt DESC")
+    @Query("SELECT DISTINCT t FROM Task t " +
+            "LEFT JOIN t.assignees a " +
+            "LEFT JOIN t.teamLeads tl " +
+            "LEFT JOIN t.assignments sub " +
+            "WHERE t.employee = :employee OR a = :employee OR tl = :employee OR sub.assignee = :employee " +
+            "ORDER BY t.createdAt DESC")
     List<Task> findTasksForEmployee(@Param("employee") Employee employee);
 
     // ============================================================
@@ -31,7 +36,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     long countByEmployee(Employee employee);
 
-    @Query("SELECT COUNT(DISTINCT t) FROM Task t LEFT JOIN t.assignees a WHERE t.employee = :employee OR a = :employee")
+    @Query("SELECT COUNT(DISTINCT t) FROM Task t " +
+            "LEFT JOIN t.assignees a " +
+            "LEFT JOIN t.teamLeads tl " +
+            "LEFT JOIN t.assignments sub " +
+            "WHERE t.employee = :employee OR a = :employee OR tl = :employee OR sub.assignee = :employee")
     long countTasksForEmployee(@Param("employee") Employee employee);
 
     // ============================================================
@@ -40,7 +49,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     long countByEmployeeAndStatus(Employee employee, String status);
 
-    @Query("SELECT COUNT(DISTINCT t) FROM Task t LEFT JOIN t.assignees a WHERE (t.employee = :employee OR a = :employee) AND UPPER(t.status) = UPPER(:status)")
+    @Query("SELECT COUNT(DISTINCT t) FROM Task t " +
+            "LEFT JOIN t.assignees a " +
+            "LEFT JOIN t.teamLeads tl " +
+            "LEFT JOIN t.assignments sub " +
+            "WHERE (t.employee = :employee OR a = :employee OR tl = :employee OR sub.assignee = :employee) AND UPPER(t.status) = UPPER(:status)")
     long countTasksForEmployeeAndStatus(@Param("employee") Employee employee, @Param("status") String status);
 
     // ============================================================
