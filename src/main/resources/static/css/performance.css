@@ -437,9 +437,11 @@ tbody tr:hover { background: #fbfcfe; }
 
 @media (max-width: 1200px) { .perf-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 @media (max-width: 850px) {
+    .header-date { display: none !important; }
     .profile-info { display: none; }
 }
 @media (max-width: 680px) {
+    .header-date { display: none !important; }
     .sidebar-menu { display: flex !important; flex-direction: column !important; }
     main { padding: 24px 18px 40px; }
     .page-header { flex-direction: column; align-items: flex-start; }

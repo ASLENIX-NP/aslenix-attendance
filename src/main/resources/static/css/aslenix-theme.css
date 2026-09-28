@@ -1153,6 +1153,10 @@ button[type="submit"]:active, input[type="submit"]:active {
         gap: 12px !important;
     }
 
+    .header-date {
+        display: none !important;
+    }
+
     /* Lock body scroll when mobile drawer is open */
     body.sidebar-open {
         overflow: hidden !important;
