@@ -1138,18 +1138,27 @@ button[type="submit"]:active, input[type="submit"]:active {
     /* 7. Header alignment on mobile */
     .top-header {
         display: flex !important;
+        flex-direction: row !important;
         align-items: center !important;
         justify-content: space-between !important;
+        position: sticky !important;
+        top: 0 !important;
+        height: 64px !important;
+        min-height: 64px !important;
         padding: 0 16px !important;
         width: 100% !important;
         left: 0 !important;
         gap: 12px !important;
+        z-index: 1000 !important;
+        box-sizing: border-box !important;
     }
 
     .header-right {
         margin-left: auto !important;
         display: flex !important;
+        flex-direction: row !important;
         align-items: center !important;
+        justify-content: flex-end !important;
         gap: 12px !important;
     }
 
