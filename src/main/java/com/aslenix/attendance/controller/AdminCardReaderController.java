@@ -185,7 +185,7 @@ public class AdminCardReaderController {
         empData.put("id", employee.getId());
         empData.put("employeeCode", employee.getEmployeeCode());
         empData.put("fullName", (employee.getFirstName() != null ? employee.getFirstName() : "") + " " + (employee.getLastName() != null ? employee.getLastName() : "").trim());
-        empData.put("role", (employee.getPosition() != null && !employee.getPosition().isBlank()) ? employee.getPosition() : "Full stack intern");
+        empData.put("role", (employee.getPosition() != null && !employee.getPosition().isBlank()) ? employee.getPosition() : "Team Member");
         empData.put("department", employee.getDepartment() != null ? employee.getDepartment().getName() : "Development");
         empData.put("joinDate", employee.getJoiningDate() != null ? employee.getJoiningDate().format(DATE_FMT) : "28 Jul 2026");
         empData.put("status", employee.isEnabled() ? "Active" : "Disabled");

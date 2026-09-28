@@ -60,6 +60,38 @@ public class EmployeeCodeAndDepartmentTest {
     }
 
     @Test
+    void testRemovalOfFullStackAndHrDepartments() {
+        // Explicitly create legacy Full Stack and HR departments to simulate existing legacy DB
+        departmentRepository.findByName("Full Stack").orElseGet(() -> {
+            Department d = new Department();
+            d.setName("Full Stack");
+            d.setActive(true);
+            return departmentRepository.save(d);
+        });
+
+        departmentRepository.findByName("HR").orElseGet(() -> {
+            Department d = new Department();
+            d.setName("HR");
+            d.setActive(true);
+            return departmentRepository.save(d);
+        });
+
+        // Verify findAvailableDepartments excludes them
+        java.util.List<Department> available = departmentRepository.findAvailableDepartments();
+        boolean hasFullStack = available.stream().anyMatch(d -> d.getName().equalsIgnoreCase("Full Stack"));
+        boolean hasHr = available.stream().anyMatch(d -> d.getName().equalsIgnoreCase("HR"));
+        assertFalse(hasFullStack, "Available departments must not include Full Stack");
+        assertFalse(hasHr, "Available departments must not include HR");
+
+        // Run cleanup
+        dataInitializer.cleanupDeprecatedDepartments();
+
+        // Verify they are removed or deactivated
+        departmentRepository.findByName("Full Stack").ifPresent(d -> assertFalse(d.isActive()));
+        departmentRepository.findByName("HR").ifPresent(d -> assertFalse(d.isActive()));
+    }
+
+    @Test
     void testStandardDepartmentsAndAbbreviations() {
         Department fe = departmentRepository.findByName("Frontend").orElseThrow();
         assertEquals("FE", fe.getEffectiveAbbreviation());

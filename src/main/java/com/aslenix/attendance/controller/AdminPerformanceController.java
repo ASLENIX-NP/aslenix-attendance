@@ -107,7 +107,7 @@ public class AdminPerformanceController {
         model.addAttribute("selectedMonthLabel", monthLabel(selYear, selMonth));
         model.addAttribute("months", buildMonthOptions(current));
         model.addAttribute("employees", employeeRepository.findAllByOrderByFirstNameAsc());
-        model.addAttribute("departments", departmentRepository.findAll());
+        model.addAttribute("departments", departmentRepository.findAvailableDepartments());
         model.addAttribute("selectedEmployeeId", employeeId);
         model.addAttribute("selectedDepartmentId", departmentId);
         model.addAttribute("settings", settingsService.getSettings());

@@ -174,7 +174,7 @@ public class EmployeeCodeService {
         set.add("DM");
 
         try {
-            List<Department> departments = departmentRepository.findAll();
+            List<Department> departments = departmentRepository.findAvailableDepartments();
             for (Department d : departments) {
                 if (d.getEffectiveAbbreviation() != null) {
                     set.add(d.getEffectiveAbbreviation());

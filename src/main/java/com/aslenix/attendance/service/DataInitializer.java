@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -83,6 +84,22 @@ public class DataInitializer implements CommandLineRunner {
 
         // Initialize standard departments with abbreviations
         initializeDepartments();
+
+        // Safely remove deprecated departments (Full Stack, HR)
+        try {
+            jdbcTemplate.execute("UPDATE employees SET department_id = (SELECT id FROM departments WHERE name = 'Backend' LIMIT 1) WHERE department_id IN (SELECT id FROM (SELECT id FROM departments WHERE LOWER(name) IN ('full stack', 'fullstack', 'full-stack')) AS tmp)");
+        } catch (Exception ignored) {
+        }
+        try {
+            jdbcTemplate.execute("UPDATE employees SET department_id = (SELECT id FROM departments WHERE name = 'Administration' LIMIT 1) WHERE department_id IN (SELECT id FROM (SELECT id FROM departments WHERE LOWER(name) = 'hr') AS tmp)");
+        } catch (Exception ignored) {
+        }
+        try {
+            jdbcTemplate.execute("DELETE FROM departments WHERE LOWER(name) IN ('full stack', 'hr', 'fullstack', 'full-stack')");
+        } catch (Exception ignored) {
+        }
+
+        cleanupDeprecatedDepartments();
 
         // Check for CLI argument-based initial admin provisioning
         String cliUsername = null;
@@ -214,5 +231,33 @@ public class DataInitializer implements CommandLineRunner {
         });
         dept.setAbbreviation(abbreviation);
         departmentRepository.save(dept);
+    }
+
+    public void cleanupDeprecatedDepartments() {
+        Department backend = departmentRepository.findByName("Backend").orElse(null);
+        Department administration = departmentRepository.findByName("Administration").orElse(null);
+
+        removeDepartmentSafely("Full Stack", backend);
+        removeDepartmentSafely("HR", administration);
+        removeDepartmentSafely("Fullstack", backend);
+        removeDepartmentSafely("Full-Stack", backend);
+    }
+
+    private void removeDepartmentSafely(String name, Department fallback) {
+        departmentRepository.findByName(name).ifPresent(dept -> {
+            try {
+                List<Employee> allEmployees = employeeRepository.findAll();
+                for (Employee emp : allEmployees) {
+                    if (emp.getDepartment() != null && emp.getDepartment().getId().equals(dept.getId())) {
+                        emp.setDepartment(fallback);
+                        employeeRepository.save(emp);
+                    }
+                }
+                departmentRepository.delete(dept);
+            } catch (Exception e) {
+                dept.setActive(false);
+                departmentRepository.save(dept);
+            }
+        });
     }
 }

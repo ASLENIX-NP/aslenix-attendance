@@ -3,6 +3,9 @@ package com.aslenix.attendance.repository;
 import com.aslenix.attendance.entity.Department;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 import java.util.Optional;
 
 public interface DepartmentRepository
@@ -11,4 +14,7 @@ public interface DepartmentRepository
     Optional<Department> findByName(String name);
 
     boolean existsByName(String name);
+
+    @Query("SELECT d FROM Department d WHERE d.active = true AND LOWER(d.name) NOT IN ('full stack', 'hr', 'fullstack', 'full-stack') ORDER BY d.id ASC")
+    List<Department> findAvailableDepartments();
 }

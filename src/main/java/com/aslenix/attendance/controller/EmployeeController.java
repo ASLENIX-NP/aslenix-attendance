@@ -69,7 +69,7 @@ public class EmployeeController {
 
         model.addAttribute(
                 "departments",
-                departmentRepository.findAll()
+                departmentRepository.findAvailableDepartments()
         );
 
         return "admin/employees";
@@ -114,7 +114,7 @@ public class EmployeeController {
 
         model.addAttribute(
                 "departments",
-                departmentRepository.findAll()
+                departmentRepository.findAvailableDepartments()
         );
 
         model.addAttribute(
@@ -295,7 +295,7 @@ public class EmployeeController {
 
         model.addAttribute(
                 "departments",
-                departmentRepository.findAll()
+                departmentRepository.findAvailableDepartments()
         );
 
         return "admin/edit-employee";
