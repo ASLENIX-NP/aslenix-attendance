@@ -1,5 +1,6 @@
 package com.aslenix.attendance.controller;
-
+ 
+import com.aslenix.attendance.entity.Role;
 import com.aslenix.attendance.entity.User;
 import com.aslenix.attendance.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,9 @@ public class LoginController {
 
     @GetMapping("/login")
     public String login() {
+        if (!userRepository.existsByRole(Role.ADMIN)) {
+            return "redirect:/setup";
+        }
         return "login";
     }
 
@@ -37,6 +41,9 @@ public class LoginController {
         if (authentication == null ||
                 !authentication.isAuthenticated()) {
 
+            if (!userRepository.existsByRole(Role.ADMIN)) {
+                return "redirect:/setup";
+            }
             return "redirect:/login";
         }
 

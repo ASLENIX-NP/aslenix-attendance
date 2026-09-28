@@ -243,6 +243,10 @@
         You have been logged out successfully.
     </div>
 
+    <div th:if="${param.setup}" class="message logout">
+        Initial Super Admin account created successfully! Please sign in.
+    </div>
+
     <form method="post" action="/login">
 
     <!-- CSRF protection -->
