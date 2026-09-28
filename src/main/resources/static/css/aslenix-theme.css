@@ -1006,6 +1006,35 @@ button[type="submit"]:active, input[type="submit"]:active {
         box-shadow: 12px 0 48px rgba(15, 23, 42, 0.30) !important;
     }
 
+    /* 3.1 Force sidebar menu into a single-column vertical list on mobile */
+    body .sidebar .sidebar-menu,
+    .admin-dashboard .sidebar-menu,
+    .sidebar .sidebar-menu,
+    .sidebar-menu {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: none !important;
+        gap: 5px !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    body .sidebar .sidebar-link,
+    .admin-dashboard .sidebar-link,
+    .sidebar .sidebar-link,
+    .sidebar-link {
+        display: flex !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    body .sidebar .sidebar-bottom,
+    .admin-dashboard .sidebar-bottom,
+    .sidebar .sidebar-bottom {
+        display: block !important;
+        margin-top: auto !important;
+    }
+
     /* 4. Backdrop overlay behind sliding drawer */
     .sidebar-backdrop {
         display: block !important;

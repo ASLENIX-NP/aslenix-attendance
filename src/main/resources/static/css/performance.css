@@ -437,17 +437,10 @@ tbody tr:hover { background: #fbfcfe; }
 
 @media (max-width: 1200px) { .perf-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 @media (max-width: 850px) {
-    .sidebar { width: 210px; }
-    .main-area { width: calc(100% - 210px); margin-left: 210px; }
-    .top-header { padding: 0 20px; }
     .profile-info { display: none; }
 }
 @media (max-width: 680px) {
-    .app-layout { display: block; }
-    .sidebar { position: relative; width: 100%; height: auto; padding: 15px; border-right: none; border-bottom: 1px solid #e8edf6; }
-    .main-area { width: 100%; margin-left: 0; }
-    .sidebar-menu { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 5px; }
-    .sidebar-bottom { display: none; }
+    .sidebar-menu { display: flex !important; flex-direction: column !important; }
     main { padding: 24px 18px 40px; }
     .page-header { flex-direction: column; align-items: flex-start; }
     .perf-grid { grid-template-columns: 1fr; }
