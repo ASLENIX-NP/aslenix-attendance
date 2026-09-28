@@ -436,6 +436,18 @@
         <p class="subtitle">Update the employee profile and department assignment details below.</p>
     </div>
 
+    <!-- FLASH & ERROR BANNERS -->
+    <div th:if="${errorMessage != null}" class="error-alert" style="margin-bottom: 20px; padding: 12px 16px; border-radius: 10px; background: #fee2e2; border: 1px solid #fda4af; color: #b91c1c; font-size: 13px; font-weight: 650;" th:text="${errorMessage}"></div>
+    <div th:if="${param.error != null and param.error[0] == 'code'}" class="error-alert" style="margin-bottom: 20px; padding: 12px 16px; border-radius: 10px; background: #fee2e2; border: 1px solid #fda4af; color: #b91c1c; font-size: 13px; font-weight: 650;">
+        Employee code already exists.
+    </div>
+    <div th:if="${param.error != null and param.error[0] == 'email'}" class="error-alert" style="margin-bottom: 20px; padding: 12px 16px; border-radius: 10px; background: #fee2e2; border: 1px solid #fda4af; color: #b91c1c; font-size: 13px; font-weight: 650;">
+        Work email already exists.
+    </div>
+    <div th:if="${param.error != null and param.error[0] == 'password_length'}" class="error-alert" style="margin-bottom: 20px; padding: 12px 16px; border-radius: 10px; background: #fee2e2; border: 1px solid #fda4af; color: #b91c1c; font-size: 13px; font-weight: 650;">
+        Password must be at least 6 characters long.
+    </div>
+
     <div class="form-card">
         <form th:action="@{/admin/employees/edit/{id}(id=${employee.id})}" th:object="${employee}" method="post" enctype="multipart/form-data">
             <input type="hidden" id="removePhoto" name="removePhoto" value="false">
@@ -538,6 +550,60 @@
                                 th:selected="${employee.department != null and employee.department.id == department.id}">
                         </option>
                     </select>
+                </div>
+
+                <!-- DIVIDER & CREDENTIALS SECTION -->
+                <div class="form-group full" style="margin-top: 10px; padding-top: 18px; border-top: 1px solid #edf1f8;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4f46e5" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span style="font-size: 13px; font-weight: 800; color: #0f172a;">Account Credentials & Password</span>
+                        <span style="font-size: 11px; font-weight: 600; color: #64748b; margin-left: auto;">Leave password blank to keep current password</span>
+                    </div>
+                </div>
+
+                <!-- USERNAME (READONLY) -->
+                <div class="form-group full">
+                    <label>Login Username</label>
+                    <input type="text" th:value="${employee.user != null ? employee.user.username : (employee.email ?: employee.employeeCode)}" readonly style="background: #f8fafc; color: #64748b; cursor: not-allowed;">
+                </div>
+
+                <!-- NEW PASSWORD -->
+                <div class="form-group">
+                    <label for="newPassword">Reset Password (Optional)</label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="newPassword" name="newPassword" placeholder="Leave blank to keep unchanged" minlength="6" autocomplete="new-password" style="padding-right: 40px;">
+                        <button type="button" onclick="toggleEditPassword('newPassword', this)" style="position: absolute; right: 10px; background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; display: flex;">
+                            <svg class="eye-open" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="eye-closed" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONFIRM NEW PASSWORD -->
+                <div class="form-group">
+                    <label for="confirmNewPassword">Confirm Reset Password</label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="Re-type to confirm" minlength="6" autocomplete="new-password" style="padding-right: 40px;">
+                        <button type="button" onclick="toggleEditPassword('confirmNewPassword', this)" style="position: absolute; right: 10px; background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; display: flex;">
+                            <svg class="eye-open" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="eye-closed" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -690,7 +756,43 @@ document.addEventListener('DOMContentLoaded', function () {
             if (removePhotoInput) removePhotoInput.value = 'true';
         });
     }
+
+    // PASSWORD VALIDATION ON FORM SUBMIT
+    const editForm = document.querySelector('form');
+    if (editForm) {
+        editForm.addEventListener('submit', function (e) {
+            const pass = document.getElementById('newPassword');
+            const confirmPass = document.getElementById('confirmNewPassword');
+            if (pass && pass.value.trim().length > 0) {
+                if (pass.value.trim().length < 6) {
+                    e.preventDefault();
+                    alert('Password must be at least 6 characters long.');
+                    pass.focus();
+                    return false;
+                }
+                if (confirmPass && pass.value !== confirmPass.value) {
+                    e.preventDefault();
+                    alert('New password and confirmation do not match.');
+                    confirmPass.focus();
+                    return false;
+                }
+            }
+        });
+    }
 });
+
+function toggleEditPassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    const openEye = btn.querySelector('.eye-open');
+    const closedEye = btn.querySelector('.eye-closed');
+    if (openEye && closedEye) {
+        openEye.style.display = isPass ? 'none' : 'block';
+        closedEye.style.display = isPass ? 'block' : 'none';
+    }
+}
 </script>
 
 </body>

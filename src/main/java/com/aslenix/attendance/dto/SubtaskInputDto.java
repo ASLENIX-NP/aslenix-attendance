@@ -2,6 +2,7 @@ package com.aslenix.attendance.dto;
 
 public class SubtaskInputDto {
 
+    private Long id;
     private Integer weekNumber;
     private String title;
     private String description;
@@ -15,6 +16,22 @@ public class SubtaskInputDto {
         this.title = title;
         this.description = description;
         this.assigneeId = assigneeId;
+    }
+
+    public SubtaskInputDto(Long id, Integer weekNumber, String title, String description, Long assigneeId) {
+        this.id = id;
+        this.weekNumber = weekNumber;
+        this.title = title;
+        this.description = description;
+        this.assigneeId = assigneeId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getWeekNumber() {

@@ -395,6 +395,7 @@ public class EmployeeTaskController {
     private Map<String, Object> buildAssignmentMap(TaskAssignment a, Employee currentEmployee) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", a.getId());
+        map.put("weekNumber", a.getWeekNumber());
         map.put("subtaskNumber", a.getSubtaskNumber());
         map.put("title", a.getTitle());
         map.put("description", a.getDescription());

@@ -29,6 +29,9 @@ public class TaskAssignment {
     @Column(name = "subtask_number", nullable = false)
     private Integer subtaskNumber = 1;
 
+    @Column(name = "week_number", nullable = false)
+    private Integer weekNumber = 1;
+
     // ============================================================
     // TITLE & ADMIN-PROVIDED WORK DESCRIPTION
     // ============================================================
@@ -177,6 +180,14 @@ public class TaskAssignment {
 
     public void setSubtaskNumber(Integer subtaskNumber) {
         this.subtaskNumber = subtaskNumber != null ? subtaskNumber : 1;
+    }
+
+    public Integer getWeekNumber() {
+        return weekNumber != null ? weekNumber : (subtaskNumber != null ? subtaskNumber : 1);
+    }
+
+    public void setWeekNumber(Integer weekNumber) {
+        this.weekNumber = weekNumber != null && weekNumber > 0 ? weekNumber : 1;
     }
 
     public String getTitle() {

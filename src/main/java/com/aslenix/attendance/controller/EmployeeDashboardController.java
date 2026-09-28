@@ -210,22 +210,28 @@ public class EmployeeDashboardController {
         );
 
         // ========================================================
-        // ABSENT
+        // ABSENT (Accounts for Employee Joining Date)
         // ========================================================
 
         long workingDays = 0;
 
-        LocalDate date =
-                monthStart;
+        LocalDate effectiveStart = monthStart;
+        if (employee.getJoiningDate() != null && employee.getJoiningDate().isAfter(effectiveStart)) {
+            effectiveStart = employee.getJoiningDate();
+        }
 
-        while (!date.isAfter(monthEnd)) {
+        if (!effectiveStart.isAfter(monthEnd)) {
+            LocalDate date = effectiveStart;
 
-            // Monday-Friday
-            if (date.getDayOfWeek().getValue() <= 5) {
-                workingDays++;
+            while (!date.isAfter(monthEnd)) {
+
+                // Monday-Friday
+                if (date.getDayOfWeek().getValue() <= 5) {
+                    workingDays++;
+                }
+
+                date = date.plusDays(1);
             }
-
-            date = date.plusDays(1);
         }
 
         long absentCount =

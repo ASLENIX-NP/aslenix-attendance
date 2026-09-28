@@ -304,8 +304,10 @@ public class EmployeeController {
             @PathVariable Long id,
             @ModelAttribute Employee employee,
             @RequestParam Long departmentId,
+            @RequestParam(value = "newPassword", required = false) String newPassword,
             @RequestParam(value = "photo", required = false) MultipartFile photoFile,
-            @RequestParam(value = "removePhoto", required = false, defaultValue = "false") boolean removePhoto) {
+            @RequestParam(value = "removePhoto", required = false, defaultValue = "false") boolean removePhoto,
+            RedirectAttributes redirectAttributes) {
 
         Employee existing = employeeRepository
                 .findById(id)
@@ -349,6 +351,35 @@ public class EmployeeController {
             existing.setEmail(
                     employee.getEmail()
             );
+        }
+
+        // =========================================================
+        // PASSWORD UPDATE (IF PROVIDED)
+        // =========================================================
+        if (newPassword != null && !newPassword.trim().isEmpty()) {
+            if (newPassword.trim().length() < 6) {
+                return "redirect:/admin/employees/edit/"
+                        + id
+                        + "?error=password_length";
+            }
+            User user = existing.getUser();
+            if (user == null) {
+                String username = (existing.getEmail() != null && !existing.getEmail().isBlank())
+                        ? existing.getEmail()
+                        : existing.getEmployeeCode().toLowerCase();
+                if (userRepository.existsByUsername(username)) {
+                    username = existing.getEmployeeCode().toLowerCase();
+                }
+                user = new User();
+                user.setUsername(username);
+                user.setRole(Role.EMPLOYEE);
+                user.setEnabled(existing.isEnabled());
+                user.setPasswordChangeRequired(false);
+                user = userRepository.save(user);
+                existing.setUser(user);
+            }
+            user.setPassword(passwordEncoder.encode(newPassword.trim()));
+            userRepository.save(user);
         }
 
         // =========================================================
@@ -412,6 +443,61 @@ public class EmployeeController {
 
         employeeRepository.save(existing);
 
+        String employeeName = existing.getFirstName() + (existing.getLastName() != null ? " " + existing.getLastName() : "");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Employee " + employeeName + " updated successfully."
+        );
+
+        return "redirect:/admin/employees";
+    }
+
+    // =========================
+    // RESET EMPLOYEE PASSWORD
+    // =========================
+
+    @PostMapping("/reset-password/{id}")
+    public String resetEmployeePassword(
+            @PathVariable Long id,
+            @RequestParam String newPassword,
+            RedirectAttributes redirectAttributes) {
+
+        Employee employee = employeeRepository.findById(id).orElse(null);
+        if (employee == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Employee not found.");
+            return "redirect:/admin/employees";
+        }
+
+        if (newPassword == null || newPassword.trim().length() < 6) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Password must be at least 6 characters long.");
+            return "redirect:/admin/employees";
+        }
+
+        User user = employee.getUser();
+        if (user == null) {
+            String username = (employee.getEmail() != null && !employee.getEmail().isBlank())
+                    ? employee.getEmail()
+                    : employee.getEmployeeCode().toLowerCase();
+            if (userRepository.existsByUsername(username)) {
+                username = employee.getEmployeeCode().toLowerCase();
+            }
+            user = new User();
+            user.setUsername(username);
+            user.setRole(Role.EMPLOYEE);
+            user.setEnabled(employee.isEnabled());
+            user.setPasswordChangeRequired(false);
+            user = userRepository.save(user);
+            employee.setUser(user);
+            employeeRepository.save(employee);
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword.trim()));
+        user.setPasswordChangeRequired(false);
+        userRepository.save(user);
+
+        String employeeName = employee.getFirstName() + (employee.getLastName() != null ? " " + employee.getLastName() : "");
+        redirectAttributes.addFlashAttribute("successMessage",
+                "Password successfully reset for " + employeeName + ".");
         return "redirect:/admin/employees";
     }
 

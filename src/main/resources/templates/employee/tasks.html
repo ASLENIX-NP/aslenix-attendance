@@ -2639,7 +2639,7 @@
         });
 
         sortedAssignments.forEach((sub, idx) => {
-            const weekNum = sub.subtaskNumber != null ? Number(sub.subtaskNumber) : (idx + 1);
+            const weekNum = sub.weekNumber != null ? Number(sub.weekNumber) : (sub.subtaskNumber != null ? Number(sub.subtaskNumber) : (idx + 1));
             const weekTitle = sub.title || `Week ${weekNum}`;
             const weekDesc = sub.description || "No specific instructions provided by administrator.";
             const weekStatus = (sub.status || "TODO").toUpperCase();

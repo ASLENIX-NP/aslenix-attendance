@@ -5,11 +5,16 @@ import com.aslenix.attendance.entity.WeeklyWorkingSchedule;
 import com.aslenix.attendance.repository.OfficeSettingsRepository;
 import com.aslenix.attendance.repository.WeeklyWorkingScheduleRepository;
 
+import com.aslenix.attendance.entity.User;
+import com.aslenix.attendance.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,6 +30,8 @@ public class OfficeSettingsController {
 
     private final OfficeSettingsRepository officeSettingsRepository;
     private final WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private static final LocalTime DEFAULT_START_TIME =
             LocalTime.of(10, 0);
@@ -44,11 +51,15 @@ public class OfficeSettingsController {
 
     public OfficeSettingsController(
             OfficeSettingsRepository officeSettingsRepository,
-            WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository) {
+            WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
 
         this.officeSettingsRepository = officeSettingsRepository;
         this.weeklyWorkingScheduleRepository =
                 weeklyWorkingScheduleRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -818,5 +829,47 @@ public class OfficeSettingsController {
             default:
                 return false;
         }
+    }
+
+    // ============================================================
+    // CHANGE ADMIN PASSWORD
+    // ============================================================
+
+    @PostMapping("/change-password")
+    public String changeAdminPassword(
+            @RequestParam String currentPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
+
+        String username = principal != null ? principal.getName() : "admin";
+        User admin = userRepository.findByUsername(username).orElse(null);
+
+        if (admin == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Administrator user account not found.");
+            return "redirect:/admin/settings";
+        }
+
+        if (currentPassword == null || !passwordEncoder.matches(currentPassword, admin.getPassword())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Current administrator password is incorrect.");
+            return "redirect:/admin/settings";
+        }
+
+        if (newPassword == null || newPassword.trim().length() < 6) {
+            redirectAttributes.addFlashAttribute("errorMessage", "New password must be at least 6 characters long.");
+            return "redirect:/admin/settings";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "New password and confirmation password do not match.");
+            return "redirect:/admin/settings";
+        }
+
+        admin.setPassword(passwordEncoder.encode(newPassword.trim()));
+        userRepository.save(admin);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Administrator password has been successfully updated.");
+        return "redirect:/admin/settings";
     }
 }

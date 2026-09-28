@@ -80,6 +80,8 @@ public class AdminTaskController {
             @RequestParam(required = false) List<Long> teamLeadIds,
             @RequestParam(required = false) List<Long> employeeIds,
             @RequestParam(required = false) String subtasksJson,
+            @RequestParam(required = false) List<Long> subtaskIds,
+            @RequestParam(required = false) List<Integer> subtaskWeekNumbers,
             @RequestParam(required = false) List<String> subtaskTitles,
             @RequestParam(required = false) List<String> subtaskDescriptions,
             @RequestParam(required = false) List<String> subtaskAssigneeIds) {
@@ -91,7 +93,7 @@ public class AdminTaskController {
             List<Employee> assignees = (employeeIds != null && !employeeIds.isEmpty())
                     ? employeeRepository.findAllById(employeeIds) : List.of();
 
-            List<SubtaskInputDto> subtasks = parseSubtasks(subtasksJson, subtaskTitles, subtaskDescriptions, subtaskAssigneeIds, weeks);
+            List<SubtaskInputDto> subtasks = parseSubtasks(subtasksJson, subtaskIds, subtaskWeekNumbers, subtaskTitles, subtaskDescriptions, subtaskAssigneeIds, weeks);
 
             taskService.createTask(
                     title,
@@ -134,6 +136,8 @@ public class AdminTaskController {
             @RequestParam(required = false) List<Long> teamLeadIds,
             @RequestParam(required = false) List<Long> employeeIds,
             @RequestParam(required = false) String subtasksJson,
+            @RequestParam(required = false) List<Long> subtaskIds,
+            @RequestParam(required = false) List<Integer> subtaskWeekNumbers,
             @RequestParam(required = false) List<String> subtaskTitles,
             @RequestParam(required = false) List<String> subtaskDescriptions,
             @RequestParam(required = false) List<String> subtaskAssigneeIds) {
@@ -143,7 +147,7 @@ public class AdminTaskController {
             List<Employee> teamLeads = teamLeadIds != null ? employeeRepository.findAllById(teamLeadIds) : null;
             List<Employee> assignees = employeeIds != null ? employeeRepository.findAllById(employeeIds) : null;
 
-            List<SubtaskInputDto> subtasks = parseSubtasks(subtasksJson, subtaskTitles, subtaskDescriptions, subtaskAssigneeIds, weeks);
+            List<SubtaskInputDto> subtasks = parseSubtasks(subtasksJson, subtaskIds, subtaskWeekNumbers, subtaskTitles, subtaskDescriptions, subtaskAssigneeIds, weeks);
 
             Task task = taskService.updateTask(
                     id,
@@ -411,6 +415,8 @@ public class AdminTaskController {
 
     private List<SubtaskInputDto> parseSubtasks(
             String subtasksJson,
+            List<Long> subtaskIds,
+            List<Integer> subtaskWeekNumbers,
             List<String> subtaskTitles,
             List<String> subtaskDescriptions,
             List<String> subtaskAssigneeIds,
@@ -418,11 +424,64 @@ public class AdminTaskController {
 
         List<SubtaskInputDto> result = new ArrayList<>();
 
+        // 1. Try parsing JSON if provided
+        if (subtasksJson != null && !subtasksJson.trim().isEmpty() && subtasksJson.startsWith("[")) {
+            try {
+                String inner = subtasksJson.trim();
+                if (inner.startsWith("[")) inner = inner.substring(1);
+                if (inner.endsWith("]")) inner = inner.substring(0, inner.length() - 1);
+                String[] objects = inner.split("\\},\\s*\\{");
+                int seq = 1;
+                for (String obj : objects) {
+                    String clean = obj.replace("{", "").replace("}", "");
+                    Long id = null;
+                    Integer weekNumber = 1;
+                    String desc = "";
+                    String title = "";
+                    Long assigneeId = null;
+
+                    for (String pair : clean.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")) {
+                        String[] kv = pair.split(":", 2);
+                        if (kv.length == 2) {
+                            String key = kv[0].replace("\"", "").trim();
+                            String val = kv[1].replace("\"", "").trim();
+                            if ("id".equalsIgnoreCase(key) && !val.isEmpty() && !"null".equalsIgnoreCase(val)) {
+                                try { id = Long.parseLong(val); } catch (Exception ignored) {}
+                            } else if ("weekNumber".equalsIgnoreCase(key) && !val.isEmpty() && !"null".equalsIgnoreCase(val)) {
+                                try { weekNumber = Integer.parseInt(val); } catch (Exception ignored) {}
+                            } else if ("description".equalsIgnoreCase(key)) {
+                                desc = val;
+                            } else if ("title".equalsIgnoreCase(key) && !val.isEmpty()) {
+                                title = val;
+                            } else if ("assigneeId".equalsIgnoreCase(key) && !val.isEmpty() && !"null".equalsIgnoreCase(val)) {
+                                try { assigneeId = Long.parseLong(val); } catch (Exception ignored) {}
+                            }
+                        }
+                    }
+
+                    if (title.isEmpty()) {
+                        title = "Week " + weekNumber + " Subtask " + seq;
+                    }
+
+                    result.add(new SubtaskInputDto(id, weekNumber, title, desc, assigneeId));
+                    seq++;
+                }
+                if (!result.isEmpty()) {
+                    return result;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        // 2. Fallback to list parameters
         if (subtaskDescriptions != null && !subtaskDescriptions.isEmpty()) {
             for (int i = 0; i < subtaskDescriptions.size(); i++) {
-                int weekNum = i + 1;
+                Long id = (subtaskIds != null && i < subtaskIds.size()) ? subtaskIds.get(i) : null;
+                int weekNum = (subtaskWeekNumbers != null && i < subtaskWeekNumbers.size() && subtaskWeekNumbers.get(i) != null && subtaskWeekNumbers.get(i) > 0)
+                        ? subtaskWeekNumbers.get(i)
+                        : (i + 1);
                 String title = (subtaskTitles != null && i < subtaskTitles.size() && subtaskTitles.get(i) != null && !subtaskTitles.get(i).trim().isEmpty())
-                        ? subtaskTitles.get(i).trim() : ("Week " + weekNum);
+                        ? subtaskTitles.get(i).trim() : ("Week " + weekNum + " Subtask " + (i + 1));
                 String desc = subtaskDescriptions.get(i);
                 Long assigneeId = null;
                 if (subtaskAssigneeIds != null && i < subtaskAssigneeIds.size()) {
@@ -433,37 +492,7 @@ public class AdminTaskController {
                         } catch (NumberFormatException ignored) {}
                     }
                 }
-                result.add(new SubtaskInputDto(weekNum, title, desc, assigneeId));
-            }
-            return result;
-        }
-
-        if (subtasksJson != null && !subtasksJson.trim().isEmpty() && subtasksJson.startsWith("[")) {
-            String inner = subtasksJson.trim();
-            if (inner.startsWith("[")) inner = inner.substring(1);
-            if (inner.endsWith("]")) inner = inner.substring(0, inner.length() - 1);
-            String[] objects = inner.split("\\},\\s*\\{");
-            int idx = 1;
-            for (String obj : objects) {
-                String clean = obj.replace("{", "").replace("}", "");
-                String desc = "";
-                String title = "Week " + idx;
-                Long assigneeId = null;
-
-                for (String pair : clean.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")) {
-                    String[] kv = pair.split(":", 2);
-                    if (kv.length == 2) {
-                        String key = kv[0].replace("\"", "").trim();
-                        String val = kv[1].replace("\"", "").trim();
-                        if ("description".equalsIgnoreCase(key)) desc = val;
-                        else if ("title".equalsIgnoreCase(key) && !val.isEmpty()) title = val;
-                        else if ("assigneeId".equalsIgnoreCase(key) && !val.isEmpty() && !"null".equalsIgnoreCase(val)) {
-                            try { assigneeId = Long.parseLong(val); } catch (Exception ignored) {}
-                        }
-                    }
-                }
-                result.add(new SubtaskInputDto(idx, title, desc, assigneeId));
-                idx++;
+                result.add(new SubtaskInputDto(id, weekNum, title, desc, assigneeId));
             }
         }
 
@@ -568,6 +597,7 @@ public class AdminTaskController {
     private Map<String, Object> buildAssignmentMap(TaskAssignment a) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", a.getId());
+        map.put("weekNumber", a.getWeekNumber());
         map.put("subtaskNumber", a.getSubtaskNumber());
         map.put("title", a.getTitle());
         map.put("description", a.getDescription());

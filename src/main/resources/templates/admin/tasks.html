@@ -1267,7 +1267,7 @@
         .picker-item:hover { background: #f8fafc; color: #4f46e5; }
 
         /* =====================================================
-           WEEKLY SUBTASKS BREAKDOWN
+           WEEKLY SUBTASKS BREAKDOWN & WEEK GROUPS
         ===================================================== */
         .subtasks-section {
             border: 1px solid #e2e8f0;
@@ -1299,25 +1299,131 @@
             color: #64748b;
         }
 
-        .subtask-cards-list {
+        .week-group-block {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 14px 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
+            transition: border-color 0.2s;
         }
 
-        .subtask-card-item {
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 14px;
+        .week-group-block:hover {
+            border-color: #cbd5e1;
+        }
+
+        .week-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1.5px dashed #e2e8f0;
+            gap: 10px;
+        }
+
+        .week-group-title-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .week-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 850;
+            color: #4f46e5;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid #e0e7ff;
+            letter-spacing: .2px;
+        }
+
+        .week-subtasks-count {
+            font-size: 11.5px;
+            font-weight: 750;
+            color: #64748b;
+        }
+
+        .week-group-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add-subtask-to-week {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eef2ff;
+            color: #4f46e5;
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 11.5px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-add-subtask-to-week:hover {
+            background: #4f46e5;
+            color: #ffffff;
+            border-color: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+        .btn-remove-week {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: 1px solid #fee2e2;
+            background: #fff5f5;
+            color: #ef4444;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-remove-week:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+
+        .week-subtasks-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            transition: border-color 0.2s;
+        }
+
+        .subtask-cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .subtask-card-item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .subtask-card-item:hover {
             border-color: #cbd5e1;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
         .subtask-card-item.invalid {
@@ -1330,6 +1436,36 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
+        }
+
+        .subtask-order-tag {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-remove-subtask-card {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid #fee2e2;
+            background: #fff5f5;
+            color: #ef4444;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-remove-subtask-card:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
         }
 
         .subtask-week-tag {
@@ -2282,29 +2418,29 @@
                     </div>
                 </div>
 
-                <!-- WEEKLY SUBTASKS BREAKDOWN (ADMIN MUST DEFINE WORK DESCRIPTIONS) -->
+                <!-- WEEKLY WORK BREAKDOWN & SUBTASKS -->
                 <div class="subtasks-section">
                     <div class="subtasks-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
                         <div>
                             <h3>
                                 <span>📋</span>
-                                <span>Weekly Subtasks Breakdown (<span id="subtasksCountLabel">1</span> Weeks)</span>
+                                <span>Weekly Work Breakdown (<span id="weeksCountLabel">1</span> Weeks · <span id="subtasksCountLabel">1</span> Subtasks)</span>
                             </h3>
-                            <p class="subtasks-hint">Each week represents 1 subtask. Admin must provide actual work descriptions before saving.</p>
+                            <p class="subtasks-hint">Work is structured by weeks. You can add multiple subtasks to any week, or add new weeks.</p>
                         </div>
-                        <button type="button" class="btn-add-subtask-action" onclick="addNewSubtaskInput()" title="Add another week and subtask">
+                        <button type="button" class="btn-add-subtask-action" onclick="addNewWeek()" title="Add another week to this task">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>Add Subtask</span>
+                            <span>Add New Week</span>
                         </button>
                     </div>
 
                     <div class="subtask-cards-list" id="modalSubtasksContainer">
-                        <!-- Dynamically filled with N subtasks -->
+                        <!-- Dynamically filled with Week groups and subtasks -->
                     </div>
 
-                    <button type="button" class="btn-add-subtask-bottom" onclick="addNewSubtaskInput()">
+                    <button type="button" class="btn-add-subtask-bottom" onclick="addNewWeek()">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        <span>Add Another Subtask</span>
+                        <span>Add New Week</span>
                     </button>
                 </div>
 
@@ -2707,241 +2843,422 @@
     }
 
     // ==========================================
-    // DYNAMIC SUBTASKS BUILDER (WEEKS REQUIRED = N)
+    // DYNAMIC WEEKS & SUBTASKS BUILDER
     // ==========================================
+
+    function collectCurrentSubtasksData() {
+        const data = [];
+        document.querySelectorAll(".week-group-block").forEach((weekBlock) => {
+            const weekNum = parseInt(weekBlock.getAttribute("data-week-num")) || 1;
+            const cards = weekBlock.querySelectorAll(".subtask-card-item");
+            cards.forEach((card, sIdx) => {
+                const desc = card.querySelector(".subtask-desc-input")?.value || "";
+                const title = card.querySelector(".subtask-title-input")?.value || `Week ${weekNum} Subtask ${sIdx + 1}`;
+                const assigneeSelect = card.querySelector(".subtask-assignee-select");
+                const assigneeId = assigneeSelect?.value || "";
+                data.push({
+                    id: card.getAttribute("data-assignment-id") || null,
+                    weekNumber: weekNum,
+                    subtaskNumber: sIdx + 1,
+                    title: title,
+                    description: desc,
+                    assignee: assigneeId ? { id: Number(assigneeId) } : null,
+                    status: card.getAttribute("data-status") || "TODO",
+                    progress: parseInt(card.getAttribute("data-progress")) || 0,
+                    declineReason: card.getAttribute("data-decline-reason") || ""
+                });
+            });
+        });
+        return data;
+    }
+
     function onWeeksRequiredChanged(val) {
         let num = parseInt(val) || 1;
         if (num < 1) num = 1;
         if (num > 52) num = 52;
         document.getElementById("modalWeeksRequiredInput").value = num;
 
-        // Collect existing descriptions before re-rendering
-        const existingData = [];
-        document.querySelectorAll(".subtask-card-item").forEach((card, idx) => {
-            const desc = card.querySelector(".subtask-desc-input")?.value || "";
-            const title = card.querySelector(".subtask-title-input")?.value || `Week ${idx + 1}`;
-            const assigneeSelect = card.querySelector(".subtask-assignee-select");
-            const assigneeId = assigneeSelect?.value || "";
-            const weekNum = parseInt(card.getAttribute("data-week-num")) || (idx + 1);
-            existingData.push({
-                subtaskNumber: weekNum,
-                title: title,
-                description: desc,
-                assignee: assigneeId ? { id: Number(assigneeId) } : null,
-                status: card.getAttribute("data-status") || "TODO",
-                progress: parseInt(card.getAttribute("data-progress")) || 0,
-                id: card.getAttribute("data-assignment-id") || null
-            });
-        });
-
-        renderSubtaskInputs(num, existingData);
+        const currentData = collectCurrentSubtasksData();
+        renderSubtaskInputs(num, currentData);
     }
 
     function renderSubtaskInputs(weeks, existingAssignments = []) {
         const container = document.getElementById("modalSubtasksContainer");
         container.innerHTML = "";
-        document.getElementById("subtasksCountLabel").textContent = String(weeks);
 
-        for (let i = 1; i <= weeks; i++) {
-            // Strictly match by subtaskNumber === i, or fallback to index i - 1 ONLY if subtaskNumber is unassigned or matches i
-            let existing = existingAssignments.find(a => Number(a.subtaskNumber) === i);
-            if (!existing && existingAssignments[i - 1]) {
-                const candidate = existingAssignments[i - 1];
-                if (!candidate.subtaskNumber || Number(candidate.subtaskNumber) === i) {
-                    existing = candidate;
+        // Determine total weeks (at least input weeks or max weekNumber among assignments)
+        let totalWeeks = parseInt(weeks) || 1;
+        if (Array.isArray(existingAssignments) && existingAssignments.length > 0) {
+            existingAssignments.forEach(a => {
+                const w = Number(a.weekNumber) || Number(a.subtaskNumber) || 1;
+                if (w > totalWeeks) totalWeeks = w;
+            });
+        }
+        if (totalWeeks < 1) totalWeeks = 1;
+        if (totalWeeks > 52) totalWeeks = 52;
+
+        const weeksInput = document.getElementById("modalWeeksRequiredInput");
+        if (weeksInput) weeksInput.value = totalWeeks;
+
+        const weeksLabel = document.getElementById("weeksCountLabel");
+        if (weeksLabel) weeksLabel.textContent = String(totalWeeks);
+
+        // Group assignments by weekNumber
+        const weekMap = {};
+        for (let w = 1; w <= totalWeeks; w++) {
+            weekMap[w] = [];
+        }
+
+        if (Array.isArray(existingAssignments) && existingAssignments.length > 0) {
+            existingAssignments.forEach((item, idx) => {
+                let w = Number(item.weekNumber);
+                if (!w || w < 1) {
+                    w = Number(item.subtaskNumber) || 1;
                 }
+                if (w > totalWeeks) totalWeeks = w;
+                if (!weekMap[w]) weekMap[w] = [];
+                weekMap[w].push(item);
+            });
+        }
+
+        // Ensure every week has at least one subtask placeholder
+        for (let w = 1; w <= totalWeeks; w++) {
+            if (!weekMap[w] || weekMap[w].length === 0) {
+                weekMap[w] = [{
+                    title: `Week ${w} Subtask 1`,
+                    description: "",
+                    weekNumber: w,
+                    subtaskNumber: 1,
+                    status: "TODO",
+                    progress: 0
+                }];
             }
+        }
 
-            const weekTitle = existing?.title || `Week ${i}`;
-            const weekDesc = existing?.description || "";
-            const weekStatus = (existing?.status || "TODO").toUpperCase();
-            const weekProgress = (existing && existing.progress != null) ? Number(existing.progress) : 0;
-            const assignmentId = existing?.id || "";
-            const isApproved = (weekStatus === "APPROVED" || weekStatus === "COMPLETED");
-            const isReview = (weekStatus === "READY_FOR_REVIEW" || weekStatus === "UNDER_REVIEW");
-            const isDeclined = (weekStatus === "DECLINED");
-            const declineReason = existing?.declineReason || "";
+        let totalSubtasksCount = 0;
 
-            let statusPillClass = "pill-todo";
-            let statusText = "To Do";
-            if (isApproved) { statusPillClass = "pill-approved"; statusText = "Approved"; }
-            else if (isReview) { statusPillClass = "pill-review"; statusText = "Under Review"; }
-            else if (isDeclined) { statusPillClass = "pill-declined"; statusText = "Declined"; }
-            else if (weekProgress > 0) { statusPillClass = "pill-progress"; statusText = "In Progress"; }
+        for (let w = 1; w <= totalWeeks; w++) {
+            const subtasksInWeek = weekMap[w];
+            totalSubtasksCount += subtasksInWeek.length;
 
-            const card = document.createElement("div");
-            card.className = "subtask-card-item";
-            card.id = `subtaskCardWeek${i}`;
-            card.setAttribute("data-week-num", String(i));
-            card.setAttribute("data-assignment-id", assignmentId ? String(assignmentId) : "");
-            card.setAttribute("data-status", weekStatus);
-            card.setAttribute("data-progress", String(weekProgress));
+            const weekBlock = document.createElement("div");
+            weekBlock.className = "week-group-block";
+            weekBlock.id = `weekGroup_${w}`;
+            weekBlock.setAttribute("data-week-num", String(w));
 
-            // Options for assignees
-            let assigneeOptionsHtml = `<option value="">-- Assign Member --</option>`;
-            ALL_EMPLOYEES.forEach(emp => {
-                const isSelected = existing?.assignee && Number(existing.assignee.id) === Number(emp.id);
-                const fullName = `${emp.firstName} ${emp.lastName || ''}`.trim();
-                assigneeOptionsHtml += `<option value="${emp.id}" ${isSelected ? 'selected' : ''}>${escapeHtml(fullName)}</option>`;
+            // Week Header
+            const header = document.createElement("div");
+            header.className = "week-group-header";
+            header.innerHTML = `
+                <div class="week-group-title-area">
+                    <span class="week-badge">📅 Week ${w}</span>
+                    <span class="week-subtasks-count">(${subtasksInWeek.length} subtask${subtasksInWeek.length !== 1 ? 's' : ''})</span>
+                </div>
+                <div class="week-group-actions">
+                    <button type="button" class="btn-add-subtask-to-week" onclick="addSubtaskToWeek(${w})" title="Add a subtask to Week ${w}">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add Subtask</span>
+                    </button>
+                    ${totalWeeks > 1 ? `
+                        <button type="button" class="btn-remove-week" onclick="removeWeek(${w})" title="Remove Week ${w}">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            weekBlock.appendChild(header);
+
+            // Subtasks list container
+            const subtasksList = document.createElement("div");
+            subtasksList.className = "week-subtasks-list";
+            subtasksList.id = `weekSubtasksContainer_${w}`;
+
+            subtasksInWeek.forEach((sub, sIdx) => {
+                const card = createSubtaskCardElement(w, sIdx + 1, sub, subtasksInWeek.length, totalWeeks);
+                subtasksList.appendChild(card);
             });
 
-            card.innerHTML = `
-                <div class="subtask-top-row">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="subtask-week-tag">Week ${i}</span>
-                        <input type="text" class="form-input subtask-title-input" style="padding: 4px 8px; font-size: 12.5px; font-weight: 750; width: 220px;" value="${escapeHtml(weekTitle)}">
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="subtask-status-pill ${statusPillClass}">${statusText}</span>
-                        <span class="subtask-progress-pct-badge" style="font-size: 11.5px; font-weight: 800; color: #4f46e5;">${weekProgress}%</span>
-                        ${!isApproved && weeks > 1 ? `
-                            <button type="button" class="btn-remove-subtask-card" onclick="removeSubtaskCard(event, ${i})" title="Remove Week ${i} Subtask">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
+            weekBlock.appendChild(subtasksList);
+            container.appendChild(weekBlock);
+        }
 
-                <div class="subtask-inputs-grid">
-                    <div class="subtask-desc-group">
-                        <label class="subtask-desc-label">
-                            <span>Work Description</span>
-                            <span class="subtask-desc-required">* Required</span>
-                        </label>
-                        <textarea class="subtask-desc-input" placeholder="Define mandatory deliverables and work required for Week ${i}...">${escapeHtml(weekDesc)}</textarea>
-                    </div>
-
-                    <div class="subtask-desc-group">
-                        <label class="subtask-desc-label">Assigned Member</label>
-                        <select class="form-select subtask-assignee-select" style="font-size: 12px; padding: 7px 10px;">
-                            ${assigneeOptionsHtml}
-                        </select>
-                    </div>
-                </div>
-
-                ${isReview && assignmentId ? `
-                    <div class="subtask-review-banner">
-                        <div class="subtask-review-info">
-                            <span>👁</span>
-                            <span>Employee submitted Week ${i} at 100% for admin approval.</span>
-                        </div>
-                        <div class="subtask-review-btns">
-                            <button type="button" class="btn-approve-subtask" onclick="adminApproveSubtask(event, ${assignmentId})">✔ Approve</button>
-                            <button type="button" class="btn-decline-subtask" onclick="openDeclineModalForCard(event, this, ${assignmentId})">✖ Decline</button>
-                        </div>
-                    </div>
-                ` : ''}
-
-                ${isDeclined ? `
-                    <div class="subtask-declined-box">
-                        <strong>⚠️ Declined by Admin:</strong> ${escapeHtml(declineReason || 'Rework requested.')}
-                    </div>
-                ` : ''}
-
-                ${isApproved ? `
-                    <div class="subtask-approved-badge">
-                        🔒 Approved & Locked — Counted toward Employee of the Month!
-                    </div>
-                ` : ''}
-
-                ${assignmentId ? `
-                    <div class="subtask-top-row" style="margin-top: 2px;">
-                        <div class="subtask-progress-mini-row" style="flex: 1;">
-                            <div class="subtask-progress-mini-track">
-                                <div class="subtask-progress-mini-fill" style="width: ${weekProgress}%;"></div>
-                            </div>
-                            <span class="subtask-progress-mini-label">${weekProgress}%</span>
-                        </div>
-                        <div style="display: flex; gap: 6px; margin-left: 12px;">
-                            ${!isApproved ? `
-                                <button type="button" class="subtask-btn-action" onclick="openSubtaskProgressFromButton(event, this, ${assignmentId}, ${weekProgress})">Update %</button>
-                            ` : ''}
-                            <button type="button" class="subtask-btn-action" onclick="openSubtaskHistoryFromButton(event, this, ${assignmentId})">History</button>
-                        </div>
-                    </div>
-                ` : ''}
-            `;
-
-            container.appendChild(card);
+        const subtasksCountLabel = document.getElementById("subtasksCountLabel");
+        if (subtasksCountLabel) {
+            subtasksCountLabel.textContent = String(totalSubtasksCount);
         }
     }
 
-    function addNewSubtaskInput() {
-        const input = document.getElementById("modalWeeksRequiredInput");
-        let currentWeeks = parseInt(input.value) || 1;
-        if (currentWeeks >= 52) {
-            showToast("Limit Reached", "Maximum limit of 52 weeks/subtasks reached.", "warning");
-            return;
-        }
-        const newWeeks = currentWeeks + 1;
-        input.value = newWeeks;
-        onWeeksRequiredChanged(newWeeks);
+    function createSubtaskCardElement(weekNum, subtaskIdx, existing, totalInWeek, totalWeeks) {
+        const subTitle = existing?.title || `Week ${weekNum} Subtask ${subtaskIdx}`;
+        const subDesc = existing?.description || "";
+        const subStatus = (existing?.status || "TODO").toUpperCase();
+        const subProgress = (existing && existing.progress != null) ? Number(existing.progress) : 0;
+        const assignmentId = existing?.id || "";
+        const isApproved = (subStatus === "APPROVED" || subStatus === "COMPLETED");
+        const isReview = (subStatus === "READY_FOR_REVIEW" || subStatus === "UNDER_REVIEW");
+        const isDeclined = (subStatus === "DECLINED");
+        const declineReason = existing?.declineReason || "";
+
+        let statusPillClass = "pill-todo";
+        let statusText = "To Do";
+        if (isApproved) { statusPillClass = "pill-approved"; statusText = "Approved"; }
+        else if (isReview) { statusPillClass = "pill-review"; statusText = "Under Review"; }
+        else if (isDeclined) { statusPillClass = "pill-declined"; statusText = "Declined"; }
+        else if (subProgress > 0) { statusPillClass = "pill-progress"; statusText = "In Progress"; }
+
+        const card = document.createElement("div");
+        card.className = "subtask-card-item";
+        card.id = assignmentId ? `subtaskCard_${assignmentId}` : `subtaskCard_w${weekNum}_s${subtaskIdx}`;
+        card.setAttribute("data-week-num", String(weekNum));
+        card.setAttribute("data-assignment-id", assignmentId ? String(assignmentId) : "");
+        card.setAttribute("data-status", subStatus);
+        card.setAttribute("data-progress", String(subProgress));
+        card.setAttribute("data-decline-reason", declineReason);
+
+        let assigneeOptionsHtml = `<option value="">-- Assign Member --</option>`;
+        ALL_EMPLOYEES.forEach(emp => {
+            const isSelected = existing?.assignee && Number(existing.assignee.id) === Number(emp.id);
+            const fullName = `${emp.firstName} ${emp.lastName || ''}`.trim();
+            assigneeOptionsHtml += `<option value="${emp.id}" ${isSelected ? 'selected' : ''}>${escapeHtml(fullName)}</option>`;
+        });
+
+        const canDeleteCard = !isApproved && (totalInWeek > 1 || totalWeeks > 1);
+
+        card.innerHTML = `
+            <div class="subtask-top-row">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="subtask-order-tag">#${subtaskIdx}</span>
+                    <input type="text" class="form-input subtask-title-input" style="padding: 4px 8px; font-size: 12.5px; font-weight: 750; width: 230px;" value="${escapeHtml(subTitle)}" placeholder="Subtask title...">
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="subtask-status-pill ${statusPillClass}">${statusText}</span>
+                    <span class="subtask-progress-pct-badge" style="font-size: 11.5px; font-weight: 800; color: #4f46e5;">${subProgress}%</span>
+                    ${canDeleteCard ? `
+                        <button type="button" class="btn-remove-subtask-card" onclick="removeSubtaskCard(this)" title="Delete this subtask">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+
+            <div class="subtask-inputs-grid">
+                <div class="subtask-desc-group">
+                    <label class="subtask-desc-label">
+                        <span>Work Deliverables / Description</span>
+                        <span class="subtask-desc-required">* Required</span>
+                    </label>
+                    <textarea class="subtask-desc-input" placeholder="Define mandatory deliverables and work required for this subtask...">${escapeHtml(subDesc)}</textarea>
+                </div>
+
+                <div class="subtask-desc-group">
+                    <label class="subtask-desc-label">Assigned Member</label>
+                    <select class="form-select subtask-assignee-select" style="font-size: 12px; padding: 7px 10px;">
+                        ${assigneeOptionsHtml}
+                    </select>
+                </div>
+            </div>
+
+            ${isReview && assignmentId ? `
+                <div class="subtask-review-banner">
+                    <div class="subtask-review-info">
+                        <span>👁</span>
+                        <span>Employee submitted this subtask at 100% for admin approval.</span>
+                    </div>
+                    <div class="subtask-review-btns">
+                        <button type="button" class="btn-approve-subtask" onclick="adminApproveSubtask(event, ${assignmentId})">✔ Approve</button>
+                        <button type="button" class="btn-decline-subtask" onclick="openDeclineModalForCard(event, this, ${assignmentId})">✖ Decline</button>
+                    </div>
+                </div>
+            ` : ''}
+
+            ${isDeclined ? `
+                <div class="subtask-declined-box">
+                    <strong>⚠️ Declined by Admin:</strong> ${escapeHtml(declineReason || 'Rework requested.')}
+                </div>
+            ` : ''}
+
+            ${isApproved ? `
+                <div class="subtask-approved-badge">
+                    🔒 Approved & Locked — Counted toward Employee of the Month!
+                </div>
+            ` : ''}
+
+            ${assignmentId ? `
+                <div class="subtask-top-row" style="margin-top: 2px;">
+                    <div class="subtask-progress-mini-row" style="flex: 1;">
+                        <div class="subtask-progress-mini-track">
+                            <div class="subtask-progress-mini-fill" style="width: ${subProgress}%;"></div>
+                        </div>
+                        <span class="subtask-progress-mini-label">${subProgress}%</span>
+                    </div>
+                    <div style="display: flex; gap: 6px; margin-left: 12px;">
+                        ${!isApproved ? `
+                            <button type="button" class="subtask-btn-action" onclick="openSubtaskProgressFromButton(event, this, ${assignmentId}, ${subProgress})">Update %</button>
+                        ` : ''}
+                        <button type="button" class="subtask-btn-action" onclick="openSubtaskHistoryFromButton(event, this, ${assignmentId})">History</button>
+                    </div>
+                </div>
+            ` : ''}
+        `;
+        return card;
+    }
+
+    function addSubtaskToWeek(weekNum) {
+        const currentData = collectCurrentSubtasksData();
+        const currentWeeks = parseInt(document.getElementById("modalWeeksRequiredInput").value) || 1;
+
+        const inWeek = currentData.filter(d => Number(d.weekNumber) === Number(weekNum));
+        const nextSubtaskIndex = inWeek.length + 1;
+
+        currentData.push({
+            id: null,
+            weekNumber: Number(weekNum),
+            subtaskNumber: nextSubtaskIndex,
+            title: `Week ${weekNum} Subtask ${nextSubtaskIndex}`,
+            description: "",
+            status: "TODO",
+            progress: 0
+        });
+
+        renderSubtaskInputs(currentWeeks, currentData);
 
         setTimeout(() => {
-            const newCard = document.getElementById(`subtaskCardWeek${newWeeks}`);
-            if (newCard) {
-                newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                const descArea = newCard.querySelector('.subtask-desc-input');
+            const weekContainer = document.getElementById(`weekSubtasksContainer_${weekNum}`);
+            if (weekContainer) {
+                const cards = weekContainer.querySelectorAll(".subtask-card-item");
+                const lastCard = cards[cards.length - 1];
+                if (lastCard) {
+                    lastCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    const descArea = lastCard.querySelector('.subtask-desc-input');
+                    if (descArea) descArea.focus();
+                }
+            }
+        }, 50);
+    }
+
+    function addNewWeek() {
+        const currentWeeks = parseInt(document.getElementById("modalWeeksRequiredInput").value) || 1;
+        if (currentWeeks >= 52) {
+            showToast("Limit Reached", "Maximum limit of 52 weeks reached.", "warning");
+            return;
+        }
+
+        const newWeekNum = currentWeeks + 1;
+        const currentData = collectCurrentSubtasksData();
+
+        currentData.push({
+            id: null,
+            weekNumber: newWeekNum,
+            subtaskNumber: 1,
+            title: `Week ${newWeekNum} Subtask 1`,
+            description: "",
+            status: "TODO",
+            progress: 0
+        });
+
+        renderSubtaskInputs(newWeekNum, currentData);
+
+        setTimeout(() => {
+            const newWeekBlock = document.getElementById(`weekGroup_${newWeekNum}`);
+            if (newWeekBlock) {
+                newWeekBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                const descArea = newWeekBlock.querySelector('.subtask-desc-input');
                 if (descArea) descArea.focus();
             }
         }, 50);
     }
 
-    function removeSubtaskCard(event, weekNum) {
-        if (event) event.stopPropagation();
-        const input = document.getElementById("modalWeeksRequiredInput");
-        let currentWeeks = parseInt(input.value) || 1;
+    function removeWeek(weekNum) {
+        const currentWeeks = parseInt(document.getElementById("modalWeeksRequiredInput").value) || 1;
         if (currentWeeks <= 1) {
-            showToast("Validation", "A task must have at least 1 week / subtask.", "warning");
+            showToast("Validation", "A task must have at least 1 week.", "warning");
             return;
         }
 
-        // Collect existing cards EXCEPT the one being removed
-        const existingData = [];
-        let skipped = false;
-        document.querySelectorAll(".subtask-card-item").forEach((card) => {
-            const num = parseInt(card.getAttribute("data-week-num"));
-            if (num === weekNum) {
-                const isApproved = card.getAttribute("data-status") === "APPROVED" || card.getAttribute("data-status") === "COMPLETED";
-                if (isApproved) {
-                    showToast("Locked Subtask", "Cannot delete an already approved subtask.", "warning");
-                    return;
-                }
-                skipped = true;
-                return; // Skip this card
-            }
-            const desc = card.querySelector(".subtask-desc-input")?.value || "";
-            const title = card.querySelector(".subtask-title-input")?.value || "";
-            const assigneeSelect = card.querySelector(".subtask-assignee-select");
-            const assigneeId = assigneeSelect?.value || "";
-            existingData.push({
-                title: title,
-                description: desc,
-                assignee: assigneeId ? { id: Number(assigneeId) } : null,
-                status: card.getAttribute("data-status") || "TODO",
-                progress: parseInt(card.getAttribute("data-progress")) || 0,
-                id: card.getAttribute("data-assignment-id") || null
+        const currentData = collectCurrentSubtasksData();
+        const hasApproved = currentData.some(d => Number(d.weekNumber) === Number(weekNum) && (d.status === "APPROVED" || d.status === "COMPLETED"));
+        if (hasApproved) {
+            showToast("Locked Week", "Cannot delete a week that contains approved subtasks.", "warning");
+            return;
+        }
+
+        const filteredData = currentData.filter(d => Number(d.weekNumber) !== Number(weekNum));
+
+        // Re-index remaining weeks sequentially
+        const uniqueRemainingWeeks = [...new Set(filteredData.map(d => Number(d.weekNumber)))].sort((a, b) => a - b);
+        const remappedData = [];
+        uniqueRemainingWeeks.forEach((oldW, newIdx) => {
+            const newW = newIdx + 1;
+            const subs = filteredData.filter(d => Number(d.weekNumber) === oldW);
+            subs.forEach((sub, sIdx) => {
+                sub.weekNumber = newW;
+                sub.subtaskNumber = sIdx + 1;
+                remappedData.push(sub);
             });
         });
 
-        if (!skipped) return;
+        const newTotalWeeks = Math.max(1, currentWeeks - 1);
+        renderSubtaskInputs(newTotalWeeks, remappedData);
+    }
 
-        const newWeeks = currentWeeks - 1;
-        input.value = newWeeks;
+    function removeSubtaskCard(btn) {
+        const card = btn.closest(".subtask-card-item");
+        if (!card) return;
 
-        // Re-index subtasks sequentially
-        existingData.forEach((item, idx) => {
-            item.subtaskNumber = idx + 1;
-            if (!item.title || item.title.startsWith("Week ")) {
-                item.title = `Week ${idx + 1}`;
+        const isApproved = card.getAttribute("data-status") === "APPROVED" || card.getAttribute("data-status") === "COMPLETED";
+        if (isApproved) {
+            showToast("Locked Subtask", "Cannot delete an already approved subtask.", "warning");
+            return;
+        }
+
+        const targetAssignmentId = card.getAttribute("data-assignment-id");
+        const weekNum = parseInt(card.getAttribute("data-week-num")) || 1;
+
+        const currentData = collectCurrentSubtasksData();
+        const currentWeeks = parseInt(document.getElementById("modalWeeksRequiredInput").value) || 1;
+
+        const inThisWeek = currentData.filter(d => Number(d.weekNumber) === Number(weekNum));
+
+        if (currentData.length <= 1) {
+            showToast("Validation", "A task must have at least one subtask.", "warning");
+            return;
+        }
+
+        if (inThisWeek.length <= 1 && currentWeeks > 1) {
+            removeWeek(weekNum);
+            return;
+        }
+
+        let removed = false;
+        const updatedData = [];
+        currentData.forEach(d => {
+            if (!removed && Number(d.weekNumber) === Number(weekNum)) {
+                if (targetAssignmentId && String(d.id) === String(targetAssignmentId)) {
+                    removed = true;
+                    return;
+                }
+                const cardTitle = card.querySelector(".subtask-title-input")?.value?.trim() || "";
+                if (!targetAssignmentId && d.title === cardTitle) {
+                    removed = true;
+                    return;
+                }
             }
+            updatedData.push(d);
         });
 
-        renderSubtaskInputs(newWeeks, existingData);
+        if (!removed && currentData.length > 0) {
+            const idxToRemove = currentData.findIndex(d => Number(d.weekNumber) === Number(weekNum));
+            if (idxToRemove !== -1) {
+                currentData.splice(idxToRemove, 1);
+                renderSubtaskInputs(currentWeeks, currentData);
+                return;
+            }
+        }
+
+        renderSubtaskInputs(currentWeeks, updatedData);
     }
 
     function updateSubtaskAssigneeDropdowns() {
-        // Can optionally highlight selected assignees
     }
 
     function escapeHtml(str) {
@@ -2971,34 +3288,47 @@
         const description = document.getElementById("modalDescriptionInput").value.trim();
 
         // VALIDATE EVERY SUBTASK HAS A MANDATORY DESCRIPTION
-        const subtaskCards = document.querySelectorAll(".subtask-card-item");
+        const weekBlocks = document.querySelectorAll(".week-group-block");
         const subtasksData = [];
         let hasValidationError = false;
+        let totalCount = 0;
 
-        subtaskCards.forEach((card, idx) => {
-            const weekNum = idx + 1;
-            const weekTitle = card.querySelector(".subtask-title-input")?.value.trim() || `Week ${weekNum}`;
-            const descInput = card.querySelector(".subtask-desc-input");
-            const desc = descInput?.value.trim() || "";
-            const assigneeSelect = card.querySelector(".subtask-assignee-select");
-            const assigneeId = assigneeSelect?.value ? parseInt(assigneeSelect.value) : null;
+        weekBlocks.forEach((wb) => {
+            const wNum = parseInt(wb.getAttribute("data-week-num")) || 1;
+            const cards = wb.querySelectorAll(".subtask-card-item");
+            cards.forEach((card, sIdx) => {
+                totalCount++;
+                const subTitle = card.querySelector(".subtask-title-input")?.value.trim() || `Week ${wNum} Subtask ${sIdx + 1}`;
+                const descInput = card.querySelector(".subtask-desc-input");
+                const desc = descInput?.value.trim() || "";
+                const assigneeSelect = card.querySelector(".subtask-assignee-select");
+                const assigneeId = assigneeSelect?.value ? parseInt(assigneeSelect.value) : null;
+                const assignmentId = card.getAttribute("data-assignment-id");
 
-            if (!desc) {
-                hasValidationError = true;
-                card.classList.add("invalid");
-                descInput.focus();
-                showToast(`Week ${weekNum} Description Required`, `Admin must define what work needs to be done for Week ${weekNum}. Empty work descriptions are not allowed.`, "error");
-            } else {
-                card.classList.remove("invalid");
-            }
+                if (!desc) {
+                    hasValidationError = true;
+                    card.classList.add("invalid");
+                    descInput.focus();
+                    showToast(`Description Required`, `Admin must define work deliverables for "${subTitle}" (Week ${wNum}).`, "error");
+                } else {
+                    card.classList.remove("invalid");
+                }
 
-            subtasksData.push({
-                weekNumber: weekNum,
-                title: weekTitle,
-                description: desc,
-                assigneeId: assigneeId
+                subtasksData.push({
+                    id: assignmentId ? parseInt(assignmentId) : null,
+                    weekNumber: wNum,
+                    subtaskNumber: totalCount,
+                    title: subTitle,
+                    description: desc,
+                    assigneeId: assigneeId
+                });
             });
         });
+
+        if (subtasksData.length === 0) {
+            showToast("Validation Error", "At least one subtask is required.", "error");
+            return;
+        }
 
         if (hasValidationError) return;
 
@@ -3015,8 +3345,10 @@
         selectedTeamLeadIds.forEach(id => formData.append("teamLeadIds", String(id)));
         selectedAssigneeIds.forEach(id => formData.append("employeeIds", String(id)));
 
-        // Send subtasks descriptions, titles, assignees
+        // Send subtasks details
         subtasksData.forEach(s => {
+            formData.append("subtaskIds", s.id ? String(s.id) : "");
+            formData.append("subtaskWeekNumbers", String(s.weekNumber));
             formData.append("subtaskTitles", s.title);
             formData.append("subtaskDescriptions", s.description);
             if (s.assigneeId) {
@@ -3026,7 +3358,7 @@
             }
         });
 
-        // Also pass subtasksJson as fallback
+        // Also pass subtasksJson
         formData.append("subtasksJson", JSON.stringify(subtasksData));
 
         try {

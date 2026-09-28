@@ -181,6 +181,10 @@ public class AttendanceService {
     // ============================================================
 
     public long getWorkingDaysThisMonth() {
+        return getWorkingDaysThisMonth(null);
+    }
+
+    public long getWorkingDaysThisMonth(Employee employee) {
 
         OfficeSettings settings =
                 officeSettingsRepository
@@ -195,6 +199,14 @@ public class AttendanceService {
 
         LocalDate firstDay =
                 today.withDayOfMonth(1);
+
+        if (employee != null && employee.getJoiningDate() != null && employee.getJoiningDate().isAfter(firstDay)) {
+            firstDay = employee.getJoiningDate();
+        }
+
+        if (firstDay.isAfter(today)) {
+            return 0;
+        }
 
         long count = 0;
 
@@ -223,7 +235,7 @@ public class AttendanceService {
             Employee employee) {
 
         long workingDays =
-                getWorkingDaysThisMonth();
+                getWorkingDaysThisMonth(employee);
 
         long attendedDays =
                 getCurrentMonthAttendance(employee)

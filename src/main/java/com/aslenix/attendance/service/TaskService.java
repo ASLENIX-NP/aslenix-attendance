@@ -101,17 +101,25 @@ public class TaskService {
 
         int weeks = (weeksRequired != null && weeksRequired > 0) ? weeksRequired : 1;
 
-        if (subtasks == null || subtasks.size() != weeks) {
-            throw new IllegalArgumentException("The number of subtasks (" + (subtasks != null ? subtasks.size() : 0)
-                    + ") must match the exact number of Weeks Required (" + weeks + ").");
+        if (subtasks == null || subtasks.isEmpty()) {
+            throw new IllegalArgumentException("At least one subtask is required.");
         }
+
+        int maxWeek = subtasks.stream()
+                .mapToInt(s -> s.getWeekNumber() != null && s.getWeekNumber() > 0 ? s.getWeekNumber() : 1)
+                .max()
+                .orElse(1);
+        weeks = Math.max(weeks, maxWeek);
 
         // Validate that admin provided actual details for every subtask
         for (int i = 0; i < subtasks.size(); i++) {
             SubtaskInputDto st = subtasks.get(i);
-            int weekNum = (st.getWeekNumber() != null && st.getWeekNumber() > 0) ? st.getWeekNumber() : (i + 1);
+            int weekNum = (st.getWeekNumber() != null && st.getWeekNumber() > 0) ? st.getWeekNumber() : 1;
+            String stTitle = (st.getTitle() != null && !st.getTitle().trim().isEmpty())
+                    ? st.getTitle().trim()
+                    : ("Week " + weekNum + " Subtask " + (i + 1));
             if (st.getDescription() == null || st.getDescription().trim().isEmpty()) {
-                throw new IllegalArgumentException("Work details/description is mandatory for Week " + weekNum + ". Please describe the required work.");
+                throw new IllegalArgumentException("Work details/description is mandatory for " + stTitle + " (Week " + weekNum + "). Please describe the required work.");
             }
         }
 
@@ -148,13 +156,13 @@ public class TaskService {
 
         Task savedTask = taskRepository.save(task);
 
-        // Create the exact N subtasks
+        // Create the subtasks
         for (int i = 0; i < subtasks.size(); i++) {
             SubtaskInputDto dto = subtasks.get(i);
-            int weekNum = i + 1;
+            int weekNum = (dto.getWeekNumber() != null && dto.getWeekNumber() > 0) ? dto.getWeekNumber() : 1;
             String stTitle = (dto.getTitle() != null && !dto.getTitle().trim().isEmpty())
                     ? dto.getTitle().trim()
-                    : ("Week " + weekNum);
+                    : ("Week " + weekNum + " Subtask " + (i + 1));
 
             Employee subAssignee = null;
             if (dto.getAssigneeId() != null) {
@@ -166,7 +174,8 @@ public class TaskService {
 
             TaskAssignment assignment = new TaskAssignment();
             assignment.setTask(savedTask);
-            assignment.setSubtaskNumber(weekNum);
+            assignment.setWeekNumber(weekNum);
+            assignment.setSubtaskNumber(i + 1);
             assignment.setTitle(stTitle);
             assignment.setDescription(dto.getDescription().trim());
             assignment.setAssignee(subAssignee);
@@ -224,15 +233,20 @@ public class TaskService {
         int weeks = (weeksRequired != null && weeksRequired > 0) ? weeksRequired : task.getWeeksRequired();
 
         if (subtasks != null && !subtasks.isEmpty()) {
-            if (subtasks.size() != weeks) {
-                throw new IllegalArgumentException("The number of subtasks (" + subtasks.size()
-                        + ") must match the exact number of Weeks Required (" + weeks + ").");
-            }
+            int maxWeek = subtasks.stream()
+                    .mapToInt(s -> s.getWeekNumber() != null && s.getWeekNumber() > 0 ? s.getWeekNumber() : 1)
+                    .max()
+                    .orElse(1);
+            weeks = Math.max(weeks, maxWeek);
+
             for (int i = 0; i < subtasks.size(); i++) {
                 SubtaskInputDto st = subtasks.get(i);
-                int weekNum = (st.getWeekNumber() != null && st.getWeekNumber() > 0) ? st.getWeekNumber() : (i + 1);
+                int weekNum = (st.getWeekNumber() != null && st.getWeekNumber() > 0) ? st.getWeekNumber() : 1;
+                String stTitle = (st.getTitle() != null && !st.getTitle().trim().isEmpty())
+                        ? st.getTitle().trim()
+                        : ("Week " + weekNum + " Subtask " + (i + 1));
                 if (st.getDescription() == null || st.getDescription().trim().isEmpty()) {
-                    throw new IllegalArgumentException("Work details/description is mandatory for Week " + weekNum + ".");
+                    throw new IllegalArgumentException("Work details/description is mandatory for " + stTitle + " (Week " + weekNum + ").");
                 }
             }
         }
@@ -258,40 +272,61 @@ public class TaskService {
 
         // Synchronize subtasks if provided
         if (subtasks != null && !subtasks.isEmpty()) {
-            List<TaskAssignment> currentAssignments = new ArrayList<>(task.getAssignments());
-            currentAssignments.sort(Comparator.comparing(a -> a.getSubtaskNumber() != null ? a.getSubtaskNumber() : 0));
+            Set<Long> incomingIds = new HashSet<>();
+            for (SubtaskInputDto dto : subtasks) {
+                if (dto.getId() != null) {
+                    incomingIds.add(dto.getId());
+                }
+            }
 
+            // Remove assignments deleted by admin (unless approved)
+            List<TaskAssignment> toRemove = new ArrayList<>();
+            for (TaskAssignment existing : task.getAssignments()) {
+                if (!incomingIds.contains(existing.getId())) {
+                    if (!existing.isLocked() && !"APPROVED".equalsIgnoreCase(existing.getStatus())) {
+                        toRemove.add(existing);
+                    }
+                }
+            }
+            for (TaskAssignment rem : toRemove) {
+                task.removeAssignment(rem);
+                taskAssignmentRepository.delete(rem);
+            }
+
+            // Process each subtask
             for (int i = 0; i < subtasks.size(); i++) {
                 SubtaskInputDto dto = subtasks.get(i);
-                int weekNum = i + 1;
+                int weekNum = (dto.getWeekNumber() != null && dto.getWeekNumber() > 0) ? dto.getWeekNumber() : 1;
                 String stTitle = (dto.getTitle() != null && !dto.getTitle().trim().isEmpty())
                         ? dto.getTitle().trim()
-                        : ("Week " + weekNum);
+                        : ("Week " + weekNum + " Subtask " + (i + 1));
 
                 Employee subAssignee = null;
                 if (dto.getAssigneeId() != null) {
                     subAssignee = employeeRepository.findById(dto.getAssigneeId()).orElse(null);
                 }
 
-                // Match existing assignment by weekNum or index
-                TaskAssignment existing = currentAssignments.stream()
-                        .filter(a -> a.getSubtaskNumber() != null && a.getSubtaskNumber() == weekNum)
-                        .findFirst()
-                        .orElse(i < currentAssignments.size() ? currentAssignments.get(i) : null);
+                TaskAssignment existing = null;
+                if (dto.getId() != null) {
+                    existing = task.getAssignments().stream()
+                            .filter(a -> Objects.equals(a.getId(), dto.getId()))
+                            .findFirst()
+                            .orElse(null);
+                }
 
                 if (existing != null) {
-                    // Update existing subtask while preserving its individual progress and status
-                    existing.setSubtaskNumber(weekNum);
+                    existing.setWeekNumber(weekNum);
+                    existing.setSubtaskNumber(i + 1);
                     existing.setTitle(stTitle);
                     existing.setDescription(dto.getDescription().trim());
                     existing.setAssignee(subAssignee);
                     existing.setWeight(task.getComplexity());
                     taskAssignmentRepository.save(existing);
                 } else {
-                    // Create new subtask for added week
                     TaskAssignment newAssignment = new TaskAssignment();
                     newAssignment.setTask(task);
-                    newAssignment.setSubtaskNumber(weekNum);
+                    newAssignment.setWeekNumber(weekNum);
+                    newAssignment.setSubtaskNumber(i + 1);
                     newAssignment.setTitle(stTitle);
                     newAssignment.setDescription(dto.getDescription().trim());
                     newAssignment.setAssignee(subAssignee);
@@ -301,15 +336,6 @@ public class TaskService {
                     newAssignment.setLocked(false);
                     TaskAssignment saved = taskAssignmentRepository.save(newAssignment);
                     task.getAssignments().add(saved);
-                }
-            }
-
-            // If weeks was reduced, remove excess subtasks
-            if (currentAssignments.size() > subtasks.size()) {
-                for (int i = subtasks.size(); i < currentAssignments.size(); i++) {
-                    TaskAssignment toRemove = currentAssignments.get(i);
-                    task.removeAssignment(toRemove);
-                    taskAssignmentRepository.delete(toRemove);
                 }
             }
         }
