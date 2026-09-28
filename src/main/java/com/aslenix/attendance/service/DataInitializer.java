@@ -5,6 +5,7 @@ import com.aslenix.attendance.entity.User;
 import com.aslenix.attendance.repository.UserRepository;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -13,17 +14,34 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     public DataInitializer(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JdbcTemplate jdbcTemplate) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public void run(String... args) {
+
+        // Ensure MySQL column nullability allows detached references on employee deletion
+        try {
+            jdbcTemplate.execute("ALTER TABLE tasks MODIFY COLUMN employee_id BIGINT NULL");
+        } catch (Exception ignored) {
+        }
+        try {
+            jdbcTemplate.execute("ALTER TABLE task_assignments MODIFY COLUMN employee_id BIGINT NULL");
+        } catch (Exception ignored) {
+        }
+        try {
+            jdbcTemplate.execute("ALTER TABLE task_assignment_histories MODIFY COLUMN updated_by_id BIGINT NULL");
+        } catch (Exception ignored) {
+        }
 
         if (!userRepository.existsByUsername("admin")) {
 

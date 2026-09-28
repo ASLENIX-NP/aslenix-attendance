@@ -281,16 +281,18 @@ public class TaskService {
 
             // Remove assignments deleted by admin (unless approved)
             List<TaskAssignment> toRemove = new ArrayList<>();
-            for (TaskAssignment existing : task.getAssignments()) {
-                if (!incomingIds.contains(existing.getId())) {
-                    if (!existing.isLocked() && !"APPROVED".equalsIgnoreCase(existing.getStatus())) {
-                        toRemove.add(existing);
+            if (!incomingIds.isEmpty()) {
+                for (TaskAssignment existing : task.getAssignments()) {
+                    if (!incomingIds.contains(existing.getId())) {
+                        if (!existing.isLocked() && !"APPROVED".equalsIgnoreCase(existing.getStatus())) {
+                            toRemove.add(existing);
+                        }
                     }
                 }
-            }
-            for (TaskAssignment rem : toRemove) {
-                task.removeAssignment(rem);
-                taskAssignmentRepository.delete(rem);
+                for (TaskAssignment rem : toRemove) {
+                    task.removeAssignment(rem);
+                    taskAssignmentRepository.delete(rem);
+                }
             }
 
             // Process each subtask
@@ -312,13 +314,15 @@ public class TaskService {
                             .filter(a -> Objects.equals(a.getId(), dto.getId()))
                             .findFirst()
                             .orElse(null);
+                } else if (incomingIds.isEmpty() && i < task.getAssignments().size()) {
+                    existing = task.getAssignments().get(i);
                 }
 
                 if (existing != null) {
                     existing.setWeekNumber(weekNum);
                     existing.setSubtaskNumber(i + 1);
                     existing.setTitle(stTitle);
-                    existing.setDescription(dto.getDescription().trim());
+                    existing.setDescription(dto.getDescription() != null ? dto.getDescription().trim() : null);
                     existing.setAssignee(subAssignee);
                     existing.setWeight(task.getComplexity());
                     taskAssignmentRepository.save(existing);

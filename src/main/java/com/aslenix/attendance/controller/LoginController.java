@@ -1,11 +1,19 @@
 package com.aslenix.attendance.controller;
 
+import com.aslenix.attendance.entity.User;
+import com.aslenix.attendance.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class LoginController {
+
+    private final UserRepository userRepository;
+
+    public LoginController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     // ============================================================
     // LOGIN PAGE
@@ -54,6 +62,11 @@ public class LoginController {
                 .anyMatch(authority ->
                         "ROLE_EMPLOYEE".equals(
                                 authority.getAuthority()))) {
+
+            User user = userRepository.findByUsername(authentication.getName()).orElse(null);
+            if (user != null && user.isPasswordChangeRequired()) {
+                return "redirect:/employee/change-password";
+            }
 
             return "redirect:/employee/dashboard";
         }

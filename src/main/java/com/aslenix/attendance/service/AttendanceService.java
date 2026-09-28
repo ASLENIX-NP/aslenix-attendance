@@ -939,6 +939,13 @@ public class AttendanceService {
 
         for (LocalDate d = earliestDate; !d.isAfter(today); d = d.plusDays(1)) {
             if (!isDateWorkingDay(d, settings)) {
+                // If employee attended on a non-working day (e.g. weekend), count towards streak
+                if (isAttendedOrApprovedLeave(employee, d, attendanceMap)) {
+                    runningStreak++;
+                    if (runningStreak > longestStreak) {
+                        longestStreak = runningStreak;
+                    }
+                }
                 // Non-working day skips without resetting running streak
                 continue;
             }

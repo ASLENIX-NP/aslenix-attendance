@@ -180,7 +180,7 @@ public class EmployeeController {
         );
         user.setRole(Role.EMPLOYEE);
         user.setEnabled(true);
-        user.setPasswordChangeRequired(false);
+        user.setPasswordChangeRequired(true);
 
         userRepository.save(user);
 
@@ -374,11 +374,12 @@ public class EmployeeController {
                 user.setUsername(username);
                 user.setRole(Role.EMPLOYEE);
                 user.setEnabled(existing.isEnabled());
-                user.setPasswordChangeRequired(false);
+                user.setPasswordChangeRequired(true);
                 user = userRepository.save(user);
                 existing.setUser(user);
             }
             user.setPassword(passwordEncoder.encode(newPassword.trim()));
+            user.setPasswordChangeRequired(true);
             userRepository.save(user);
         }
 
@@ -485,14 +486,14 @@ public class EmployeeController {
             user.setUsername(username);
             user.setRole(Role.EMPLOYEE);
             user.setEnabled(employee.isEnabled());
-            user.setPasswordChangeRequired(false);
+            user.setPasswordChangeRequired(true);
             user = userRepository.save(user);
             employee.setUser(user);
             employeeRepository.save(employee);
         }
 
         user.setPassword(passwordEncoder.encode(newPassword.trim()));
-        user.setPasswordChangeRequired(false);
+        user.setPasswordChangeRequired(true);
         userRepository.save(user);
 
         String employeeName = employee.getFirstName() + (employee.getLastName() != null ? " " + employee.getLastName() : "");
@@ -566,17 +567,24 @@ public class EmployeeController {
             @PathVariable Long id,
             RedirectAttributes redirectAttributes) {
 
-        boolean deleted = employeeDeletionService.deleteEmployee(id);
+        try {
+            boolean deleted = employeeDeletionService.deleteEmployee(id);
 
-        if (deleted) {
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Employee deleted permanently."
-            );
-        } else {
+            if (deleted) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        "Employee deleted permanently."
+                );
+            } else {
+                redirectAttributes.addFlashAttribute(
+                        "errorMessage",
+                        "Employee not found."
+                );
+            }
+        } catch (Exception e) {
             redirectAttributes.addFlashAttribute(
                     "errorMessage",
-                    "Employee not found."
+                    "Failed to delete employee: " + (e.getMessage() != null ? e.getMessage() : "Unexpected error")
             );
         }
 
