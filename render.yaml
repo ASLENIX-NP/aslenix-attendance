@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: aslenix-attendance
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /login
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: JPA_DDL_AUTO
+        value: update
+      - key: THYMELEAF_CACHE
+        value: true
+      - key: AUTO_CREATE_ADMIN
+        value: false
+      # Configure your database connection in the Render dashboard:
+      # Either provide full DB_URL (or DATABASE_URL):
+      # - key: DB_URL
+      #   sync: false
+      # Or configure discrete components:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 3306
+      - key: DB_NAME
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
