@@ -14,6 +14,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.aslenix.attendance.entity.Department;
+import com.aslenix.attendance.repository.DepartmentRepository;
+import com.aslenix.attendance.repository.EmployeeRepository;
+
 import java.security.Principal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -21,6 +25,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAdjusters;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +37,8 @@ public class OfficeSettingsController {
     private final WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DepartmentRepository departmentRepository;
+    private final EmployeeRepository employeeRepository;
 
     private static final LocalTime DEFAULT_START_TIME =
             LocalTime.of(10, 0);
@@ -53,13 +60,17 @@ public class OfficeSettingsController {
             OfficeSettingsRepository officeSettingsRepository,
             WeeklyWorkingScheduleRepository weeklyWorkingScheduleRepository,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            DepartmentRepository departmentRepository,
+            EmployeeRepository employeeRepository) {
 
         this.officeSettingsRepository = officeSettingsRepository;
         this.weeklyWorkingScheduleRepository =
                 weeklyWorkingScheduleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.departmentRepository = departmentRepository;
+        this.employeeRepository = employeeRepository;
     }
 
 
@@ -240,6 +251,13 @@ public class OfficeSettingsController {
                 weekEnd
         );
 
+        List<Department> availableDepartments = departmentRepository.findAvailableDepartments();
+        Map<Long, Long> deptEmployeeCounts = new HashMap<>();
+        for (Department d : availableDepartments) {
+            deptEmployeeCounts.put(d.getId(), employeeRepository.countByDepartmentId(d.getId()));
+        }
+        model.addAttribute("departments", availableDepartments);
+        model.addAttribute("deptEmployeeCounts", deptEmployeeCounts);
 
         return "admin/settings";
     }

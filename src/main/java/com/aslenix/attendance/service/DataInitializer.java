@@ -215,11 +215,19 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     public void initializeDepartments() {
-        seedDepartment("Frontend", "FE");
-        seedDepartment("UI/UX", "FE");
-        seedDepartment("Backend", "BE");
-        seedDepartment("Administration", "AD");
-        seedDepartment("Digital Marketing", "DM");
+        if (departmentRepository.count() == 0) {
+            seedDepartment("Frontend", "FE");
+            seedDepartment("UI/UX", "FE");
+            seedDepartment("Backend", "BE");
+            seedDepartment("Administration", "AD");
+            seedDepartment("Digital Marketing", "DM");
+        } else {
+            updateAbbreviationIfMissing("Frontend", "FE");
+            updateAbbreviationIfMissing("UI/UX", "FE");
+            updateAbbreviationIfMissing("Backend", "BE");
+            updateAbbreviationIfMissing("Administration", "AD");
+            updateAbbreviationIfMissing("Digital Marketing", "DM");
+        }
     }
 
     private void seedDepartment(String name, String abbreviation) {
@@ -231,6 +239,15 @@ public class DataInitializer implements CommandLineRunner {
         });
         dept.setAbbreviation(abbreviation);
         departmentRepository.save(dept);
+    }
+
+    private void updateAbbreviationIfMissing(String name, String abbreviation) {
+        departmentRepository.findByName(name).ifPresent(dept -> {
+            if (dept.getAbbreviation() == null || dept.getAbbreviation().isBlank()) {
+                dept.setAbbreviation(abbreviation);
+                departmentRepository.save(dept);
+            }
+        });
     }
 
     public void cleanupDeprecatedDepartments() {

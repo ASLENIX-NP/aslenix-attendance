@@ -23,4 +23,8 @@ public interface EmployeeRepository
     List<Employee> findAllByOrderByFirstNameAsc();
 
     List<Employee> findByUserRole(Role role);
+
+    long countByDepartmentId(Long departmentId);
+
+    List<Employee> findByDepartmentId(Long departmentId);
 }

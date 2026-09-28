@@ -13,7 +13,13 @@ public interface DepartmentRepository
 
     Optional<Department> findByName(String name);
 
+    Optional<Department> findByNameIgnoreCase(String name);
+
     boolean existsByName(String name);
+
+    boolean existsByNameIgnoreCase(String name);
+
+    List<Department> findByActiveTrueOrderByIdAsc();
 
     @Query("SELECT d FROM Department d WHERE d.active = true AND LOWER(d.name) NOT IN ('full stack', 'hr', 'fullstack', 'full-stack') ORDER BY d.id ASC")
     List<Department> findAvailableDepartments();

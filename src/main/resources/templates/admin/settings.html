@@ -1677,6 +1677,12 @@
             .days-grid { grid-template-columns: 1fr; }
             .schedule-grid { grid-template-columns: 1fr; }
         }
+
+        @media (max-width: 640px) {
+            .dept-add-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
     <link rel="stylesheet" href="/css/admin-dashboard.css">
 </head>
@@ -2415,6 +2421,123 @@
                         </section>
                     </form>
                 </article>
+
+                <!-- DEPARTMENT MANAGEMENT PANEL -->
+                <article class="panel" id="departmentsSection">
+                    <div class="panel-header">
+                        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: #eef2ff; color: #4f46e5; display: grid; place-items: center; flex-shrink: 0;">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2>Department Management</h2>
+                                    <span>Add, configure, or remove organizational departments at any time</span>
+                                </div>
+                            </div>
+                            <a href="#addDeptForm" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; transition: all 0.2s ease;">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>+ New Department</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- FLASH MESSAGES -->
+                    <div th:if="${deptSuccess != null}" class="message success-message" style="margin: 16px 24px 0;" th:text="${deptSuccess}">
+                        ✓ Department updated successfully.
+                    </div>
+                    <div th:if="${deptError != null}" class="message error-message" style="margin: 16px 24px 0;" th:text="${deptError}">
+                        Unable to modify department.
+                    </div>
+
+                    <!-- DEPARTMENTS LIST TABLE -->
+                    <div style="padding: 20px 24px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px;">
+                            <thead>
+                                <tr style="background: #f8fafc; text-align: left; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;">
+                                    <th style="padding: 12px 16px; border-radius: 8px 0 0 8px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-left: 1px solid #e2e8f0;">Department Name</th>
+                                    <th style="padding: 12px 16px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">Abbreviation</th>
+                                    <th style="padding: 12px 16px; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">Assigned Employees</th>
+                                    <th style="padding: 12px 16px; border-radius: 0 8px 8px 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${departments == null || #lists.isEmpty(departments)}">
+                                    <td colspan="4" style="text-align: center; padding: 24px; color: #8a96aa;">No departments configured. Add one below.</td>
+                                </tr>
+                                <tr th:each="dept : ${departments}" style="border-bottom: 1px solid #f1f5f9; transition: background 0.15s ease;">
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid #f1f5f9;">
+                                        <div style="font-weight: 700; color: #0f172a; font-size: 13.5px;" th:text="${dept.name}">Frontend</div>
+                                    </td>
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid #f1f5f9;">
+                                        <span style="display: inline-block; padding: 4px 10px; background: #eef2ff; color: #4338ca; border-radius: 6px; font-weight: 800; font-size: 11.5px; letter-spacing: 0.5px;"
+                                              th:text="${dept.effectiveAbbreviation}">FE</span>
+                                    </td>
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid #f1f5f9;">
+                                        <span style="display: inline-flex; align-items: center; gap: 6px; color: #475569; font-weight: 600;">
+                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            <span th:text="${deptEmployeeCounts != null && deptEmployeeCounts[dept.id] != null ? deptEmployeeCounts[dept.id] + ' employee' + (deptEmployeeCounts[dept.id] == 1 ? '' : 's') : '0 employees'}">0 employees</span>
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid #f1f5f9; text-align: right;">
+                                        <button type="button" class="btn-remove-department"
+                                                th:data-dept-id="${dept.id}"
+                                                th:data-dept-name="${dept.name}"
+                                                th:data-dept-code="${dept.effectiveAbbreviation}"
+                                                th:data-emp-count="${deptEmployeeCounts != null && deptEmployeeCounts[dept.id] != null ? deptEmployeeCounts[dept.id] : 0}"
+                                                onclick="openDeptDeleteModal(this)"
+                                                style="display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                            <span>Remove</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- QUICK ADD FORM -->
+                    <div style="padding: 20px 24px 24px; background: #f8fafc; border-top: 1px solid #e8edf6; border-radius: 0 0 16px 16px;">
+                        <form th:action="@{/admin/departments/add}" method="post" id="addDeptForm" style="display: flex; flex-direction: column; gap: 14px;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <div style="font-size: 13px; font-weight: 750; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4f46e5" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Add New Department</span>
+                            </div>
+                            <div class="dept-add-grid" style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; align-items: flex-end;">
+                                <div>
+                                    <label for="deptNameInput" style="display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Department Name</label>
+                                    <input type="text" id="deptNameInput" name="name" placeholder="e.g. Quality Assurance" required
+                                           style="width: 100%; height: 42px; padding: 0 12px; border: 1.5px solid #cbd5e1; border-radius: 9px; font-size: 13px; font-weight: 600; color: #0f172a; outline: none; background: #ffffff;">
+                                </div>
+                                <div>
+                                    <label for="deptAbbrevInput" style="display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Abbreviation (Prefix)</label>
+                                    <input type="text" id="deptAbbrevInput" name="abbreviation" placeholder="e.g. QA" maxlength="10"
+                                           oninput="this.value = this.value.toUpperCase()"
+                                           style="width: 100%; height: 42px; padding: 0 12px; border: 1.5px solid #cbd5e1; border-radius: 9px; font-size: 13px; font-weight: 700; color: #4338ca; text-transform: uppercase; outline: none; background: #ffffff;">
+                                </div>
+                                <button type="submit" style="height: 42px; padding: 0 20px; background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color: #ffffff; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25); white-space: nowrap;">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span>Add Department</span>
+                                </button>
+                            </div>
+                            <div style="font-size: 11px; color: #8a96aa;">
+                                When new employees are added to this department, their ID & login username will automatically format as <strong>[ABBREVIATION]-100X</strong>.
+                            </div>
+                        </form>
+                    </div>
+                </article>
                 </div>
 
                 <!-- RIGHT: CURRENT CONFIGURATION AUDIT -->
@@ -2504,6 +2627,12 @@
                         <div class="info-item">
                             <span>Leave system</span>
                             <span style="color: #15803d; font-weight: 800;">Active</span>
+                        </div>
+
+                        <!-- DEPARTMENTS -->
+                        <div class="info-item">
+                            <span>Departments</span>
+                            <span th:text="${departments != null ? #lists.size(departments) + ' active' : '0 active'}">5 active</span>
                         </div>
                     </div>
 
@@ -3281,7 +3410,108 @@ function validateAdminPasswordChange(e) {
     errEl.style.display = 'none';
     return true;
 }
+
+function openDeptDeleteModal(btn) {
+    const deptId = btn.getAttribute('data-dept-id');
+    const deptName = btn.getAttribute('data-dept-name');
+    const deptCode = btn.getAttribute('data-dept-code');
+    const empCount = parseInt(btn.getAttribute('data-emp-count') || '0', 10);
+
+    const modal = document.getElementById('deptDeleteModal');
+    const form = document.getElementById('deptDeleteForm');
+    const nameText = document.getElementById('deleteDeptNameText');
+    const codeText = document.getElementById('deleteDeptCodeText');
+    const countText = document.getElementById('deleteDeptCountText');
+    const reassignSection = document.getElementById('deptDeleteReassignSection');
+    const reassignSelect = document.getElementById('reassignDeptSelect');
+    const submitBtn = document.getElementById('deptDeleteSubmitBtn');
+
+    form.action = '/admin/departments/delete/' + deptId;
+    nameText.textContent = deptName;
+    codeText.textContent = deptCode;
+    countText.textContent = empCount;
+
+    // Filter out current department from reassign select options
+    if (reassignSelect) {
+        for (let i = 0; i < reassignSelect.options.length; i++) {
+            const opt = reassignSelect.options[i];
+            if (opt.value === deptId) {
+                opt.style.display = 'none';
+                opt.disabled = true;
+            } else {
+                opt.style.display = 'block';
+                opt.disabled = false;
+            }
+        }
+        reassignSelect.selectedIndex = 0;
+    }
+
+    if (empCount > 0) {
+        reassignSection.style.display = 'block';
+        if (reassignSelect) reassignSelect.required = true;
+        submitBtn.textContent = 'Transfer & Remove Department';
+    } else {
+        reassignSection.style.display = 'none';
+        if (reassignSelect) reassignSelect.required = false;
+        submitBtn.textContent = 'Remove Department';
+    }
+
+    modal.style.display = 'grid';
+}
+
+function closeDeptDeleteModal() {
+    const modal = document.getElementById('deptDeleteModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Close modal on click outside content
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('deptDeleteModal');
+    if (event.target === modal) {
+        closeDeptDeleteModal();
+    }
+});
 </script>
+
+<!-- REMOVE DEPARTMENT CONFIRMATION MODAL -->
+<div id="deptDeleteModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; place-items: center; padding: 16px;">
+    <div style="background: #ffffff; border-radius: 16px; max-width: 480px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.05); overflow: hidden; border: 1px solid #e2e8f0;">
+        <div style="padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: grid; place-items: center;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </div>
+                <h3 style="font-size: 16px; font-weight: 750; color: #0f172a; margin: 0;">Remove Department</h3>
+            </div>
+            <button type="button" onclick="closeDeptDeleteModal()" style="background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+
+        <form id="deptDeleteForm" method="post" action="" style="padding: 24px;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            
+            <p style="font-size: 13.5px; color: #334155; line-height: 1.5; margin-bottom: 16px;">
+                Are you sure you want to remove the department <strong id="deleteDeptNameText"></strong> (<span id="deleteDeptCodeText"></span>)?
+            </p>
+
+            <div id="deptDeleteReassignSection" style="display: none; margin-bottom: 16px;">
+                <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; display: flex; gap: 10px; font-size: 12.5px; color: #9a3412;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <span>This department has <strong id="deleteDeptCountText">0</strong> active employee(s). Please choose a target department to transfer them to:</span>
+                </div>
+                <label for="reassignDeptSelect" style="display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px;">Transfer Employees To:</label>
+                <select id="reassignDeptSelect" name="reassignDepartmentId" style="width: 100%; height: 40px; padding: 0 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 600; color: #0f172a; outline: none; background: #ffffff;">
+                    <option value="">Select Target Department</option>
+                    <option th:each="d : ${departments}" th:value="${d.id}" th:text="${d.name + ' (' + d.effectiveAbbreviation + ')'}"></option>
+                </select>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" onclick="closeDeptDeleteModal()" style="padding: 9px 16px; border: 1.5px solid #e2e8f0; background: #ffffff; color: #475569; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Cancel</button>
+                <button type="submit" id="deptDeleteSubmitBtn" style="padding: 9px 18px; border: none; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);">Remove Department</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

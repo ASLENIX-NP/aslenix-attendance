@@ -1,5 +1,6 @@
 package com.aslenix.attendance;
 
+import com.aslenix.attendance.controller.AdminDepartmentController;
 import com.aslenix.attendance.controller.EmployeeController;
 import com.aslenix.attendance.entity.Department;
 import com.aslenix.attendance.entity.Employee;
@@ -53,8 +54,22 @@ public class EmployeeCodeAndDepartmentTest {
     @Autowired
     private DataInitializer dataInitializer;
 
+    @Autowired
+    private AdminDepartmentController adminDepartmentController;
+
     @BeforeEach
     void setUp() {
+        for (Employee e : employeeRepository.findAll()) {
+            if (e.getEmployeeCode() != null && !e.getEmployeeCode().startsWith("ADM-")) {
+                User u = e.getUser();
+                employeeRepository.delete(e);
+                if (u != null) {
+                    userRepository.delete(u);
+                }
+            }
+        }
+        employeeSequenceRepository.deleteAll();
+
         // Run department initialization
         dataInitializer.initializeDepartments();
     }
@@ -247,5 +262,112 @@ public class EmployeeCodeAndDepartmentTest {
         emp.setJoiningDate(LocalDate.now());
         emp.setEnabled(true);
         employeeRepository.save(emp);
+    }
+
+    @Test
+    void testAdminCanAddAndRemoveDepartments() {
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        // 1. Admin adds a new department "Quality Assurance" with abbreviation "QA"
+        String redirect = adminDepartmentController.addDepartment("Quality Assurance", "QA", redirectAttributes);
+        assertEquals("redirect:/admin/settings#departmentsSection", redirect);
+        assertTrue(redirectAttributes.getFlashAttributes().containsKey("deptSuccess"));
+
+        Department qa = departmentRepository.findByName("Quality Assurance").orElseThrow();
+        assertEquals("QA", qa.getAbbreviation());
+        assertTrue(qa.isActive());
+
+        // Verify it appears in available departments
+        java.util.List<Department> available = departmentRepository.findAvailableDepartments();
+        assertTrue(available.stream().anyMatch(d -> d.getName().equals("Quality Assurance")));
+
+        // Verify sequential employee ID generation works for QA
+        String nextQaCode = employeeCodeService.generateNextEmployeeCode(qa);
+        assertTrue(nextQaCode.startsWith("QA-"));
+
+        // 2. Duplicate addition is prevented
+        RedirectAttributesModelMap dupAttrs = new RedirectAttributesModelMap();
+        adminDepartmentController.addDepartment("Quality Assurance", "QA", dupAttrs);
+        assertTrue(dupAttrs.getFlashAttributes().containsKey("deptError"));
+
+        // 3. Admin removes the department
+        RedirectAttributesModelMap delAttrs = new RedirectAttributesModelMap();
+        String delRedirect = adminDepartmentController.deleteDepartment(qa.getId(), null, delAttrs);
+        assertEquals("redirect:/admin/settings#departmentsSection", delRedirect);
+        assertTrue(delAttrs.getFlashAttributes().containsKey("deptSuccess"));
+
+        // Verify it no longer appears in available departments
+        java.util.List<Department> updatedAvailable = departmentRepository.findAvailableDepartments();
+        assertFalse(updatedAvailable.stream().anyMatch(d -> d.getName().equals("Quality Assurance")));
+    }
+
+    @Test
+    void testAdminCannotDeleteDepartmentWithActiveEmployeesWithoutReassignment() {
+        Department be = departmentRepository.findByName("Backend").orElseThrow();
+
+        // Save employee assigned to Backend
+        saveEmployeeWithCode("BE-1001", be, "be.emp@aslenix.local");
+
+        // Attempt deletion without reassignment
+        RedirectAttributesModelMap attrs = new RedirectAttributesModelMap();
+        adminDepartmentController.deleteDepartment(be.getId(), null, attrs);
+
+        assertTrue(attrs.getFlashAttributes().containsKey("deptError"));
+        assertTrue(attrs.getFlashAttributes().get("deptError").toString().contains("assigned"));
+
+        // Backend must still be active
+        Department reloadedBe = departmentRepository.findById(be.getId()).orElseThrow();
+        assertTrue(reloadedBe.isActive());
+    }
+
+    @Test
+    void testAdminCanDeleteDepartmentWithEmployeeReassignment() {
+        // Create temporary department
+        Department temp = new Department("Mobile Development", "MD");
+        temp.setActive(true);
+        departmentRepository.save(temp);
+
+        Department fe = departmentRepository.findByName("Frontend").orElseThrow();
+
+        // Assign employee to temp
+        saveEmployeeWithCode("MD-1001", temp, "mobile.dev@aslenix.local");
+        Employee emp = employeeRepository.findByEmployeeCode("MD-1001").orElseThrow();
+        assertEquals(temp.getId(), emp.getDepartment().getId());
+
+        // Delete temp with reassignment to Frontend
+        RedirectAttributesModelMap attrs = new RedirectAttributesModelMap();
+        adminDepartmentController.deleteDepartment(temp.getId(), fe.getId(), attrs);
+
+        assertTrue(attrs.getFlashAttributes().containsKey("deptSuccess"));
+
+        // Verify employee was reassigned to Frontend
+        Employee reassigned = employeeRepository.findById(emp.getId()).orElseThrow();
+        assertEquals(fe.getId(), reassigned.getDepartment().getId());
+
+        // Verify temp is no longer available
+        java.util.List<Department> available = departmentRepository.findAvailableDepartments();
+        assertFalse(available.stream().anyMatch(d -> d.getName().equals("Mobile Development")));
+    }
+
+    @Test
+    void testAdminCanReactivateDeletedDepartment() {
+        Department dm = departmentRepository.findByName("Digital Marketing").orElseThrow();
+        dm.setActive(false);
+        departmentRepository.save(dm);
+
+        assertFalse(departmentRepository.findAvailableDepartments().stream()
+                .anyMatch(d -> d.getName().equals("Digital Marketing")));
+
+        // Re-adding the department reactivates it
+        RedirectAttributesModelMap attrs = new RedirectAttributesModelMap();
+        adminDepartmentController.addDepartment("Digital Marketing", "DM", attrs);
+
+        assertTrue(attrs.getFlashAttributes().containsKey("deptSuccess"));
+        assertTrue(attrs.getFlashAttributes().get("deptSuccess").toString().contains("reactivated"));
+
+        Department reactivated = departmentRepository.findByName("Digital Marketing").orElseThrow();
+        assertTrue(reactivated.isActive());
+        assertTrue(departmentRepository.findAvailableDepartments().stream()
+                .anyMatch(d -> d.getName().equals("Digital Marketing")));
     }
 }
