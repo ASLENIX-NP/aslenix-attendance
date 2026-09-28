@@ -928,3 +928,207 @@ button[type="submit"]:active, input[type="submit"]:active {
     padding: 0 !important;
 }
 
+/* ==============================================================================
+   MOBILE RESPONSIVE SIDEBAR & SLIDING DRAWER SYSTEM
+   ============================================================================== */
+
+/* Desktop defaults: Hide mobile toggle, backdrop, and close button */
+.mobile-sidebar-toggle {
+    display: none !important;
+}
+
+.sidebar-backdrop {
+    display: none;
+}
+
+.sidebar-close-btn {
+    display: none !important;
+}
+
+/* Tablet & Mobile Breakpoint (<= 900px) */
+@media (max-width: 900px) {
+    /* 1. Layout reset for single-column mobile view */
+    html, body {
+        overflow-x: hidden !important;
+        position: relative;
+    }
+
+    .app-layout {
+        display: block !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        overflow-x: hidden !important;
+    }
+
+    .main-area {
+        width: 100% !important;
+        margin-left: 0 !important;
+        max-width: 100vw !important;
+        min-height: 100vh !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* 2. Sidebar hidden off-screen to the left by default with smooth slide transition */
+    body .sidebar,
+    .admin-dashboard .sidebar,
+    .app-layout .sidebar,
+    aside.sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 280px !important;
+        max-width: 84vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        z-index: 1200 !important;
+        transform: translateX(-100%) !important;
+        -webkit-transform: translateX(-100%) !important;
+        transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease !important;
+        background: #ffffff !important;
+        border-right: 1px solid #e4e9f3 !important;
+        box-shadow: none !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 16px 14px !important;
+    }
+
+    /* 3. When opened, slide in smoothly from the left */
+    body .sidebar.mobile-open,
+    .admin-dashboard .sidebar.mobile-open,
+    .app-layout .sidebar.mobile-open,
+    aside.sidebar.mobile-open {
+        transform: translateX(0) !important;
+        -webkit-transform: translateX(0) !important;
+        box-shadow: 12px 0 48px rgba(15, 23, 42, 0.30) !important;
+    }
+
+    /* 4. Backdrop overlay behind sliding drawer */
+    .sidebar-backdrop {
+        display: block !important;
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(15, 23, 42, 0.48) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        z-index: 1190 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease !important;
+    }
+
+    .sidebar-backdrop.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    /* 5. Mobile hamburger button on the left side of top-header */
+    .mobile-sidebar-toggle {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        border-radius: 12px !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #1e293b !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 8px rgba(16, 37, 54, 0.06) !important;
+        margin-right: auto !important;
+        margin-left: 0 !important;
+        flex-shrink: 0 !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        padding: 0 !important;
+    }
+
+    .mobile-sidebar-toggle svg {
+        width: 22px !important;
+        height: 22px !important;
+        stroke: #1e293b !important;
+        display: block !important;
+        transition: stroke 0.2s ease !important;
+    }
+
+    .mobile-sidebar-toggle:hover,
+    .mobile-sidebar-toggle:active {
+        background: #f8fafc !important;
+        border-color: var(--aslenix-purple) !important;
+        transform: scale(1.03) !important;
+    }
+
+    .mobile-sidebar-toggle:hover svg,
+    .mobile-sidebar-toggle:active svg {
+        stroke: var(--aslenix-purple) !important;
+    }
+
+    /* 6. Sidebar title container & close button */
+    .sidebar-title-with-close {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+
+    .sidebar-close-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        border-radius: 9px !important;
+        background: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #64748b !important;
+        cursor: pointer !important;
+        margin-left: auto !important;
+        padding: 0 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .sidebar-close-btn svg {
+        stroke: currentColor !important;
+        width: 17px !important;
+        height: 17px !important;
+        display: block !important;
+    }
+
+    .sidebar-close-btn:hover {
+        background: #fee2e2 !important;
+        color: #ef4444 !important;
+        border-color: #fecaca !important;
+    }
+
+    /* 7. Header alignment on mobile */
+    .top-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 16px !important;
+        width: 100% !important;
+        left: 0 !important;
+        gap: 12px !important;
+    }
+
+    .header-right {
+        margin-left: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+
+    /* Lock body scroll when mobile drawer is open */
+    body.sidebar-open {
+        overflow: hidden !important;
+        touch-action: none !important;
+    }
+}
+
+

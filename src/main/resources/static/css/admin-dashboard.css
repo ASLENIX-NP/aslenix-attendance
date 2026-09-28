@@ -388,21 +388,13 @@
 }
 
 @media (max-width: 850px) {
-    .admin-dashboard .sidebar { width: 220px; }
-    .admin-dashboard .main-area { width: calc(100% - 220px); margin-left: 220px; }
-    .admin-dashboard .top-header { padding: 0 22px; }
+    .admin-dashboard .top-header { padding: 0 16px; }
     .admin-dashboard .header-context { display: none; }
     .admin-dashboard .profile-info { display: none; }
-    .admin-dashboard main { padding: 28px 24px 48px; }
+    .admin-dashboard main { padding: 24px 18px 40px; }
 }
 
 @media (max-width: 680px) {
-    .admin-dashboard .app-layout { display: block; }
-    .admin-dashboard .sidebar { position: relative; width: 100%; height: auto; min-height: 0; padding: 16px; border-right: 0; }
-    .admin-dashboard .sidebar-brand { margin-bottom: 18px; }
-    .admin-dashboard .sidebar-menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
-    .admin-dashboard .sidebar-link { min-height: 54px; }
-    .admin-dashboard .sidebar-bottom { display: none; }
     .admin-dashboard .main-area { width: 100%; margin-left: 0; }
     .admin-dashboard .top-header { height: 64px; min-height: 64px; padding: 0 16px; }
     .admin-dashboard .header-date { display: none; }

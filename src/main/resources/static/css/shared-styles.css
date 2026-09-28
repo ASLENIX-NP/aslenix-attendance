@@ -1653,19 +1653,9 @@ tbody tr:last-child td {
 ===================================================== */
 
 @media (max-width: 850px) {
-    .sidebar {
-        width: 210px;
-        min-width: 210px;
-    }
+    .top-header  { padding: 0 16px; }
 
-    .main-area {
-        width: calc(100% - 210px);
-        margin-left: 210px;
-    }
-
-    .top-header  { padding: 0 20px; }
-
-    main { padding: 25px 20px 40px; }
+    main { padding: 25px 16px 40px; }
 
     .profile-info,
     .profile-arrow { display: none; }
@@ -1679,42 +1669,6 @@ tbody tr:last-child td {
 ===================================================== */
 
 @media (max-width: 680px) {
-    .app-layout { display: block; }
-
-    .sidebar {
-        position: relative;
-        width: 100%;
-        min-width: 0;
-        height: auto;
-        padding: 15px;
-        border-right: none;
-        border-bottom: 1px solid var(--sidebar-border);
-    }
-
-    .brand {
-        height: 90px;
-        min-height: 90px;
-        flex: 0 0 90px;
-        margin-bottom: 12px;
-    }
-
-    .brand-logo { height: 90px; }
-
-    .brand-logo img,
-    .brand-logo .aslenix-logo {
-        width:  90px !important;
-        height: 90px !important;
-    }
-
-    .sidebar-menu {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 5px;
-    }
-
-    .sidebar-bottom,
-    .sidebar-footer { display: none; }
-
     .main-area {
         width: 100%;
         margin-left: 0;
