@@ -1,0 +1,219 @@
+package com.aslenix.attendance;
+
+import com.aslenix.attendance.controller.EmployeeController;
+import com.aslenix.attendance.entity.Department;
+import com.aslenix.attendance.entity.Employee;
+import com.aslenix.attendance.entity.Role;
+import com.aslenix.attendance.entity.User;
+import com.aslenix.attendance.repository.DepartmentRepository;
+import com.aslenix.attendance.repository.EmployeeRepository;
+import com.aslenix.attendance.repository.EmployeeSequenceRepository;
+import com.aslenix.attendance.repository.UserRepository;
+import com.aslenix.attendance.security.CustomUserDetailsService;
+import com.aslenix.attendance.service.DataInitializer;
+import com.aslenix.attendance.service.EmployeeCodeService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@Transactional
+public class EmployeeCodeAndDepartmentTest {
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EmployeeSequenceRepository employeeSequenceRepository;
+
+    @Autowired
+    private EmployeeCodeService employeeCodeService;
+
+    @Autowired
+    private EmployeeController employeeController;
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+
+    @Autowired
+    private DataInitializer dataInitializer;
+
+    @BeforeEach
+    void setUp() {
+        // Run department initialization
+        dataInitializer.initializeDepartments();
+    }
+
+    @Test
+    void testStandardDepartmentsAndAbbreviations() {
+        Department fe = departmentRepository.findByName("Frontend").orElseThrow();
+        assertEquals("FE", fe.getEffectiveAbbreviation());
+
+        Department uiux = departmentRepository.findByName("UI/UX").orElseThrow();
+        assertEquals("FE", uiux.getEffectiveAbbreviation(),
+                "UI/UX department must have abbreviation FE as specified");
+
+        Department be = departmentRepository.findByName("Backend").orElseThrow();
+        assertEquals("BE", be.getEffectiveAbbreviation());
+
+        Department ad = departmentRepository.findByName("Administration").orElseThrow();
+        assertEquals("AD", ad.getEffectiveAbbreviation());
+
+        Department dm = departmentRepository.findByName("Digital Marketing").orElseThrow();
+        assertEquals("DM", dm.getEffectiveAbbreviation());
+    }
+
+    @Test
+    void testSequentialEmployeeGenerationAcrossDepartments() {
+        // Reset test sequence to start from 1001 baseline
+        employeeSequenceRepository.deleteAll();
+
+        Department fe = departmentRepository.findByName("Frontend").orElseThrow();
+        Department be = departmentRepository.findByName("Backend").orElseThrow();
+        Department uiux = departmentRepository.findByName("UI/UX").orElseThrow();
+        Department ad = departmentRepository.findByName("Administration").orElseThrow();
+        Department dm = departmentRepository.findByName("Digital Marketing").orElseThrow();
+
+        // 1. First employee -> Frontend -> FE-1001
+        String code1 = employeeCodeService.generateNextEmployeeCode(fe);
+        assertEquals("FE-1001", code1);
+
+        // Save employee 1
+        saveEmployeeWithCode(code1, fe, "emp1@aslenix.local");
+
+        // 2. Second employee -> Backend -> BE-1002
+        String code2 = employeeCodeService.generateNextEmployeeCode(be);
+        assertEquals("BE-1002", code2);
+        saveEmployeeWithCode(code2, be, "emp2@aslenix.local");
+
+        // 3. Third employee -> UI/UX -> FE-1003
+        String code3 = employeeCodeService.generateNextEmployeeCode(uiux);
+        assertEquals("FE-1003", code3);
+        saveEmployeeWithCode(code3, uiux, "emp3@aslenix.local");
+
+        // 4. Fourth employee -> Administration -> AD-1004
+        String code4 = employeeCodeService.generateNextEmployeeCode(ad);
+        assertEquals("AD-1004", code4);
+        saveEmployeeWithCode(code4, ad, "emp4@aslenix.local");
+
+        // 5. Fifth employee -> Digital Marketing -> DM-1005
+        String code5 = employeeCodeService.generateNextEmployeeCode(dm);
+        assertEquals("DM-1005", code5);
+        saveEmployeeWithCode(code5, dm, "emp5@aslenix.local");
+    }
+
+    @Test
+    void testEmployeeCreationViaControllerMakesIdAndUsernameIdentical() {
+        Department fe = departmentRepository.findByName("Frontend").orElseThrow();
+
+        Employee emp = new Employee();
+        emp.setFirstName("Alice");
+        emp.setLastName("Wonder");
+        emp.setEmail("alice.wonder@example.com");
+        emp.setPosition("Frontend Engineer");
+        emp.setJoiningDate(LocalDate.now());
+
+        String redirect = employeeController.addEmployee(
+                emp,
+                null, // No manual username provided
+                "TempPass123",
+                fe.getId(),
+                null
+        );
+        assertEquals("redirect:/admin/employees", redirect);
+
+        assertNotNull(emp.getEmployeeCode());
+        assertTrue(emp.getEmployeeCode().startsWith("FE-"));
+
+        User user = emp.getUser();
+        assertNotNull(user);
+        assertEquals(emp.getEmployeeCode(), user.getUsername(),
+                "Employee ID and login username must be 100% identical");
+
+        // Verify login works with the generated username
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        assertNotNull(userDetails);
+        assertEquals(user.getUsername(), userDetails.getUsername());
+
+        // Verify case-insensitive login works as well
+        UserDetails lowerDetails = userDetailsService.loadUserByUsername(user.getUsername().toLowerCase());
+        assertNotNull(lowerDetails);
+    }
+
+    @Test
+    void testAdminCannotManuallyModifyEmployeeCodeInEdit() {
+        Department fe = departmentRepository.findByName("Frontend").orElseThrow();
+
+        Employee emp = new Employee();
+        emp.setFirstName("Bob");
+        emp.setLastName("Builder");
+        emp.setEmail("bob.builder@example.com");
+        emp.setPosition("Developer");
+        emp.setJoiningDate(LocalDate.now());
+
+        employeeController.addEmployee(emp, null, "TempPass123", fe.getId(), null);
+        String originalCode = emp.getEmployeeCode();
+        assertNotNull(originalCode);
+
+        // Attempt to edit and alter employee code
+        Employee editForm = new Employee();
+        editForm.setFirstName("Bob (Edited)");
+        editForm.setLastName("Builder");
+        editForm.setEmail("bob.builder@example.com");
+        editForm.setPosition("Senior Developer");
+        editForm.setJoiningDate(LocalDate.now());
+        editForm.setEmployeeCode("HACKED-CODE-999");
+
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+        employeeController.updateEmployee(
+                emp.getId(),
+                editForm,
+                fe.getId(),
+                null,
+                null,
+                false,
+                redirectAttributes
+        );
+
+        Employee reloaded = employeeRepository.findById(emp.getId()).orElseThrow();
+        assertEquals(originalCode, reloaded.getEmployeeCode(),
+                "Admin should not be able to manually overwrite the generated employee ID");
+        assertEquals("Senior Developer", reloaded.getPosition());
+    }
+
+    private void saveEmployeeWithCode(String code, Department dept, String email) {
+        User user = new User();
+        user.setUsername(code);
+        user.setPassword("secret");
+        user.setRole(Role.EMPLOYEE);
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        Employee emp = new Employee();
+        emp.setEmployeeCode(code);
+        emp.setEmail(email);
+        emp.setFirstName("Test");
+        emp.setLastName("Employee");
+        emp.setPosition("Staff");
+        emp.setDepartment(dept);
+        emp.setUser(user);
+        emp.setJoiningDate(LocalDate.now());
+        emp.setEnabled(true);
+        employeeRepository.save(emp);
+    }
+}

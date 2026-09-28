@@ -33,6 +33,7 @@ public class EmployeeController {
     private final QrCodeService qrCodeService;
     private final FileUploadService fileUploadService;
     private final EmployeeDeletionService employeeDeletionService;
+    private final com.aslenix.attendance.service.EmployeeCodeService employeeCodeService;
 
     public EmployeeController(
             EmployeeRepository employeeRepository,
@@ -41,7 +42,8 @@ public class EmployeeController {
             PasswordEncoder passwordEncoder,
             QrCodeService qrCodeService,
             FileUploadService fileUploadService,
-            EmployeeDeletionService employeeDeletionService) {
+            EmployeeDeletionService employeeDeletionService,
+            com.aslenix.attendance.service.EmployeeCodeService employeeCodeService) {
 
         this.employeeRepository = employeeRepository;
         this.userRepository = userRepository;
@@ -50,6 +52,7 @@ public class EmployeeController {
         this.qrCodeService = qrCodeService;
         this.fileUploadService = fileUploadService;
         this.employeeDeletionService = employeeDeletionService;
+        this.employeeCodeService = employeeCodeService;
     }
 
     // =========================
@@ -114,7 +117,30 @@ public class EmployeeController {
                 departmentRepository.findAll()
         );
 
+        model.addAttribute(
+                "nextEmployeeNumber",
+                employeeCodeService.peekNextEmployeeNumber()
+        );
+
         return "admin/add-employee";
+    }
+
+    // ============================================================
+    // API: PREVIEW NEXT CODE BY DEPARTMENT
+    // ============================================================
+
+    @GetMapping("/api/next-code")
+    @ResponseBody
+    public ResponseEntity<?> getNextCode(@RequestParam Long departmentId) {
+        Department dept = departmentRepository.findById(departmentId).orElse(null);
+        if (dept == null) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", "Department not found"));
+        }
+        return ResponseEntity.ok(java.util.Map.of(
+                "employeeCode", employeeCodeService.previewNextEmployeeCode(dept),
+                "abbreviation", dept.getEffectiveAbbreviation(),
+                "nextNumber", employeeCodeService.peekNextEmployeeNumber()
+        ));
     }
 
     // =========================
@@ -124,19 +150,10 @@ public class EmployeeController {
     @PostMapping("/add")
     public String addEmployee(
             @ModelAttribute Employee employee,
-            @RequestParam String username,
+            @RequestParam(value = "username", required = false) String username,
             @RequestParam String password,
             @RequestParam Long departmentId,
             @RequestParam(value = "photo", required = false) MultipartFile photoFile) {
-
-        // =========================================================
-        // CHECK USERNAME
-        // =========================================================
-
-        if (userRepository.existsByUsername(username)) {
-
-            return "redirect:/admin/employees/add?error=username";
-        }
 
         // =========================================================
         // CHECK EMAIL
@@ -157,10 +174,13 @@ public class EmployeeController {
                 .orElseThrow();
 
         // =========================================================
-        // AUTOMATICALLY GENERATE UNIQUE EMPLOYEE CODE
+        // AUTOMATICALLY GENERATE UNIQUE EMPLOYEE ID & USERNAME
+        // Format: DEPARTMENT_ABBREVIATION-NUMBER (e.g. FE-1001)
+        // Employee ID and Username are exactly the same.
         // =========================================================
 
-        employee.setEmployeeCode(generateEmployeeCode());
+        String generatedCode = employeeCodeService.generateNextEmployeeCode(department);
+        employee.setEmployeeCode(generatedCode);
 
         // =========================================================
         // AUTOMATICALLY GENERATE UNIQUE QR TOKEN
@@ -174,7 +194,7 @@ public class EmployeeController {
 
         User user = new User();
 
-        user.setUsername(username);
+        user.setUsername(generatedCode);
         user.setPassword(
                 passwordEncoder.encode(password)
         );
@@ -236,22 +256,8 @@ public class EmployeeController {
     // GENERATE UNIQUE EMPLOYEE CODE
     // ============================================================
 
-    private String generateEmployeeCode() {
-
-        String employeeCode;
-
-        do {
-            employeeCode = "ASL-" +
-                    String.format(
-                            "%05d",
-                            (int) (Math.random() * 100000)
-                    );
-
-        } while (
-                employeeRepository.existsByEmployeeCode(employeeCode)
-        );
-
-        return employeeCode;
+    private String generateEmployeeCode(Department department) {
+        return employeeCodeService.generateNextEmployeeCode(department);
     }
 
     // ============================================================
@@ -314,24 +320,10 @@ public class EmployeeController {
                 .orElseThrow();
 
         // =========================================================
-        // EMPLOYEE CODE
+        // EMPLOYEE CODE (IMMUTABLE)
+        // System-generated employee ID and login username cannot be
+        // manually modified by admin. Existing code is preserved.
         // =========================================================
-
-        if (employee.getEmployeeCode() != null
-                && !employee.getEmployeeCode().equals(existing.getEmployeeCode())) {
-
-            if (employeeRepository.existsByEmployeeCode(
-                    employee.getEmployeeCode())) {
-
-                return "redirect:/admin/employees/edit/"
-                        + id
-                        + "?error=code";
-            }
-
-            existing.setEmployeeCode(
-                    employee.getEmployeeCode()
-            );
-        }
 
         // =========================================================
         // EMAIL

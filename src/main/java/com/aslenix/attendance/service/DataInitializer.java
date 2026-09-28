@@ -76,6 +76,13 @@ public class DataInitializer implements CommandLineRunner {
             jdbcTemplate.execute("ALTER TABLE task_assignment_histories MODIFY COLUMN updated_by_id BIGINT NULL");
         } catch (Exception ignored) {
         }
+        try {
+            jdbcTemplate.execute("ALTER TABLE departments ADD COLUMN abbreviation VARCHAR(20) NULL");
+        } catch (Exception ignored) {
+        }
+
+        // Initialize standard departments with abbreviations
+        initializeDepartments();
 
         // Check for CLI argument-based initial admin provisioning
         String cliUsername = null;
@@ -153,9 +160,14 @@ public class DataInitializer implements CommandLineRunner {
         Department department = departmentRepository.findByName("Administration").orElseGet(() -> {
             Department d = new Department();
             d.setName("Administration");
+            d.setAbbreviation("AD");
             d.setActive(true);
             return departmentRepository.save(d);
         });
+        if (department.getAbbreviation() == null || department.getAbbreviation().isBlank()) {
+            department.setAbbreviation("AD");
+            departmentRepository.save(department);
+        }
 
         String name = (fullName != null && !fullName.isBlank()) ? fullName.trim() : "System Admin";
         String[] parts = name.split("\\s+", 2);
@@ -183,5 +195,24 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println("  Username: " + username);
         System.out.println("  Role: " + Role.ADMIN);
         System.out.println("=====================================================================");
+    }
+
+    public void initializeDepartments() {
+        seedDepartment("Frontend", "FE");
+        seedDepartment("UI/UX", "FE");
+        seedDepartment("Backend", "BE");
+        seedDepartment("Administration", "AD");
+        seedDepartment("Digital Marketing", "DM");
+    }
+
+    private void seedDepartment(String name, String abbreviation) {
+        Department dept = departmentRepository.findByName(name).orElseGet(() -> {
+            Department d = new Department();
+            d.setName(name);
+            d.setActive(true);
+            return d;
+        });
+        dept.setAbbreviation(abbreviation);
+        departmentRepository.save(dept);
     }
 }

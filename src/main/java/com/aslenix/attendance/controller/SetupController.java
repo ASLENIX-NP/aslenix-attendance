@@ -145,8 +145,15 @@ public class SetupController {
             Department d = new Department();
             d.setName(deptName);
             d.setActive(true);
-            return departmentRepository.save(d);
+            return d;
         });
+        if (department.getAbbreviation() == null || department.getAbbreviation().isBlank()) {
+            department.setAbbreviation(department.getEffectiveAbbreviation());
+        }
+        department = departmentRepository.save(department);
+
+        // Also ensure standard departments exist
+        seedStandardDepartments();
 
         // --- CREATE LINKED ADMIN EMPLOYEE PROFILE ---
         String name = (fullName != null && !fullName.trim().isEmpty()) ? fullName.trim() : "System Administrator";
@@ -186,5 +193,26 @@ public class SetupController {
         redirectAttributes.addFlashAttribute("retainedFullName", fullName);
         redirectAttributes.addFlashAttribute("retainedEmail", email);
         redirectAttributes.addFlashAttribute("retainedDepartmentName", departmentName);
+    }
+
+    private void seedStandardDepartments() {
+        seedDept("Frontend", "FE");
+        seedDept("UI/UX", "FE");
+        seedDept("Backend", "BE");
+        seedDept("Administration", "AD");
+        seedDept("Digital Marketing", "DM");
+    }
+
+    private void seedDept(String name, String abbrev) {
+        Department d = departmentRepository.findByName(name).orElseGet(() -> {
+            Department dept = new Department();
+            dept.setName(name);
+            dept.setActive(true);
+            return dept;
+        });
+        if (d.getAbbreviation() == null || d.getAbbreviation().isBlank()) {
+            d.setAbbreviation(abbrev);
+        }
+        departmentRepository.save(d);
     }
 }

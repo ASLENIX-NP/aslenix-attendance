@@ -101,13 +101,16 @@ class EmployeePasswordChangeTest {
 
         employeeController.addEmployee(
                 newEmp,
-                "brand.new",
+                null,
                 "initialTempPass123",
                 department.getId(),
                 null
         );
 
-        User createdUser = userRepository.findByUsername("brand.new").orElseThrow();
+        assertNotNull(newEmp.getEmployeeCode());
+        User createdUser = userRepository.findByUsername(newEmp.getEmployeeCode()).orElseThrow();
+        assertEquals(newEmp.getEmployeeCode(), createdUser.getUsername(),
+                "Generated employee ID and username must be exactly the same");
         assertTrue(createdUser.isPasswordChangeRequired(),
                 "Newly created employee user must have passwordChangeRequired = true");
     }

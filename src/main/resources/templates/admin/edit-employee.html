@@ -498,8 +498,11 @@
             <div class="form-grid">
                 <!-- EMPLOYEE CODE -->
                 <div class="form-group">
-                    <label for="employeeCode">Employee Code</label>
-                    <input type="text" id="employeeCode" th:field="*{employeeCode}" required>
+                    <label for="employeeCode">Employee ID / Code</label>
+                    <input type="text" id="employeeCode" th:field="*{employeeCode}" readonly style="background: #f8fafc; color: #475569; font-weight: 700; cursor: not-allowed;">
+                    <small style="display: block; margin-top: 5px; font-size: 11px; color: #64748b;">
+                        System-generated employee ID and login username. Cannot be modified.
+                    </small>
                 </div>
 
                 <!-- EMAIL -->
@@ -546,7 +549,7 @@
                         <option value="">Select Department</option>
                         <option th:each="department : ${departments}"
                                 th:value="${department.id}"
-                                th:text="${department.name}"
+                                th:text="${department.name + (department.effectiveAbbreviation != null ? ' (' + department.effectiveAbbreviation + ')' : '')}"
                                 th:selected="${employee.department != null and employee.department.id == department.id}">
                         </option>
                     </select>
