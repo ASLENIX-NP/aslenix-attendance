@@ -957,7 +957,6 @@ button[type="submit"]:active, input[type="submit"]:active {
         display: block !important;
         width: 100% !important;
         min-height: 100vh !important;
-        overflow-x: hidden !important;
     }
 
     .main-area {
@@ -965,8 +964,10 @@ button[type="submit"]:active, input[type="submit"]:active {
         margin-left: 0 !important;
         max-width: 100vw !important;
         min-height: 100vh !important;
+        padding-top: 64px !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
+        box-sizing: border-box !important;
     }
 
     /* 2. Sidebar hidden off-screen to the left by default with smooth slide transition */
@@ -1135,22 +1136,32 @@ button[type="submit"]:active, input[type="submit"]:active {
         border-color: #fecaca !important;
     }
 
-    /* 7. Header alignment on mobile */
-    .top-header {
+    /* 7. Header alignment on mobile - pinned securely to the top of the page on scroll */
+    .top-header,
+    body .top-header,
+    .app-layout .top-header,
+    .admin-dashboard .top-header,
+    header.top-header {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: space-between !important;
-        position: sticky !important;
+        position: fixed !important;
         top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
         height: 64px !important;
         min-height: 64px !important;
         padding: 0 16px !important;
         width: 100% !important;
-        left: 0 !important;
         gap: 12px !important;
-        z-index: 1000 !important;
+        z-index: 1100 !important;
         box-sizing: border-box !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border-bottom: 1px solid rgba(228, 233, 245, 0.9) !important;
+        box-shadow: 0 2px 12px rgba(25, 35, 65, 0.06) !important;
     }
 
     .header-right {
@@ -1164,6 +1175,36 @@ button[type="submit"]:active, input[type="submit"]:active {
 
     .header-date {
         display: none !important;
+    }
+
+    /* 8. Notification popup on mobile (ensures it is 100% visible inside the screen) */
+    .notification-dropdown,
+    .admin-dashboard .notification-dropdown,
+    .app-layout .notification-dropdown {
+        position: fixed !important;
+        top: 68px !important;
+        left: 10px !important;
+        right: 10px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 440px !important;
+        margin: 0 auto !important;
+        max-height: calc(100vh - 80px) !important;
+        max-height: calc(100dvh - 80px) !important;
+        box-sizing: border-box !important;
+        z-index: 100050 !important;
+    }
+
+    .notification-dropdown-body,
+    .notification-list {
+        max-height: calc(100vh - 150px) !important;
+        max-height: calc(100dvh - 150px) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .notification-item {
+        cursor: pointer !important;
     }
 
     /* Lock body scroll when mobile drawer is open */

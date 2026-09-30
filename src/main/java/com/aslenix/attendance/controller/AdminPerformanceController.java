@@ -53,7 +53,7 @@ public class AdminPerformanceController {
     // DASHBOARD
     // ============================================================
 
-    @GetMapping
+    @GetMapping({"", "/", "/dashboard"})
     public String dashboard(@RequestParam(name = "year", required = false) Integer year,
                             @RequestParam(name = "month", required = false) Integer month,
                             @RequestParam(name = "employeeId", required = false) Long employeeId,

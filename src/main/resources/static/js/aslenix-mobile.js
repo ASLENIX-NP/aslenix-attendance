@@ -149,9 +149,97 @@
         });
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initMobileSidebar);
-    } else {
+    /* =========================================================
+       NOTIFICATION SYSTEM: REDIRECT ON CLICK & VIEWPORT CONTAINMENT
+    ========================================================= */
+
+    window.getNotificationRedirectUrl = function (notification) {
+        if (notification && notification.targetUrl) {
+            return notification.targetUrl;
+        }
+        const type = ((notification && notification.type) || '').toUpperCase();
+        const text = (((notification && notification.title) || '') + ' ' + ((notification && notification.message) || '')).toLowerCase();
+        const isAdmin = window.location.pathname.startsWith('/admin');
+
+        if (isAdmin) {
+            if (type.includes('ATTENDANCE') || text.includes('attendance')) return '/admin/attendance';
+            if (type.includes('LEAVE') || text.includes('leave')) return '/admin/leave';
+            if (type.includes('TASK') || text.includes('task') || text.includes('subtask') || text.includes('assignment')) return '/admin/tasks';
+            if (type.includes('EMPLOYEE_OF_THE_MONTH') || type.includes('PERFORMANCE') || text.includes('performance') || text.includes('employee of the month')) return '/admin/performance';
+            if (type.includes('EMPLOYEE') || text.includes('employee')) return '/admin/employees';
+            return '/admin/dashboard';
+        } else {
+            if (type.includes('ATTENDANCE') || text.includes('attendance')) return '/employee/attendance';
+            if (type.includes('LEAVE') || text.includes('leave')) return '/employee/leave';
+            if (type.includes('TASK') || text.includes('task') || text.includes('subtask') || text.includes('assignment')) return '/employee/tasks';
+            if (type.includes('EMPLOYEE_OF_THE_MONTH') || type.includes('PROFILE') || text.includes('profile') || text.includes('employee of the month')) return '/employee/profile';
+            return '/employee/dashboard';
+        }
+    };
+
+    window.handleNotificationClick = async function (notification, itemElement) {
+        if (!notification) return;
+        const targetUrl = notification.targetUrl || window.getNotificationRedirectUrl(notification);
+
+        if (!notification.read && notification.id) {
+            try {
+                if (typeof markNotificationAsRead === 'function') {
+                    await markNotificationAsRead(notification.id, itemElement);
+                } else {
+                    const csrfMeta = document.querySelector('meta[name="_csrf"]');
+                    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+                    const csrfHeader = (document.querySelector('meta[name="_csrf_header"]') || {}).content || 'X-CSRF-TOKEN';
+                    const endpoint = window.location.pathname.startsWith('/admin')
+                        ? '/api/notifications/' + encodeURIComponent(notification.id) + '/read'
+                        : '/employee/notifications/' + encodeURIComponent(notification.id) + '/read';
+                    const headers = { 'Accept': 'application/json' };
+                    if (csrfToken) headers[csrfHeader] = csrfToken;
+                    await fetch(endpoint, {
+                        method: 'POST',
+                        headers: headers,
+                        credentials: 'same-origin',
+                        keepalive: true
+                    });
+                }
+            } catch (e) {
+                console.error('Error marking notification as read before redirect:', e);
+            }
+        }
+
+        if (targetUrl) {
+            window.location.href = targetUrl;
+        }
+    };
+
+    function initMobileNotifications() {
+        const notifDropdown = document.getElementById('notificationDropdown') || document.querySelector('.notification-dropdown');
+        if (!notifDropdown) return;
+
+        function adjustDropdownPosition() {
+            if (window.innerWidth <= 900 && (notifDropdown.classList.contains('show') || notifDropdown.classList.contains('open') || window.getComputedStyle(notifDropdown).display !== 'none')) {
+                const rect = notifDropdown.getBoundingClientRect();
+                if (rect.left < 8 || rect.right > window.innerWidth - 8) {
+                    notifDropdown.style.left = '10px';
+                    notifDropdown.style.right = '10px';
+                    notifDropdown.style.width = 'auto';
+                    notifDropdown.style.maxWidth = 'calc(100vw - 20px)';
+                }
+            }
+        }
+
+        const observer = new MutationObserver(adjustDropdownPosition);
+        observer.observe(notifDropdown, { attributes: true, attributeFilter: ['class', 'style'] });
+        window.addEventListener('resize', adjustDropdownPosition);
+    }
+
+    function initAll() {
         initMobileSidebar();
+        initMobileNotifications();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+        initAll();
     }
 })();

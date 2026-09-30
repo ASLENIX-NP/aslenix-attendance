@@ -59,7 +59,7 @@ public class SecurityConfig {
                 // EMPLOYEE
                 // ------------------------------------------------
 
-                .requestMatchers("/employee/**")
+                .requestMatchers("/employee", "/employee/**")
                 .hasRole("EMPLOYEE")
 
                 // ------------------------------------------------

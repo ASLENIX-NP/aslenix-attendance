@@ -114,7 +114,7 @@ public class EmployeePasswordController {
         if ("profile".equalsIgnoreCase(source)) {
             return "redirect:/employee/profile";
         } else {
-            return "redirect:/employee/dashboard";
+            return "redirect:/employee/attendance";
         }
     }
 }

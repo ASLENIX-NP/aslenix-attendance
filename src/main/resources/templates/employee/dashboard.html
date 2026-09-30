@@ -3176,9 +3176,13 @@
             }
 
             .notification-dropdown {
-                width: calc(100vw - 26px);
-
-                right: -5px;
+                position: fixed;
+                top: 68px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-width: 440px;
+                margin: 0 auto;
             }
         }
 
@@ -5542,6 +5546,8 @@
                             item.dataset.notificationId =
                                 notification.id;
 
+                            item.dataset.targetUrl =
+                                notification.targetUrl || '';
 
                             item.setAttribute(
                                 'aria-label',
@@ -5552,88 +5558,53 @@
                                 )
                             );
 
-
                             item.innerHTML = `
-
                         <div class="notification-item-icon">
-
                             ${getNotificationIcon(
                                 notificationType
                             )}
-
                         </div>
 
-
                         <div class="notification-item-content">
-
                             <div class="notification-item-top">
-
                                 <div class="notification-item-title">
-
                                     ${escapeHtml(
                                 notification.title ||
                                 'Notification'
                             )}
-
                                 </div>
 
-
                                 <div class="notification-item-time">
-
                                     ${escapeHtml(
                                 notification.time ||
                                 ''
                             )}
-
                                 </div>
-
                             </div>
 
-
                             <div class="notification-item-message">
-
                                 ${escapeHtml(
                                 notification.message ||
                                 ''
                             )}
-
                             </div>
 
-
                             <span class="notification-item-type">
-
                                 ${escapeHtml(
                                 notificationType
                             )}
-
                             </span>
-
                         </div>
-
                     `;
-
 
                             item.addEventListener(
                                 'click',
                                 function (event) {
-
                                     event.stopPropagation();
-
-
-                                    if (
-                                        notification.read
-                                    ) {
-
-                                        return;
-
-                                    }
-
-
-                                    markNotificationAsRead(
-                                        notification.id,
+                                    handleNotificationClick(
+                                        notification,
                                         item
                                     );
-
                                 }
                             );
 
@@ -5757,7 +5728,8 @@
                                 {
                                     method: 'POST',
                                     headers: headers,
-                                    credentials: 'same-origin'
+                                    credentials: 'same-origin',
+                                    keepalive: true
                                 }
                             );
 
@@ -5883,6 +5855,41 @@
 
                     }
 
+                }
+
+
+                /* =====================================================
+                   REDIRECT ON NOTIFICATION CLICK
+                ===================================================== */
+
+                function getNotificationRedirectUrl(notification) {
+                    if (notification && notification.targetUrl) {
+                        return notification.targetUrl;
+                    }
+                    const type = ((notification && notification.type) || '').toUpperCase();
+                    const text = (((notification && notification.title) || '') + ' ' + ((notification && notification.message) || '')).toLowerCase();
+                    if (type.includes('ATTENDANCE') || text.includes('attendance')) return '/employee/attendance';
+                    if (type.includes('LEAVE') || text.includes('leave')) return '/employee/leave';
+                    if (type.includes('TASK') || text.includes('task') || text.includes('subtask') || text.includes('assignment')) return '/employee/tasks';
+                    if (type.includes('EMPLOYEE_OF_THE_MONTH') || type.includes('PROFILE') || text.includes('profile') || text.includes('employee of the month')) return '/employee/profile';
+                    return '/employee/dashboard';
+                }
+
+                async function handleNotificationClick(notification, itemElement) {
+                    if (!notification) return;
+                    const targetUrl = notification.targetUrl || getNotificationRedirectUrl(notification);
+
+                    if (!notification.read && notification.id) {
+                        try {
+                            await markNotificationAsRead(notification.id, itemElement);
+                        } catch (e) {
+                            console.error('Error marking notification as read before redirect:', e);
+                        }
+                    }
+
+                    if (targetUrl) {
+                        window.location.href = targetUrl;
+                    }
                 }
 
 

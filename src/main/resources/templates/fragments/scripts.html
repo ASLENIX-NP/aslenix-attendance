@@ -24,11 +24,31 @@
                 const token = getCsrfToken();
                 return fetch(url, {
                     method: 'POST',
+                    keepalive: true,
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
                     body: token ? new URLSearchParams({ _csrf: token }) : null
                 });
+            }
+
+            function getNotificationRedirectUrl(item) {
+                if (!item) return '/';
+                if (item.targetUrl && typeof item.targetUrl === 'string' && item.targetUrl.trim() !== '') {
+                    return item.targetUrl;
+                }
+                if (typeof window.getNotificationRedirectUrl === 'function') {
+                    const url = window.getNotificationRedirectUrl(item);
+                    if (url) return url;
+                }
+                const isAdmin = window.location.pathname.startsWith('/admin');
+                const type = (item.type || '').toUpperCase();
+                if (type.startsWith('ATTENDANCE')) return isAdmin ? '/admin/attendance' : '/employee/attendance';
+                if (type.startsWith('LEAVE')) return isAdmin ? '/admin/leave' : '/employee/leave';
+                if (type.startsWith('TASK')) return isAdmin ? '/admin/tasks' : '/employee/tasks';
+                if (type === 'EMPLOYEE_OF_THE_MONTH' || type.startsWith('PERFORMANCE')) return isAdmin ? '/admin/performance' : '/employee/profile';
+                if (type.startsWith('EMPLOYEE')) return isAdmin ? '/admin/employees' : '/employee/profile';
+                return isAdmin ? '/admin/dashboard' : '/employee/dashboard';
             }
 
             function fetchUnreadCount() {
@@ -63,6 +83,9 @@
                         data.forEach(notification => {
                             const item = document.createElement('div');
                             item.className = 'notification-item' + (notification.read ? '' : ' unread');
+                            const redirectUrl = getNotificationRedirectUrl(notification);
+                            item.setAttribute('data-target-url', redirectUrl);
+                            item.style.cursor = 'pointer';
                             
                             const date = new Date(notification.createdAt);
                             const timeStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -86,6 +109,9 @@
                                             fetchUnreadCount();
                                         })
                                         .catch(err => console.error('Error marking as read:', err));
+                                }
+                                if (redirectUrl) {
+                                    window.location.href = redirectUrl;
                                 }
                             });
                             

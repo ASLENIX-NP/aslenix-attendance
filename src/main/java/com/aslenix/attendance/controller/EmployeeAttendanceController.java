@@ -61,7 +61,7 @@ public class EmployeeAttendanceController {
     // ATTENDANCE PAGE
     // ============================================================
 
-    @GetMapping
+    @GetMapping({"", "/"})
     public String attendance(
             Authentication authentication,
             Model model) {

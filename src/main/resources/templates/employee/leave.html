@@ -73,12 +73,16 @@
         .app-layout {
             min-height: 100vh;
             display: flex;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         .main-area {
             width: calc(100% - 250px);
             margin-left: 250px;
             min-width: 0;
+            max-width: 100%;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -781,6 +785,9 @@
             max-width: 1500px;
             margin: 0 auto;
             padding: 36px 36px 48px;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         .page-header {
@@ -921,6 +928,9 @@
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 18px;
             margin-bottom: 25px;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         .stat-card {
@@ -932,6 +942,8 @@
             border: 1px solid #e6eaf2;
             box-shadow: 0 4px 18px rgba(35, 48, 85, 0.04);
             transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         .stat-card:hover {
@@ -1000,6 +1012,14 @@
             grid-template-columns: minmax(320px, 0.75fr) minmax(0, 1.6fr);
             gap: 22px;
             align-items: start;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        .leave-grid > * {
+            min-width: 0;
+            max-width: 100%;
         }
 
         .panel {
@@ -1009,6 +1029,10 @@
             padding: 24px;
             box-shadow: 0 4px 20px rgba(35, 48, 85, 0.035);
             backdrop-filter: blur(8px);
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .panel-header {
@@ -1017,12 +1041,14 @@
             align-items: flex-start;
             gap: 15px;
             margin-bottom: 20px;
+            min-width: 0;
         }
 
         .panel-header h2 {
             font-size: 18px;
             font-weight: 850;
             color: #0f172a;
+            word-break: break-word;
         }
 
         .panel-header p {
@@ -1030,6 +1056,7 @@
             font-size: 12px;
             margin-top: 4px;
             line-height: 1.5;
+            word-break: break-word;
         }
 
         /* =====================================================
@@ -1041,6 +1068,9 @@
             background: #f8faff;
             border: 1px solid #e7ebf4;
             border-radius: 12px;
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .form-section-title {
@@ -1054,6 +1084,9 @@
 
         .form-group {
             margin-bottom: 16px;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         .form-group > label {
@@ -1066,6 +1099,7 @@
 
         .form-control {
             width: 100%;
+            max-width: 100%;
             padding: 10px 13px;
             border: 1px solid #dce2ee;
             border-radius: 9px;
@@ -1073,6 +1107,7 @@
             color: #0f172a;
             font-size: 12px;
             outline: none;
+            box-sizing: border-box;
             transition: border-color .18s ease, box-shadow .18s ease;
         }
 
@@ -1095,6 +1130,14 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .date-field {
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .date-field label {
@@ -1110,10 +1153,13 @@
             font-size: 10px;
             line-height: 1.5;
             margin-top: 6px;
+            word-break: break-word;
         }
 
         .submit-btn {
             width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
             padding: 12px 18px;
             border: none;
             border-radius: 10px;
@@ -1141,6 +1187,7 @@
             line-height: 1.6;
             margin-top: 12px;
             text-align: center;
+            word-break: break-word;
         }
 
         .hidden {
@@ -1152,14 +1199,19 @@
         ===================================================== */
         .table-wrapper {
             width: 100%;
+            max-width: 100%;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            display: block;
             border-radius: 12px;
             border: 1px solid #e6eaf3;
             background: #ffffff;
+            box-sizing: border-box;
         }
 
         table {
             width: 100%;
+            min-width: 560px;
             border-collapse: collapse;
         }
 
@@ -1345,92 +1397,120 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
             .leave-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
         }
 
-        @media (max-width: 850px) {
-            .sidebar {
-                width: 210px;
+        @media (max-width: 900px) {
+            .app-layout {
+                display: block;
+                width: 100%;
             }
             .main-area {
-                width: calc(100% - 210px);
-                margin-left: 210px;
+                width: 100% !important;
+                margin-left: 0 !important;
+                max-width: 100vw !important;
+                min-width: 0 !important;
+                padding-top: 64px !important;
+            }
+            main {
+                padding: 20px 14px 36px;
+                width: 100%;
+                max-width: 100vw;
+                box-sizing: border-box;
+                overflow-x: hidden;
             }
             .top-header {
-                padding: 0 20px;
+                padding: 0 16px;
             }
             .profile-info,
             .profile-arrow {
                 display: none;
             }
+            .leave-grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+                gap: 16px;
+                width: 100%;
+            }
+            .panel {
+                padding: 18px 14px;
+                border-radius: 14px;
+            }
+            .form-section {
+                padding: 12px 10px;
+            }
+            .notification-dropdown {
+                position: fixed !important;
+                top: 68px !important;
+                left: 10px !important;
+                right: 10px !important;
+                width: auto !important;
+                max-width: 440px !important;
+                margin: 0 auto !important;
+            }
         }
 
-        @media (max-width: 750px) {
-            main {
-                padding: 24px 18px 40px;
-            }
+        @media (max-width: 768px) {
             .page-header {
-                align-items: flex-start;
+                align-items: stretch;
                 flex-direction: column;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            .page-header h1 {
+                font-size: 26px;
             }
             .date-box {
                 width: 100%;
-            }
-        }
-
-        @media (max-width: 680px) {
-            .app-layout {
-                display: block;
-            }
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-                padding: 15px;
-                border-right: none;
-                border-bottom: 1px solid #e8edf6;
-            }
-            .main-area {
-                width: 100%;
-                margin-left: 0;
-            }
-            .sidebar-menu {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 5px;
-            }
-            .sidebar-bottom {
-                display: none;
-            }
-            .notification-dropdown {
-                right: -5px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .sidebar-menu {
-                grid-template-columns: 1fr;
-            }
-            .top-header {
-                padding: 0 14px;
-            }
-            .notification-dropdown {
-                width: calc(100vw - 26px);
-                right: -5px;
-            }
-            .stats {
-                grid-template-columns: 1fr;
+                text-align: center;
+                box-sizing: border-box;
             }
             .status-banner {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
+                padding: 14px 16px;
+            }
+            .status-pill {
+                align-self: flex-start;
+            }
+        }
+
+        @media (max-width: 540px) {
+            main {
+                padding: 16px 12px 32px;
+            }
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+            .stat-card {
+                padding: 14px 12px;
+            }
+            .stat-value {
+                font-size: 22px;
+            }
+            .stat-label {
+                font-size: 10px;
+            }
+            .stat-description {
+                font-size: 10px;
             }
             .date-row {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .panel {
+                padding: 16px 12px;
             }
             .page-header h1 {
-                font-size: 26px;
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .stats {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -2229,6 +2309,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const notificationType = notification.type || 'GENERAL';
             item.dataset.type = notificationType;
             item.dataset.notificationId = notification.id;
+            item.dataset.targetUrl = notification.targetUrl || '';
             item.setAttribute('aria-label', 'Notification: ' + (notification.title || 'Notification'));
 
             item.innerHTML = `
@@ -2244,8 +2325,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             item.addEventListener('click', function (event) {
                 event.stopPropagation();
-                if (notification.read) return;
-                markNotificationAsRead(notification.id, item);
+                handleNotificationClick(notification, item);
             });
 
             notificationDropdownBody.appendChild(item);
@@ -2279,7 +2359,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch('/employee/notifications/' + notificationId + '/read', {
                 method: 'POST',
                 headers: headers,
-                credentials: 'same-origin'
+                credentials: 'same-origin',
+                keepalive: true
             });
             if (!response.ok) throw new Error('Failed to mark notification as read');
             if (itemElement) itemElement.classList.remove('unread');
@@ -2308,6 +2389,36 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) {
             console.error('Mark all notifications as read error:', error);
             await loadUnreadCount();
+        }
+    }
+
+    function getNotificationRedirectUrl(notification) {
+        if (notification && notification.targetUrl) {
+            return notification.targetUrl;
+        }
+        const type = ((notification && notification.type) || '').toUpperCase();
+        const text = (((notification && notification.title) || '') + ' ' + ((notification && notification.message) || '')).toLowerCase();
+        if (type.includes('ATTENDANCE') || text.includes('attendance')) return '/employee/attendance';
+        if (type.includes('LEAVE') || text.includes('leave')) return '/employee/leave';
+        if (type.includes('TASK') || text.includes('task') || text.includes('subtask') || text.includes('assignment')) return '/employee/tasks';
+        if (type.includes('EMPLOYEE_OF_THE_MONTH') || type.includes('PROFILE') || text.includes('profile') || text.includes('employee of the month')) return '/employee/profile';
+        return '/employee/dashboard';
+    }
+
+    async function handleNotificationClick(notification, itemElement) {
+        if (!notification) return;
+        const targetUrl = notification.targetUrl || getNotificationRedirectUrl(notification);
+
+        if (!notification.read && notification.id) {
+            try {
+                await markNotificationAsRead(notification.id, itemElement);
+            } catch (e) {
+                console.error('Error marking notification as read before redirect:', e);
+            }
+        }
+
+        if (targetUrl) {
+            window.location.href = targetUrl;
         }
     }
 

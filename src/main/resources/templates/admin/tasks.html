@@ -1282,8 +1282,10 @@
 
         .subtasks-header {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .subtasks-header h3 {
@@ -1437,6 +1439,69 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .subtask-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1 1 200px;
+            min-width: 0;
+        }
+
+        .subtask-title-input {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            padding: 5px 8px;
+            font-size: 12.5px;
+            font-weight: 750;
+            box-sizing: border-box;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            color: #0f172a;
+        }
+
+        .subtask-title-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12);
+        }
+
+        .subtask-status-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .subtask-progress-pct-badge {
+            font-size: 11.5px;
+            font-weight: 800;
+            color: #4f46e5;
+            white-space: nowrap;
+        }
+
+        .subtask-bottom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .subtask-actions-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: auto;
         }
 
         .subtask-order-tag {
@@ -1862,13 +1927,195 @@
         @media (max-width: 1200px) {
             .kanban-board { grid-template-columns: repeat(2, 1fr); }
         }
+        @media (max-width: 900px) {
+            .notification-dropdown {
+                position: fixed !important;
+                top: 68px !important;
+                left: 10px !important;
+                right: 10px !important;
+                width: auto !important;
+                max-width: 440px !important;
+                margin: 0 auto !important;
+                max-height: calc(100dvh - 80px) !important;
+                z-index: 100050 !important;
+            }
+        }
         @media (max-width: 768px) {
             .sidebar { display: none; }
             .main-area { width: 100%; margin-left: 0; }
+            main { padding: 16px 14px 40px !important; }
             .kanban-board { grid-template-columns: 1fr; }
-            .form-row-3 { grid-template-columns: 1fr; }
-            .complexity-cards-grid { grid-template-columns: repeat(2, 1fr); }
-            .subtask-inputs-grid { grid-template-columns: 1fr; }
+            .page-action-bar { flex-direction: column; align-items: stretch; gap: 14px; margin-bottom: 18px; }
+            .action-controls { width: 100%; gap: 8px; }
+            .task-search-box { width: 100%; flex: 1 1 100%; }
+            .task-search-box input { width: 100% !important; }
+            .filter-select { flex: 1 1 calc(50% - 4px); min-width: 0; }
+            .btn-assign-task { width: 100%; justify-content: center; }
+
+            /* Modals Mobile Responsiveness */
+            .modal-backdrop, .modal-backdrop-sub {
+                padding: 10px !important;
+            }
+            .modal-dialog, .modal-dialog-sub {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: calc(100vh - 20px) !important;
+                max-height: calc(100dvh - 20px) !important;
+                border-radius: 14px !important;
+                margin: auto !important;
+            }
+            .modal-header, .modal-header-sub {
+                padding: 14px 44px 14px 16px !important;
+            }
+            .modal-header h2, .modal-header-sub h3 {
+                font-size: 16px !important;
+            }
+            .modal-header p, .modal-header-sub p {
+                font-size: 11.5px !important;
+            }
+            .modal-close-btn {
+                top: 12px !important;
+                right: 12px !important;
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 13px !important;
+            }
+            .modal-tabs {
+                padding: 0 12px !important;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .modal-tab-btn {
+                padding: 9px 12px !important;
+                font-size: 12px !important;
+                white-space: nowrap;
+            }
+            .modal-body, .modal-body-sub {
+                padding: 14px 12px !important;
+                gap: 14px !important;
+            }
+            .form-row-3 { grid-template-columns: 1fr; gap: 10px; }
+            .complexity-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .subtasks-section {
+                padding: 12px 10px !important;
+                gap: 10px !important;
+                border-radius: 12px !important;
+                min-width: 0;
+                overflow: hidden;
+            }
+            .subtasks-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 8px !important;
+            }
+            .subtasks-header h3 {
+                font-size: 13px !important;
+            }
+            .btn-add-subtask-action {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+            .week-group-block {
+                padding: 10px !important;
+                gap: 10px !important;
+                border-radius: 10px !important;
+                min-width: 0;
+                overflow: hidden;
+            }
+            .week-group-header {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .subtask-card-item {
+                padding: 10px !important;
+                gap: 8px !important;
+                border-radius: 10px !important;
+                min-width: 0;
+                overflow: hidden;
+            }
+            .subtask-inputs-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .modal-footer, .modal-footer-sub {
+                padding: 12px 14px !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .btn-delete-task-modal {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+            .footer-right-actions {
+                width: 100% !important;
+                justify-content: flex-end !important;
+                gap: 8px !important;
+            }
+            .btn-save-modal, .btn-cancel-modal {
+                flex: 1 !important;
+                text-align: center !important;
+                justify-content: center !important;
+            }
+            .picker-popover {
+                max-width: calc(100vw - 32px) !important;
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-backdrop, .modal-backdrop-sub {
+                padding: 6px !important;
+            }
+            .modal-dialog, .modal-dialog-sub {
+                max-height: calc(100vh - 12px) !important;
+                max-height: calc(100dvh - 12px) !important;
+                border-radius: 12px !important;
+            }
+            .modal-body, .modal-body-sub {
+                padding: 12px 8px !important;
+                gap: 12px !important;
+            }
+            .subtasks-section {
+                padding: 10px 8px !important;
+            }
+            .week-group-block {
+                padding: 8px !important;
+            }
+            .subtask-card-item {
+                padding: 8px !important;
+            }
+            .subtask-title-wrap {
+                flex: 1 1 100%;
+                width: 100%;
+            }
+            .subtask-status-wrap {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .subtask-bottom-row {
+                gap: 6px;
+            }
+            .subtask-actions-group {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .subtask-review-banner {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 8px !important;
+            }
+            .subtask-review-btns {
+                justify-content: flex-end !important;
+            }
+            .comp-card {
+                padding: 8px !important;
+            }
+            .comp-card h4 {
+                font-size: 11.5px !important;
+            }
+            .comp-card p {
+                font-size: 9.5px !important;
+            }
         }
     </style>
 </head>
@@ -2421,7 +2668,7 @@
 
                 <!-- WEEKLY WORK BREAKDOWN & SUBTASKS -->
                 <div class="subtasks-section">
-                    <div class="subtasks-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                    <div class="subtasks-header">
                         <div>
                             <h3>
                                 <span>📋</span>
@@ -3027,13 +3274,13 @@
 
         card.innerHTML = `
             <div class="subtask-top-row">
-                <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="subtask-title-wrap">
                     <span class="subtask-order-tag">#${subtaskIdx}</span>
-                    <input type="text" class="form-input subtask-title-input" style="padding: 4px 8px; font-size: 12.5px; font-weight: 750; width: 230px;" value="${escapeHtml(subTitle)}" placeholder="Subtask title...">
+                    <input type="text" class="form-input subtask-title-input" value="${escapeHtml(subTitle)}" placeholder="Subtask title...">
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="subtask-status-wrap">
                     <span class="subtask-status-pill ${statusPillClass}">${statusText}</span>
-                    <span class="subtask-progress-pct-badge" style="font-size: 11.5px; font-weight: 800; color: #4f46e5;">${subProgress}%</span>
+                    <span class="subtask-progress-pct-badge">${subProgress}%</span>
                     ${canDeleteCard ? `
                         <button type="button" class="btn-remove-subtask-card" onclick="removeSubtaskCard(this)" title="Delete this subtask">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -3085,14 +3332,14 @@
             ` : ''}
 
             ${assignmentId ? `
-                <div class="subtask-top-row" style="margin-top: 2px;">
-                    <div class="subtask-progress-mini-row" style="flex: 1;">
+                <div class="subtask-bottom-row">
+                    <div class="subtask-progress-mini-row" style="flex: 1; min-width: 120px;">
                         <div class="subtask-progress-mini-track">
                             <div class="subtask-progress-mini-fill" style="width: ${subProgress}%;"></div>
                         </div>
                         <span class="subtask-progress-mini-label">${subProgress}%</span>
                     </div>
-                    <div style="display: flex; gap: 6px; margin-left: 12px;">
+                    <div class="subtask-actions-group">
                         ${!isApproved ? `
                             <button type="button" class="subtask-btn-action" onclick="openSubtaskProgressFromButton(event, this, ${assignmentId}, ${subProgress})">Update %</button>
                         ` : ''}
@@ -3792,6 +4039,77 @@ document.addEventListener('DOMContentLoaded', function () {
     const markAllReadButton = document.getElementById('markAllReadButton');
 
     if (notificationButton && notificationDropdown) {
+        function notifCsrfHeaders() {
+            const h = { 'Accept': 'application/json' };
+            const t = document.querySelector('meta[name="_csrf"]');
+            const n = document.querySelector('meta[name="_csrf_header"]');
+            if (t) h[n ? n.getAttribute('content') : 'X-CSRF-TOKEN'] = t.getAttribute('content');
+            return h;
+        }
+
+        function getNotificationRedirectUrl(item) {
+            if (!item) return '/admin/dashboard';
+            if (item.targetUrl && typeof item.targetUrl === 'string' && item.targetUrl.trim() !== '') {
+                return item.targetUrl;
+            }
+            if (typeof window.getNotificationRedirectUrl === 'function') {
+                const url = window.getNotificationRedirectUrl(item);
+                if (url) return url;
+            }
+            const type = (item.type || '').toUpperCase();
+            if (type.startsWith('ATTENDANCE')) return '/admin/attendance';
+            if (type.startsWith('LEAVE')) return '/admin/leave';
+            if (type.startsWith('TASK')) return '/admin/tasks';
+            if (type === 'EMPLOYEE_OF_THE_MONTH' || type.startsWith('PERFORMANCE')) return '/admin/performance';
+            if (type.startsWith('EMPLOYEE')) return '/admin/employees';
+            return '/admin/dashboard';
+        }
+
+        async function markNotificationAsRead(id, itemEl) {
+            if (id === null || id === undefined) return;
+            try {
+                const response = await fetch('/api/notifications/' + encodeURIComponent(id) + '/read', {
+                    method: 'POST', credentials: 'same-origin', keepalive: true, headers: notifCsrfHeaders()
+                });
+                if (!response.ok) throw new Error('Failed to mark notification as read');
+                if (itemEl) { itemEl.classList.remove('unread'); itemEl.style.background = ''; }
+                await loadUnreadCount();
+            } catch (e) { console.error('Mark notification as read error:', e); }
+        }
+
+        async function markAllNotificationsAsRead() {
+            if (markAllReadButton) markAllReadButton.disabled = true;
+            try {
+                const response = await fetch('/api/notifications/read-all', {
+                    method: 'POST', credentials: 'same-origin', keepalive: true, headers: notifCsrfHeaders()
+                });
+                if (!response.ok) throw new Error('Failed to mark all notifications as read');
+                updateBadge(0);
+                await loadNotifications();
+            } catch (e) {
+                console.error('Mark all notifications as read error:', e);
+                if (markAllReadButton) markAllReadButton.disabled = false;
+            }
+        }
+
+        function handleNotificationClick(item, itemEl) {
+            const targetUrl = (itemEl && itemEl.getAttribute('data-target-url')) || getNotificationRedirectUrl(item);
+            const id = item ? item.id : (itemEl ? itemEl.getAttribute('data-id') : null);
+            if (id && (!item || !item.read)) {
+                markNotificationAsRead(id, itemEl);
+            }
+            if (targetUrl) {
+                window.location.href = targetUrl;
+            }
+        }
+
+        if (markAllReadButton) {
+            markAllReadButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                markAllNotificationsAsRead();
+            });
+        }
+
         notificationButton.addEventListener('click', function(e) {
             e.stopPropagation();
             notificationDropdown.classList.toggle('show');
@@ -3814,14 +4132,40 @@ document.addEventListener('DOMContentLoaded', function () {
                     notificationDropdownBody.innerHTML = `<div style="padding: 24px; text-align: center; color: #7d889d; font-size: 12px;">No new notifications</div>`;
                     return;
                 }
-                notificationDropdownBody.innerHTML = list.map(item => `
-                    <div style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; ${!item.read ? 'background: #fbfcfe;' : ''}">
+                notificationDropdownBody.innerHTML = list.map(item => {
+                    const redirectUrl = getNotificationRedirectUrl(item);
+                    return `
+                    <div class="notification-item${!item.read ? ' unread' : ''}" data-id="${item.id}" data-target-url="${redirectUrl}" style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; ${!item.read ? 'background: #fbfcfe;' : ''}">
                         <div style="font-size: 12.5px; font-weight: 750; color: #0f172a;">${item.title || 'Notice'}</div>
                         <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">${item.message || ''}</div>
                     </div>
-                `).join('');
+                `;
+                }).join('');
+
+                notificationDropdownBody.querySelectorAll('.notification-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const id = el.getAttribute('data-id');
+                        const matchedItem = list.find(n => String(n.id) === String(id));
+                        handleNotificationClick(matchedItem || { id: id }, el);
+                    });
+                });
             } catch {
                 notificationDropdownBody.innerHTML = `<div style="padding: 24px; text-align: center; color: #7d889d; font-size: 12px;">No notifications right now</div>`;
+            }
+        }
+
+        function updateBadge(count) {
+            if (count > 0) {
+                notificationDot.style.display = 'flex';
+                notificationDot.textContent = count > 9 ? '9+' : String(count);
+                notificationDot.classList.add('has-count');
+                notificationHeaderCount.textContent = String(count);
+                notificationHeaderCount.classList.add('show');
+                if (markAllReadButton) markAllReadButton.disabled = false;
+            } else {
+                notificationDot.style.display = 'none';
+                notificationHeaderCount.classList.remove('show');
+                if (markAllReadButton) markAllReadButton.disabled = true;
             }
         }
 
@@ -3830,19 +4174,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const res = await fetch('/api/notifications/unread-count', { headers: { 'Accept': 'application/json' } });
                 if (!res.ok) return;
                 const d = await res.json();
-                const count = d.count || 0;
-                if (count > 0) {
-                    notificationDot.style.display = 'flex';
-                    notificationDot.textContent = count > 9 ? '9+' : String(count);
-                    notificationDot.classList.add('has-count');
-                    notificationHeaderCount.textContent = String(count);
-                    notificationHeaderCount.classList.add('show');
-                    if (markAllReadButton) markAllReadButton.disabled = false;
-                } else {
-                    notificationDot.style.display = 'none';
-                    notificationHeaderCount.classList.remove('show');
-                    if (markAllReadButton) markAllReadButton.disabled = true;
-                }
+                updateBadge(d.count || 0);
             } catch {}
         }
         loadUnreadCount();

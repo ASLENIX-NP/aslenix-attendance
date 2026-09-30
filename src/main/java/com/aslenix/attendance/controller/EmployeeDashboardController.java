@@ -42,6 +42,15 @@ public class EmployeeDashboardController {
     }
 
     // ============================================================
+    // EMPLOYEE ROOT (DEFAULT LANDING PAGE -> ATTENDANCE)
+    // ============================================================
+
+    @GetMapping({"", "/"})
+    public String employeeRoot() {
+        return "redirect:/employee/attendance";
+    }
+
+    // ============================================================
     // EMPLOYEE DASHBOARD
     // ============================================================
 

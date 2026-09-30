@@ -75,7 +75,7 @@ public class LoginController {
                 return "redirect:/employee/change-password";
             }
 
-            return "redirect:/employee/dashboard";
+            return "redirect:/employee/attendance";
         }
 
         // --------------------------------------------------------

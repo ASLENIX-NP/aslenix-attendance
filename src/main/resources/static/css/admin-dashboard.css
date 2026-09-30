@@ -411,7 +411,15 @@
     .admin-dashboard .sidebar-menu { grid-template-columns: 1fr; }
     .admin-dashboard .quick-grid { grid-template-columns: 1fr; }
     .admin-dashboard .page-header h1 { font-size: 28px; }
-    .admin-dashboard .notification-dropdown { width: calc(100vw - 26px); right: -5px; }
+    .admin-dashboard .notification-dropdown {
+        position: fixed;
+        top: 68px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: 440px;
+        margin: 0 auto;
+    }
 }
 
 /* Fix for Nepali Date Picker clipping/bleeding off screen */

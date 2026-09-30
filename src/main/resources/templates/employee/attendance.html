@@ -2599,24 +2599,27 @@
    RESPONSIVE 850
 ===================================================== */
 
-        @media (max-width: 850px) {
-
-            .sidebar {
-                width: 210px;
+        @media (max-width: 900px) {
+            .app-layout {
+                display: block;
+                width: 100%;
             }
 
             .main-area {
-                width: calc(100% - 210px);
-
-                margin-left: 210px;
+                width: 100% !important;
+                margin-left: 0 !important;
+                max-width: 100vw !important;
+                min-width: 0 !important;
+                padding-top: 64px !important;
             }
 
             .top-header {
-                padding: 0 20px;
+                padding: 0 16px;
             }
 
             main {
-                padding: 25px 20px 40px;
+                padding: 20px 16px 40px;
+                box-sizing: border-box;
             }
 
             .profile-info,
@@ -2627,70 +2630,19 @@
             .hero-message {
                 display: none;
             }
+
+            .notification-dropdown {
+                position: fixed !important;
+                top: 68px !important;
+                left: 10px !important;
+                right: 10px !important;
+                width: auto !important;
+                max-width: 440px !important;
+                margin: 0 auto !important;
+            }
         }
 
-
-        /* =====================================================
-   RESPONSIVE 680
-===================================================== */
-
         @media (max-width: 680px) {
-
-            .app-layout {
-                display: block;
-            }
-
-            .sidebar {
-                position: relative;
-
-                width: 100%;
-
-                height: auto;
-
-                padding: 15px;
-
-                border-right: none;
-
-                border-bottom: 1px solid #e8edf6;
-            }
-
-            .brand {
-                height: 60px;
-
-                margin-bottom: 12px;
-
-                padding: 0;
-
-                justify-content: center;
-            }
-
-            .brand img {
-                width: auto;
-
-                height: 40px;
-
-                max-width: 140px;
-            }
-
-            .sidebar-menu {
-                display: grid;
-
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
-
-                gap: 5px;
-            }
-
-            .sidebar-bottom {
-                display: none;
-            }
-
-            .main-area {
-                width: 100%;
-
-                margin-left: 0;
-            }
-
             .search-box {
                 width: 100%;
             }
@@ -2700,7 +2652,7 @@
             }
 
             .page-hero {
-                padding: 22px;
+                padding: 20px 16px;
             }
 
             .summary {
@@ -2717,22 +2669,11 @@
 
             .page-footer {
                 flex-direction: column;
-
                 align-items: flex-start;
-            }
-
-            .notification-dropdown {
-                right: -5px;
             }
         }
 
-
-        /* =====================================================
-   RESPONSIVE 450
-===================================================== */
-
         @media (max-width: 450px) {
-
             main {
                 padding: 18px 13px 30px;
             }
@@ -2748,17 +2689,7 @@
 
             .attendance-action-header {
                 align-items: flex-start;
-
                 flex-direction: column;
-            }
-
-            .sidebar-menu {
-                grid-template-columns: 1fr;
-            }
-
-            .notification-dropdown {
-                width: calc(100vw - 26px);
-                right: -5px;
             }
         }
 
@@ -5740,6 +5671,8 @@
                             item.dataset.notificationId =
                                 notification.id;
 
+                            item.dataset.targetUrl =
+                                notification.targetUrl || '';
 
                             item.setAttribute(
                                 'aria-label',
@@ -5750,88 +5683,53 @@
                                 )
                             );
 
-
                             item.innerHTML = `
-
                         <div class="notification-item-icon">
-
                             ${getNotificationIcon(
                                 notificationType
                             )}
-
                         </div>
 
-
                         <div class="notification-item-content">
-
                             <div class="notification-item-top">
-
                                 <div class="notification-item-title">
-
                                     ${escapeHtml(
                                 notification.title ||
                                 'Notification'
                             )}
-
                                 </div>
 
-
                                 <div class="notification-item-time">
-
                                     ${escapeHtml(
                                 notification.time ||
                                 ''
                             )}
-
                                 </div>
-
                             </div>
 
-
                             <div class="notification-item-message">
-
                                 ${escapeHtml(
                                 notification.message ||
                                 ''
                             )}
-
                             </div>
 
-
                             <span class="notification-item-type">
-
                                 ${escapeHtml(
                                 notificationType
                             )}
-
                             </span>
-
                         </div>
-
                     `;
-
 
                             item.addEventListener(
                                 'click',
                                 function (event) {
-
                                     event.stopPropagation();
-
-
-                                    if (
-                                        notification.read
-                                    ) {
-
-                                        return;
-
-                                    }
-
-
-                                    markNotificationAsRead(
-                                        notification.id,
+                                    handleNotificationClick(
+                                        notification,
                                         item
                                     );
-
                                 }
                             );
 
@@ -5955,7 +5853,8 @@
                                 {
                                     method: 'POST',
                                     headers: headers,
-                                    credentials: 'same-origin'
+                                    credentials: 'same-origin',
+                                    keepalive: true
                                 }
                             );
 
@@ -6081,6 +5980,41 @@
 
                     }
 
+                }
+
+
+                /* =====================================================
+                   REDIRECT ON NOTIFICATION CLICK
+                ===================================================== */
+
+                function getNotificationRedirectUrl(notification) {
+                    if (notification && notification.targetUrl) {
+                        return notification.targetUrl;
+                    }
+                    const type = ((notification && notification.type) || '').toUpperCase();
+                    const text = (((notification && notification.title) || '') + ' ' + ((notification && notification.message) || '')).toLowerCase();
+                    if (type.includes('ATTENDANCE') || text.includes('attendance')) return '/employee/attendance';
+                    if (type.includes('LEAVE') || text.includes('leave')) return '/employee/leave';
+                    if (type.includes('TASK') || text.includes('task') || text.includes('subtask') || text.includes('assignment')) return '/employee/tasks';
+                    if (type.includes('EMPLOYEE_OF_THE_MONTH') || type.includes('PROFILE') || text.includes('profile') || text.includes('employee of the month')) return '/employee/profile';
+                    return '/employee/dashboard';
+                }
+
+                async function handleNotificationClick(notification, itemElement) {
+                    if (!notification) return;
+                    const targetUrl = notification.targetUrl || getNotificationRedirectUrl(notification);
+
+                    if (!notification.read && notification.id) {
+                        try {
+                            await markNotificationAsRead(notification.id, itemElement);
+                        } catch (e) {
+                            console.error('Error marking notification as read before redirect:', e);
+                        }
+                    }
+
+                    if (targetUrl) {
+                        window.location.href = targetUrl;
+                    }
                 }
 
 

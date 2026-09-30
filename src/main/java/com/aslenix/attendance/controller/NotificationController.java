@@ -82,8 +82,9 @@ public class NotificationController {
             notifications = notificationService.getEmployeeNotifications(employee);
         }
 
+        boolean admin = isAdmin(authentication);
         List<NotificationResponse> response = notifications.stream()
-                .map(this::toResponse)
+                .map(n -> toResponse(n, admin))
                 .toList();
 
         return ResponseEntity.ok(response);
@@ -183,6 +184,10 @@ public class NotificationController {
     // ============================================================
 
     private NotificationResponse toResponse(Notification notification) {
+        return toResponse(notification, false);
+    }
+
+    private NotificationResponse toResponse(Notification notification, boolean isAdmin) {
         return new NotificationResponse(
                 notification.getId(),
                 notification.getTitle(),
@@ -190,8 +195,54 @@ public class NotificationController {
                 notification.getType(),
                 notification.isRead(),
                 notification.getCreatedAt(),
-                formatTime(notification.getCreatedAt())
+                formatTime(notification.getCreatedAt()),
+                determineTargetUrl(notification, isAdmin)
         );
+    }
+
+    private String determineTargetUrl(Notification notification, boolean isAdmin) {
+        if (notification == null) {
+            return isAdmin ? "/admin/dashboard" : "/employee/dashboard";
+        }
+        String type = notification.getType() != null ? notification.getType().toUpperCase() : "";
+        if (isAdmin) {
+            if (type.contains("ATTENDANCE")) {
+                return "/admin/attendance";
+            } else if (type.contains("LEAVE")) {
+                return "/admin/leave";
+            } else if (type.contains("TASK")) {
+                return "/admin/tasks";
+            } else if (type.contains("EMPLOYEE_OF_THE_MONTH") || type.contains("PERFORMANCE")) {
+                return "/admin/performance";
+            } else if (type.contains("EMPLOYEE")) {
+                return "/admin/employees";
+            }
+            String text = ((notification.getTitle() != null ? notification.getTitle() : "") + " "
+                    + (notification.getMessage() != null ? notification.getMessage() : "")).toLowerCase();
+            if (text.contains("attendance")) return "/admin/attendance";
+            if (text.contains("leave")) return "/admin/leave";
+            if (text.contains("task") || text.contains("assignment")) return "/admin/tasks";
+            if (text.contains("performance") || text.contains("employee of the month")) return "/admin/performance";
+            if (text.contains("employee")) return "/admin/employees";
+            return "/admin/dashboard";
+        } else {
+            if (type.contains("ATTENDANCE")) {
+                return "/employee/attendance";
+            } else if (type.contains("LEAVE")) {
+                return "/employee/leave";
+            } else if (type.contains("TASK")) {
+                return "/employee/tasks";
+            } else if (type.contains("EMPLOYEE_OF_THE_MONTH") || type.contains("PROFILE") || type.contains("PERFORMANCE")) {
+                return "/employee/profile";
+            }
+            String text = ((notification.getTitle() != null ? notification.getTitle() : "") + " "
+                    + (notification.getMessage() != null ? notification.getMessage() : "")).toLowerCase();
+            if (text.contains("attendance")) return "/employee/attendance";
+            if (text.contains("leave")) return "/employee/leave";
+            if (text.contains("task") || text.contains("assignment")) return "/employee/tasks";
+            if (text.contains("profile") || text.contains("performance") || text.contains("employee of the month")) return "/employee/profile";
+            return "/employee/dashboard";
+        }
     }
 
     // ============================================================
@@ -239,7 +290,8 @@ public class NotificationController {
             String type,
             boolean read,
             LocalDateTime createdAt,
-            String time
+            String time,
+            String targetUrl
     ) {
     }
 }

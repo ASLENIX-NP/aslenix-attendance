@@ -1721,8 +1721,13 @@
                 padding: 0 14px;
             }
             .notification-dropdown {
-                width: calc(100vw - 26px);
-                right: -5px;
+                position: fixed;
+                top: 68px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-width: 440px;
+                margin: 0 auto;
             }
             .page-header h1 {
                 font-size: 26px;
@@ -2412,18 +2417,49 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         notificationDropdownBody.innerHTML = notifications.map(item => `
-            <div class="notification-item${!item.read ? ' unread' : ''}" data-id="${item.id}" style="padding: 12px 16px; border-bottom: 1px solid #f1f4f9; display: flex; flex-direction: column; gap: 4px; cursor: ${!item.read ? 'pointer' : 'default'}; ${!item.read ? 'background: #fbfcfe;' : ''}">
+            <div class="notification-item${!item.read ? ' unread' : ''}" data-id="${item.id}" data-target-url="${item.targetUrl || ''}" style="padding: 12px 16px; border-bottom: 1px solid #f1f4f9; display: flex; flex-direction: column; gap: 4px; cursor: pointer; ${!item.read ? 'background: #fbfcfe;' : ''}">
                 <div style="font-size: 12.5px; font-weight: 750; color: #0f172a;">${item.title || 'Notification'}</div>
                 <div style="font-size: 11.5px; color: #5a667d;">${item.message || ''}</div>
                 <div style="font-size: 10px; color: #8a96aa; margin-top: 2px;">${item.time || ''}</div>
             </div>
         `).join('');
 
-        notificationDropdownBody.querySelectorAll('.notification-item.unread').forEach(el => {
+        notificationDropdownBody.querySelectorAll('.notification-item').forEach((el, index) => {
             el.addEventListener('click', function () {
-                markNotificationAsRead(el.getAttribute('data-id'), el);
+                handleNotificationClick(notifications[index], el);
             });
         });
+    }
+
+    function getNotificationRedirectUrl(notification) {
+        if (notification && notification.targetUrl) {
+            return notification.targetUrl;
+        }
+        const type = ((notification && notification.type) || '').toUpperCase();
+        const text = (((notification && notification.title) || '') + ' ' + ((notification && notification.message) || '')).toLowerCase();
+        if (type.includes('ATTENDANCE') || text.includes('attendance')) return '/admin/attendance';
+        if (type.includes('LEAVE') || text.includes('leave')) return '/admin/leave';
+        if (type.includes('TASK') || text.includes('task') || text.includes('subtask') || text.includes('assignment')) return '/admin/tasks';
+        if (type.includes('EMPLOYEE_OF_THE_MONTH') || type.includes('PERFORMANCE') || text.includes('performance') || text.includes('employee of the month')) return '/admin/performance';
+        if (type.includes('EMPLOYEE') || text.includes('employee')) return '/admin/employees';
+        return '/admin/dashboard';
+    }
+
+    async function handleNotificationClick(notification, itemElement) {
+        if (!notification) return;
+        const targetUrl = notification.targetUrl || getNotificationRedirectUrl(notification);
+
+        if (!notification.read && notification.id) {
+            try {
+                await markNotificationAsRead(notification.id, itemElement);
+            } catch (e) {
+                console.error('Error marking notification as read before redirect:', e);
+            }
+        }
+
+        if (targetUrl) {
+            window.location.href = targetUrl;
+        }
     }
 
     function notifCsrfHeaders() {
@@ -2438,10 +2474,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (id === null || id === undefined) return;
         try {
             const response = await fetch('/api/notifications/' + encodeURIComponent(id) + '/read', {
-                method: 'POST', headers: notifCsrfHeaders(), credentials: 'same-origin'
+                method: 'POST', headers: notifCsrfHeaders(), credentials: 'same-origin', keepalive: true
             });
             if (!response.ok) throw new Error('Failed to mark notification as read');
-            if (item) { item.classList.remove('unread'); item.style.background = ''; item.style.cursor = 'default'; }
+            if (item) { item.classList.remove('unread'); item.style.background = ''; }
             await loadUnreadCount();
         } catch (e) { console.error('Mark notification as read error:', e); }
     }

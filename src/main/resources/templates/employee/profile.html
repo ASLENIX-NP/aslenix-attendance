@@ -1115,8 +1115,13 @@
                 padding: 0 14px;
             }
             .notification-dropdown {
-                width: calc(100vw - 26px);
-                right: -5px;
+                position: fixed;
+                top: 68px;
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-width: 440px;
+                margin: 0 auto;
             }
             .page-header h1 {
                 font-size: 26px;
@@ -1725,6 +1730,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const notificationType = notification.type || 'GENERAL';
             item.dataset.type = notificationType;
             item.dataset.notificationId = notification.id;
+            item.dataset.targetUrl = notification.targetUrl || '';
             item.setAttribute('aria-label', 'Notification: ' + (notification.title || 'Notification'));
 
             item.innerHTML = `
@@ -1740,8 +1746,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             item.addEventListener('click', function (event) {
                 event.stopPropagation();
-                if (notification.read) return;
-                markNotificationAsRead(notification.id, item);
+                handleNotificationClick(notification, item);
             });
 
             notificationDropdownBody.appendChild(item);
@@ -1775,7 +1780,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch('/employee/notifications/' + notificationId + '/read', {
                 method: 'POST',
                 headers: headers,
-                credentials: 'same-origin'
+                credentials: 'same-origin',
+                keepalive: true
             });
             if (!response.ok) throw new Error('Failed to mark notification as read');
             if (itemElement) itemElement.classList.remove('unread');
@@ -1804,6 +1810,36 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) {
             console.error('Mark all notifications as read error:', error);
             await loadUnreadCount();
+        }
+    }
+
+    function getNotificationRedirectUrl(notification) {
+        if (notification && notification.targetUrl) {
+            return notification.targetUrl;
+        }
+        const type = ((notification && notification.type) || '').toUpperCase();
+        const text = (((notification && notification.title) || '') + ' ' + ((notification && notification.message) || '')).toLowerCase();
+        if (type.includes('ATTENDANCE') || text.includes('attendance')) return '/employee/attendance';
+        if (type.includes('LEAVE') || text.includes('leave')) return '/employee/leave';
+        if (type.includes('TASK') || text.includes('task') || text.includes('subtask') || text.includes('assignment')) return '/employee/tasks';
+        if (type.includes('EMPLOYEE_OF_THE_MONTH') || type.includes('PROFILE') || text.includes('profile') || text.includes('employee of the month')) return '/employee/profile';
+        return '/employee/dashboard';
+    }
+
+    async function handleNotificationClick(notification, itemElement) {
+        if (!notification) return;
+        const targetUrl = notification.targetUrl || getNotificationRedirectUrl(notification);
+
+        if (!notification.read && notification.id) {
+            try {
+                await markNotificationAsRead(notification.id, itemElement);
+            } catch (e) {
+                console.error('Error marking notification as read before redirect:', e);
+            }
+        }
+
+        if (targetUrl) {
+            window.location.href = targetUrl;
         }
     }
 
