@@ -161,6 +161,21 @@
 
 
         <!-- =====================================================
+             POSTGRESQL (Enables Render native managed Postgres)
+        ====================================================== -->
+
+        <dependency>
+
+            <groupId>org.postgresql</groupId>
+
+            <artifactId>postgresql</artifactId>
+
+            <scope>runtime</scope>
+
+        </dependency>
+
+
+        <!-- =====================================================
              QR CODE GENERATION - ZXING CORE
         ====================================================== -->
 

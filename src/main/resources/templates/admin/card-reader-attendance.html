@@ -2977,7 +2977,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const lower = String(msg).toLowerCase();
 
-        // 1. Already Checked In
+        // 1. Hardware / Reader / Camera status OK or Connected
+        if (lower.includes("status: ok") || lower.includes("reader & camera status: ok") || lower.includes("reader status: ok") || lower.includes("reader connected") || (type === "success" && (lower.includes("reader") || lower.includes("camera") || lower.includes("online")))) {
+            return {
+                title: "Card Reader & Camera Online",
+                message: msg,
+                guidance: "",
+                badge: "Online",
+                type: "success",
+                iconSvg: getToastIconSvg("check")
+            };
+        }
+
+        // 2. Already Checked In
         if (lower.includes("already checked in")) {
             return {
                 title: "Already Checked In Today",
@@ -2989,7 +3001,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
 
-        // 2. Card or ID Scan Required
+        // 3. Card or ID Scan Required
         if (lower.includes("scan an employee card") || lower.includes("card or id")) {
             return {
                 title: "Card Or ID Scan Required",
@@ -3001,7 +3013,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
 
-        // 3. Employee Not Recognized
+        // 4. Employee Not Recognized
         if (lower.includes("not recognized") || lower.includes("not found") || lower.includes("unrecognized")) {
             return {
                 title: "Employee Not Recognized",
@@ -3013,8 +3025,8 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
 
-        // 4. Camera Access Blocked
-        if (lower.includes("camera")) {
+        // 5. Camera Access Blocked (ONLY for actual permission or device access errors)
+        if (lower.includes("camera") && (lower.includes("blocked") || lower.includes("permission") || lower.includes("denied") || lower.includes("could not access") || lower.includes("failed") || lower.includes("error") || lower.includes("not supported") || type === "error")) {
             return {
                 title: "Camera Access Blocked",
                 message: msg,
@@ -3025,7 +3037,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
 
-        // 5. Failed to record or process attendance
+        // 6. Failed to record or process attendance
         if (lower.includes("failed to record") || lower.includes("failed to process") || lower.includes("could not be completed")) {
             return {
                 title: "Attendance Operation Failed",
@@ -3037,7 +3049,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
 
-        // 6. Card Scanned / Verified Success
+        // 7. Card Scanned / Verified Success
         if (lower.includes("scanned & verified") || lower.includes("verified for")) {
             return {
                 title: "Card Verified Successfully",
@@ -3049,17 +3061,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         }
 
-        // 7. Reader Connected / Disconnected
-        if (lower.includes("reader connected") || lower.includes("reader status: ok")) {
-            return {
-                title: "Card Reader Online",
-                message: msg,
-                guidance: "",
-                badge: "Connected",
-                type: "success",
-                iconSvg: getToastIconSvg("check")
-            };
-        }
+        // 8. Reader Disconnected
         if (lower.includes("reader disconnected")) {
             return {
                 title: "Card Reader Disconnected",
@@ -3520,51 +3522,130 @@ document.addEventListener('DOMContentLoaded', function () {
     // =========================================================
     // CAMERA QR SCANNER
     // =========================================================
-    function startCameraScanner() {
-        cameraModal.classList.add('open');
-
-        if (!html5QrCodeScanner) {
-            html5QrCodeScanner = new Html5Qrcode('qrCameraReader');
+    async function startCameraScanner() {
+        if (typeof Html5Qrcode === 'undefined') {
+            showToast('QR scanning library is loading. Please check internet connection and retry.', 'warning');
+            return;
         }
 
-        const config = {
-            fps: 15,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0
-        };
+        // Check Secure Context (required by modern browsers for camera access)
+        if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            showToast('Camera access requires HTTPS or localhost. Please access via a secure connection.', 'error');
+            return;
+        }
 
-        html5QrCodeScanner.start(
-            { facingMode: 'environment' },
-            config,
-            (decodedText) => {
-                // QR Decoded successfully!
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showToast('Camera device is not supported or blocked by browser policy.', 'error');
+            return;
+        }
+
+        // 1. Show modal first
+        cameraModal.classList.add('open');
+
+        // 2. Wait for modal animation and DOM rendering so viewfinder has non-zero clientWidth/Height
+        await new Promise(resolve => setTimeout(resolve, 250));
+
+        // 3. Clear previous scanner instance safely if one exists
+        if (html5QrCodeScanner) {
+            try {
+                if (html5QrCodeScanner.isScanning) {
+                    await html5QrCodeScanner.stop();
+                }
+                await html5QrCodeScanner.clear();
+            } catch (e) {
+                console.warn('Scanner cleanup warning:', e);
+            }
+            html5QrCodeScanner = null;
+        }
+
+        try {
+            html5QrCodeScanner = new Html5Qrcode('qrCameraReader');
+
+            const config = {
+                fps: 15,
+                qrbox: function(viewfinderWidth, viewfinderHeight) {
+                    const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                    const qrboxSize = Math.max(160, Math.floor(minEdge * 0.75));
+                    return { width: qrboxSize, height: qrboxSize };
+                },
+                aspectRatio: 1.0
+            };
+
+            const onScanSuccess = (decodedText) => {
                 stopCameraScanner();
                 scanQueryInput.value = decodedText;
                 processScan(decodedText);
-            },
-            () => {
-                // Scanning frame callback (silent)
+            };
+
+            // 4. Check available camera devices via Html5Qrcode.getCameras()
+            let cameras = [];
+            try {
+                cameras = await Html5Qrcode.getCameras();
+            } catch (camErr) {
+                console.warn('getCameras enumeration failed, will use facingMode constraints:', camErr);
             }
-        ).catch(err => {
-            console.error('Camera open failed:', err);
-            showToast('Could not access camera. Please allow camera permissions.', 'error');
+
+            if (cameras && cameras.length > 0) {
+                // Prefer back/environment camera, fallback to first camera
+                const backCam = cameras.find(c => {
+                    const label = (c.label || '').toLowerCase();
+                    return label.includes('back') || label.includes('rear') || label.includes('environment');
+                });
+                const selectedCameraId = backCam ? backCam.id : cameras[0].id;
+                await html5QrCodeScanner.start(
+                    selectedCameraId,
+                    config,
+                    onScanSuccess,
+                    () => {}
+                );
+            } else {
+                // Fallback to constraints
+                try {
+                    await html5QrCodeScanner.start(
+                        { facingMode: { ideal: 'environment' } },
+                        config,
+                        onScanSuccess,
+                        () => {}
+                    );
+                } catch (errEnv) {
+                    console.warn('Environment camera failed, attempting user camera:', errEnv);
+                    await html5QrCodeScanner.start(
+                        { facingMode: 'user' },
+                        config,
+                        onScanSuccess,
+                        () => {}
+                    );
+                }
+            }
+        } catch (err) {
+            console.error('All camera attempts failed:', err);
+            let userFriendlyError = 'Could not access camera. Please allow camera permissions.';
+            if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+                userFriendlyError = 'Camera permission denied. Please allow camera access in browser address bar.';
+            } else if (err && (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError')) {
+                userFriendlyError = 'No camera found on this device.';
+            } else if (err && (err.name === 'NotReadableError' || err.name === 'TrackStartError')) {
+                userFriendlyError = 'Camera is currently in use by another program or browser tab.';
+            } else if (err && err.message) {
+                userFriendlyError = err.message;
+            }
+            showToast(userFriendlyError, 'error');
             stopCameraScanner();
-        });
+        }
     }
 
-    function stopCameraScanner() {
+    async function stopCameraScanner() {
+        cameraModal.classList.remove('open');
         if (html5QrCodeScanner) {
             try {
-                html5QrCodeScanner.stop().then(() => {
-                    cameraModal.classList.remove('open');
-                }).catch(() => {
-                    cameraModal.classList.remove('open');
-                });
+                if (html5QrCodeScanner.isScanning) {
+                    await html5QrCodeScanner.stop();
+                }
+                await html5QrCodeScanner.clear();
             } catch (e) {
-                cameraModal.classList.remove('open');
+                console.warn('Error stopping scanner:', e);
             }
-        } else {
-            cameraModal.classList.remove('open');
+            html5QrCodeScanner = null;
         }
     }
 

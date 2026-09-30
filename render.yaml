@@ -1,3 +1,9 @@
+# ==============================================================================
+# RENDER BLUEPRINT (render.yaml)
+# ASLENIX Attendance Management System
+# ==============================================================================
+# Docs: https://render.com/docs/blueprint-spec
+
 services:
   - type: web
     name: aslenix-attendance
@@ -16,18 +22,29 @@ services:
         value: true
       - key: AUTO_CREATE_ADMIN
         value: false
-      # Configure your database connection in the Render dashboard:
-      # Either provide full DB_URL (or DATABASE_URL):
-      # - key: DB_URL
+      # OPTION 1 (DEFAULT / 1-CLICK): Automatically wired to the free Render PostgreSQL database below
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aslenix-db
+          property: connectionString
+
+      # OPTION 2 (ALTERNATIVE): External MySQL Database (Aiven, TiDB, Railway, AWS RDS, etc.)
+      # If using external MySQL, remove the DATABASE_URL above and uncomment the following:
+      # - key: DB_HOST
       #   sync: false
-      # Or configure discrete components:
-      - key: DB_HOST
-        sync: false
-      - key: DB_PORT
-        value: 3306
-      - key: DB_NAME
-        sync: false
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
+      # - key: DB_PORT
+      #   value: 3306
+      # - key: DB_NAME
+      #   sync: false
+      # - key: DB_USERNAME
+      #   sync: false
+      # - key: DB_PASSWORD
+      #   sync: false
+
+# Render Managed Free PostgreSQL Database (automatically provisioned on Blueprint deploy)
+databases:
+  - name: aslenix-db
+    plan: free
+    region: oregon
+    databaseName: aslenix_attendance
+    user: aslenix

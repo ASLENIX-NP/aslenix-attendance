@@ -42,7 +42,7 @@ USER appuser
 ENV PORT=8080
 
 # JVM Container memory optimization for Render (avoids OOM kills on 512MB RAM free/starter tiers)
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=40.0 -XX:+ExitOnOutOfMemoryError"
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=65.0 -XX:InitialRAMPercentage=30.0 -XX:+UseSerialGC -Xss512k -XX:+ExitOnOutOfMemoryError"
 
 # Expose default port
 EXPOSE 8080
