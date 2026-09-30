@@ -49,6 +49,13 @@
 
     <dependencies>
 
+        <!-- Source: https://mvnrepository.com/artifact/io.imagekit/image-kit-java -->
+        <dependency>
+            <groupId>io.imagekit</groupId>
+            <artifactId>image-kit-java</artifactId>
+            <version>3.6.0</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- =====================================================
              SPRING DATA JPA
