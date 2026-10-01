@@ -36,3 +36,4 @@ build/
 .env
 .env.example
 .env*.local
+application.properties
