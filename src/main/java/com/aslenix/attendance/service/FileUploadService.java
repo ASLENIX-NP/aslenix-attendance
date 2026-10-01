@@ -77,17 +77,10 @@ public class FileUploadService {
         byte[] fileBytes = file.getBytes();
 
         if (isImageKitActive()) {
-            try {
-                String cloudUrl = uploadToImageKit(fileBytes, uniqueFileName);
-                if (cloudUrl != null && !cloudUrl.isBlank()) {
-                    return cloudUrl;
-                }
-            } catch (Exception e) {
-                log.error("Failed to upload photo to ImageKit: {}. Falling back to local storage.", e.getMessage(), e);
-            }
+            return uploadToImageKit(fileBytes, uniqueFileName);
         }
 
-        // Default / fallback local disk storage
+        // Default / fallback local disk storage ONLY when ImageKit is not configured/active
         return storeLocally(fileBytes, uniqueFileName);
     }
 
@@ -111,26 +104,31 @@ public class FileUploadService {
             builder.publicKey(pubKey);
         }
 
-        FileUploadResponse response = imageKitClient.files().upload(builder.build());
-        String photoUrl = response.url().orElse(null);
+        try {
+            FileUploadResponse response = imageKitClient.files().upload(builder.build());
+            String photoUrl = response.url().orElse(null);
 
-        if (photoUrl == null || photoUrl.isBlank()) {
-            String endpoint = imageKitConfig.getUrlEndpoint();
-            if (endpoint != null && !endpoint.isBlank()) {
-                if (endpoint.endsWith("/")) {
-                    endpoint = endpoint.substring(0, endpoint.length() - 1);
+            if (photoUrl == null || photoUrl.isBlank()) {
+                String endpoint = imageKitConfig.getUrlEndpoint();
+                if (endpoint != null && !endpoint.isBlank()) {
+                    if (endpoint.endsWith("/")) {
+                        endpoint = endpoint.substring(0, endpoint.length() - 1);
+                    }
+                    String filePath = response.filePath().orElse(folder + "/" + fileName);
+                    if (!filePath.startsWith("/")) {
+                        filePath = "/" + filePath;
+                    }
+                    photoUrl = endpoint + filePath;
                 }
-                String filePath = response.filePath().orElse(folder + "/" + fileName);
-                if (!filePath.startsWith("/")) {
-                    filePath = "/" + filePath;
-                }
-                photoUrl = endpoint + filePath;
             }
-        }
 
-        log.info("Uploaded employee photo to ImageKit: fileName={}, fileId={}, url={}",
-                fileName, response.fileId().orElse("N/A"), photoUrl);
-        return photoUrl;
+            log.info("Uploaded employee photo to ImageKit: fileName={}, fileId={}, url={}",
+                    fileName, response.fileId().orElse("N/A"), photoUrl);
+            return photoUrl;
+        } catch (Exception e) {
+            log.error("ImageKit upload error for '{}': {}", fileName, e.getMessage(), e);
+            throw new IOException("Failed to upload photo to ImageKit: " + e.getMessage(), e);
+        }
     }
 
     /**

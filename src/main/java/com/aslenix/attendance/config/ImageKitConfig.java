@@ -100,28 +100,32 @@ public class ImageKitConfig {
 
     private static Map<String, String> loadDotenv() {
         Map<String, String> map = new HashMap<>();
-        File dotEnv = new File(".env");
-        if (!dotEnv.exists() || !dotEnv.isFile()) {
-            return map;
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(dotEnv, StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("#") || !line.contains("=")) {
-                    continue;
+        File[] candidates = new File[]{
+                new File(".env"),
+                new File("../.env"),
+                new File("aslenix-attendance/.env")
+        };
+        for (File dotEnv : candidates) {
+            if (dotEnv.exists() && dotEnv.isFile()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(dotEnv, StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        line = line.trim();
+                        if (line.isEmpty() || line.startsWith("#") || !line.contains("=")) {
+                            continue;
+                        }
+                        int eq = line.indexOf('=');
+                        String key = line.substring(0, eq).trim();
+                        String val = line.substring(eq + 1).trim();
+                        if ((val.startsWith("\"") && val.endsWith("\"")) || (val.startsWith("'") && val.endsWith("'"))) {
+                            val = val.substring(1, val.length() - 1);
+                        }
+                        map.putIfAbsent(key, val);
+                    }
+                } catch (Exception e) {
+                    // Ignore if .env cannot be read
                 }
-                int eq = line.indexOf('=');
-                String key = line.substring(0, eq).trim();
-                String val = line.substring(eq + 1).trim();
-                if ((val.startsWith("\"") && val.endsWith("\"")) || (val.startsWith("'") && val.endsWith("'"))) {
-                    val = val.substring(1, val.length() - 1);
-                }
-                map.put(key, val);
             }
-        } catch (Exception e) {
-            // Ignore if .env cannot be read
         }
         return map;
     }

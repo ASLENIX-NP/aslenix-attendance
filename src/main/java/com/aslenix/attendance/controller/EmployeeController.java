@@ -10,6 +10,8 @@ import com.aslenix.attendance.repository.UserRepository;
 import com.aslenix.attendance.service.EmployeeDeletionService;
 import com.aslenix.attendance.service.FileUploadService;
 import com.aslenix.attendance.service.QrCodeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +27,8 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/admin/employees")
 public class EmployeeController {
+
+    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
 
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
@@ -153,7 +157,8 @@ public class EmployeeController {
             @RequestParam(value = "username", required = false) String username,
             @RequestParam String password,
             @RequestParam Long departmentId,
-            @RequestParam(value = "photo", required = false) MultipartFile photoFile) {
+            @RequestParam(value = "photo", required = false) MultipartFile photoFile,
+            RedirectAttributes redirectAttributes) {
 
         // =========================================================
         // CHECK EMAIL
@@ -239,7 +244,11 @@ public class EmployeeController {
                 String photoUrl = fileUploadService.storeEmployeePhoto(photoFile);
                 employee.setPhotoUrl(photoUrl);
             } catch (Exception e) {
-                // Log and continue gracefully so employee creation isn't blocked
+                log.error("Failed to store employee photo: {}", e.getMessage(), e);
+                if (redirectAttributes != null) {
+                    redirectAttributes.addFlashAttribute("errorMessage",
+                            "Employee created, but photo upload to ImageKit failed: " + e.getMessage());
+                }
             }
         }
 
@@ -249,7 +258,21 @@ public class EmployeeController {
 
         employeeRepository.save(employee);
 
+        if (redirectAttributes != null && !redirectAttributes.getFlashAttributes().containsKey("errorMessage")) {
+            String employeeName = employee.getFirstName() + (employee.getLastName() != null ? " " + employee.getLastName() : "");
+            redirectAttributes.addFlashAttribute("successMessage", "Employee " + employeeName + " added successfully.");
+        }
+
         return "redirect:/admin/employees";
+    }
+
+    public String addEmployee(
+            Employee employee,
+            String username,
+            String password,
+            Long departmentId,
+            MultipartFile photoFile) {
+        return addEmployee(employee, username, password, departmentId, photoFile, null);
     }
 
     // ============================================================
@@ -426,7 +449,9 @@ public class EmployeeController {
                 String photoUrl = fileUploadService.storeEmployeePhoto(photoFile);
                 existing.setPhotoUrl(photoUrl);
             } catch (Exception e) {
-                // Log and continue gracefully
+                log.error("Failed to update employee photo: {}", e.getMessage(), e);
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Employee updated, but photo upload to ImageKit failed: " + e.getMessage());
             }
         }
 

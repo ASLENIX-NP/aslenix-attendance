@@ -47,4 +47,30 @@ public class FileUploadServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> service.storeEmployeePhoto(badFile));
     }
+
+    @Test
+    void testImageKitFailureThrowsExceptionAndDoesNotSaveLocally() {
+        ImageKitConfig config = org.mockito.Mockito.mock(ImageKitConfig.class);
+        org.mockito.Mockito.when(config.isConfigured()).thenReturn(true);
+        org.mockito.Mockito.when(config.getFolder()).thenReturn("/employee-photos");
+        org.mockito.Mockito.when(config.getPublicKey()).thenReturn("public_test");
+
+        io.imagekit.client.ImageKitClient client = org.mockito.Mockito.mock(io.imagekit.client.ImageKitClient.class);
+        io.imagekit.services.blocking.FileService fileService = org.mockito.Mockito.mock(io.imagekit.services.blocking.FileService.class);
+        org.mockito.Mockito.when(client.files()).thenReturn(fileService);
+        org.mockito.Mockito.when(fileService.upload(org.mockito.Mockito.any())).thenThrow(new RuntimeException("Your request contains expired private API key."));
+
+        FileUploadService service = new FileUploadService(config, client);
+        assertTrue(service.isImageKitActive());
+
+        MockMultipartFile file = new MockMultipartFile(
+                "photo",
+                "avatar.jpg",
+                "image/jpeg",
+                new byte[]{10, 20, 30}
+        );
+
+        IOException thrown = assertThrows(IOException.class, () -> service.storeEmployeePhoto(file));
+        assertTrue(thrown.getMessage().contains("Failed to upload photo to ImageKit"));
+    }
 }

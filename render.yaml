@@ -22,6 +22,14 @@ services:
         value: true
       - key: AUTO_CREATE_ADMIN
         value: false
+      - key: IMAGEKIT_PUBLIC_KEY
+        value: public_ya787pz0qzjIbo0Wb7IYB+GHKww=
+      - key: IMAGEKIT_PRIVATE_KEY
+        value: private_wgG7O/RG43VOFhabN1zTrT77ZjM=
+      - key: IMAGEKIT_URL_ENDPOINT
+        value: https://ik.imagekit.io/7gqvkziy4c
+      - key: IMAGEKIT_FOLDER
+        value: /employee-photos
       # OPTION 1 (DEFAULT / 1-CLICK): Automatically wired to the free Render PostgreSQL database below
       - key: DATABASE_URL
         fromDatabase:

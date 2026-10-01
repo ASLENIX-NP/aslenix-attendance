@@ -62,6 +62,11 @@ public class ImageKitMigrationRunner implements ApplicationRunner {
                             migratedCount++;
                             log.info("Successfully migrated employee {} photo to ImageKit: {}",
                                     employee.getId(), cloudUrl);
+                            try {
+                                Files.deleteIfExists(localFile);
+                            } catch (Exception ex) {
+                                log.warn("Could not delete local file after ImageKit migration: {}", localFile);
+                            }
                         }
                     } catch (Exception e) {
                         log.error("Failed to migrate photo '{}' for employee {}: {}",

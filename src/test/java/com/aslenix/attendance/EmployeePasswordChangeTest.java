@@ -231,7 +231,7 @@ class EmployeePasswordChangeTest {
                 auth,
                 r4
         );
-        assertEquals("redirect:/employee/dashboard", dest);
+        assertEquals("redirect:/employee/attendance", dest);
         assertNotNull(r4.getFlashAttributes().get("successMessage"));
 
         // Verify in DB

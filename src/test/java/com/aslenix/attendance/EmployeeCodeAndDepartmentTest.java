@@ -57,15 +57,14 @@ public class EmployeeCodeAndDepartmentTest {
     @Autowired
     private AdminDepartmentController adminDepartmentController;
 
+    @Autowired
+    private com.aslenix.attendance.service.EmployeeDeletionService employeeDeletionService;
+
     @BeforeEach
     void setUp() {
         for (Employee e : employeeRepository.findAll()) {
             if (e.getEmployeeCode() != null && !e.getEmployeeCode().startsWith("ADM-")) {
-                User u = e.getUser();
-                employeeRepository.delete(e);
-                if (u != null) {
-                    userRepository.delete(u);
-                }
+                employeeDeletionService.deleteEmployee(e.getId());
             }
         }
         employeeSequenceRepository.deleteAll();
