@@ -296,12 +296,12 @@ public class AdminRecoveryService {
     private static Map<String, String> loadDotEnv() {
         Map<String, String> map = new HashMap<>();
         File[] candidates = new File[]{
-                new File(".env"),
                 new File(".env.example"),
-                new File("../.env"),
+                new File(".env"),
                 new File("../.env.example"),
-                new File("aslenix-attendance/.env"),
-                new File("aslenix-attendance/.env.example")
+                new File("../.env"),
+                new File("aslenix-attendance/.env.example"),
+                new File("aslenix-attendance/.env")
         };
         for (File file : candidates) {
             if (file.exists() && file.isFile()) {
