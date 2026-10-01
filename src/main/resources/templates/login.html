@@ -247,6 +247,10 @@
         Initial Super Admin account created successfully! Please sign in.
     </div>
 
+    <div th:if="${param.recovery}" class="message logout">
+        Your password has been reset successfully. Please sign in with your new password.
+    </div>
+
     <form method="post" action="/login">
 
     <!-- CSRF protection -->

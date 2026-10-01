@@ -54,9 +54,14 @@ class InitialAdminSetupTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private com.aslenix.attendance.repository.AdminRecoveryTokenRepository adminRecoveryTokenRepository;
+
     @BeforeEach
     void setUp() {
-        // Clear all admin users to simulate empty database state for setup testing
+        // Clear tokens and admin users to simulate empty database state for setup testing
+        adminRecoveryTokenRepository.deleteAll();
+
         List<User> admins = userRepository.findAll().stream()
                 .filter(u -> u.getRole() == Role.ADMIN)
                 .toList();

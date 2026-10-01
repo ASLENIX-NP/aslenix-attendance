@@ -49,6 +49,14 @@ public class SecurityConfig {
                 ).permitAll()
 
                 // ------------------------------------------------
+                // ADMIN RECOVERY (public — user is locked out)
+                // ------------------------------------------------
+
+                .requestMatchers(
+                        "/admin/recovery/**"
+                ).permitAll()
+
+                // ------------------------------------------------
                 // ADMIN
                 // ------------------------------------------------
 

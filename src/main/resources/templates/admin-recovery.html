@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ASLENIX | Admin Password Recovery</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --aslenix-gradient: linear-gradient(
+                135deg,
+                #FF4D9D 0%,
+                #ED4AC2 30%,
+                #9855FF 55%,
+                #428EFF 80%,
+                #3EB1FC 100%
+            );
+            --aslenix-pink: #FF4D9D;
+            --aslenix-magenta: #ED4AC2;
+            --aslenix-purple: #9855FF;
+            --aslenix-blue: #428EFF;
+            --aslenix-light-blue: #3EB1FC;
+
+            --background: #f4f7f6;
+            --foreground: #102536;
+            --card: #ffffff;
+            --primary: var(--aslenix-pink);
+            --primary-hover: var(--aslenix-magenta);
+            --border: #dbe5e7;
+            --muted: #6b7b85;
+            --spectrum: var(--aslenix-gradient);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+            background:
+                radial-gradient(circle at 88% 12%, rgba(122, 44, 255, 0.08), transparent 32%),
+                radial-gradient(circle at 12% 88%, rgba(255, 10, 120, 0.07), transparent 35%),
+                var(--background);
+            color: var(--foreground);
+            -webkit-font-smoothing: antialiased;
+            padding: 20px;
+        }
+
+        .recovery-container {
+            width: 100%;
+            max-width: 440px;
+            padding: 40px 36px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 18px 42px rgba(16, 37, 54, 0.10);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recovery-container::before {
+            content: '';
+            position: absolute;
+            inset: 0 0 auto;
+            height: 4px;
+            background: var(--aslenix-gradient);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 850;
+            letter-spacing: 0.8px;
+            color: #102536;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .logo::after {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--aslenix-gradient);
+            display: inline-block;
+            margin: -2px 0 0;
+        }
+
+        .login-logo-mark {
+            display: block;
+            width: 74px;
+            height: 74px;
+            object-fit: contain;
+            margin: 0 auto 12px;
+            filter: drop-shadow(0 7px 14px rgba(122, 44, 255, 0.22));
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            background: #f8fafc;
+            color: #0f172a;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            border-color: var(--aslenix-purple);
+            background: #ffffff;
+            box-shadow: 0 0 0 3.5px rgba(122, 44, 255, 0.14);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 13px;
+            box-shadow: none;
+            width: auto;
+        }
+
+        .toggle-btn:hover {
+            color: #475569;
+            box-shadow: none;
+            transform: translateY(-50%);
+            background: none;
+        }
+
+        .toggle-btn:active {
+            box-shadow: none;
+            transform: translateY(-50%);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-top: 1px solid rgba(255, 255, 255, 0.58);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.22);
+            border-radius: 11px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.10) 100%),
+                linear-gradient(135deg, #FF4D9D 0%, #ED4AC2 30%, #9855FF 55%, #428EFF 80%, #3EB1FC 100%);
+            background-color: #9855ff;
+            color: white;
+            font-size: 15px;
+            font-weight: 750;
+            cursor: pointer;
+            box-shadow:
+                inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.75),
+                inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.24),
+                0 6px 18px rgba(152, 85, 255, 0.32),
+                0 2px 4px rgba(0, 0, 0, 0.12);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+            position: relative;
+            margin-top: 6px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.44) 0%, rgba(255, 255, 255, 0.18) 48%, rgba(255, 255, 255, 0.00) 52%, rgba(0, 0, 0, 0.06) 100%),
+                linear-gradient(135deg, #FF4D9D 0%, #ED4AC2 30%, #9855FF 55%, #428EFF 80%, #3EB1FC 100%);
+            transform: translateY(-1.5px);
+            box-shadow:
+                inset 0 1px 2px 0 rgba(255, 255, 255, 0.90),
+                inset 0 -1.5px 0 0 rgba(0, 0, 0, 0.28),
+                0 10px 24px rgba(152, 85, 255, 0.45),
+                0 3px 6px rgba(0, 0, 0, 0.16);
+            filter: brightness(1.03) saturate(1.08);
+        }
+
+        .submit-btn:active {
+            box-shadow:
+                inset 0 2px 4px 0 rgba(0, 0, 0, 0.32),
+                0 2px 6px rgba(152, 85, 255, 0.22);
+            transform: translateY(1px);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .invalid-token-card {
+            text-align: center;
+        }
+
+        .invalid-icon {
+            font-size: 48px;
+            color: #dc2626;
+            margin-bottom: 16px;
+        }
+
+        .invalid-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .invalid-text {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--aslenix-purple);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--aslenix-magenta);
+        }
+
+        /* Strength meter */
+        .strength-container {
+            margin-top: 6px;
+        }
+
+        .strength-bar-bg {
+            height: 4px;
+            width: 100%;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .strength-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748b;
+            margin-top: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .match-badge {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .security-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11.5px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="recovery-container">
+
+    <div class="logo"><img class="login-logo-mark" src="/images/aslenix.png" alt="ASLENIX">ASLENIX</div>
+
+    <!-- ============================================================ -->
+    <!-- INVALID / EXPIRED TOKEN VIEW                                 -->
+    <!-- ============================================================ -->
+
+    <div th:if="${tokenInvalid}" class="invalid-token-card">
+        <div class="subtitle">Password Recovery</div>
+
+        <div class="invalid-icon">
+            <i class="fa-solid fa-shield-xmark"></i>
+        </div>
+
+        <div class="invalid-title">Recovery Link Invalid or Expired</div>
+
+        <div class="invalid-text">
+            This password recovery link is no longer valid. It may have
+            expired, already been used, or the link is incorrect.<br>
+            Please request a new recovery link.
+        </div>
+
+        <a href="/login" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Login
+        </a>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PASSWORD RESET FORM                                          -->
+    <!-- ============================================================ -->
+
+    <div th:if="${!tokenInvalid}">
+
+        <div class="subtitle">
+            Admin Password Recovery
+        </div>
+
+        <div th:if="${errorMessage}" class="message error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span th:text="${errorMessage}">Validation error</span>
+        </div>
+
+        <form method="post" th:action="'/admin/recovery/' + ${token}" id="recoveryForm">
+
+            <!-- CSRF protection -->
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <div class="form-group">
+                <label for="password">New Password <span style="color:#ef4444">*</span></label>
+                <div class="input-wrapper">
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter a secure password (min 6 characters)"
+                            required
+                            minlength="6"
+                            autocomplete="new-password">
+                    <button type="button" class="toggle-btn" onclick="togglePasswordVisibility('password', this)">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                <div class="strength-container">
+                    <div class="strength-bar-bg">
+                        <div id="strengthBar" class="strength-bar"></div>
+                    </div>
+                    <div class="strength-label">
+                        <span>Password Strength: <strong id="strengthText">None</strong></span>
+                        <span>Min. 6 chars</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password <span style="color:#ef4444">*</span></label>
+                <div class="input-wrapper">
+                    <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            placeholder="Re-enter password to confirm"
+                            required
+                            minlength="6"
+                            autocomplete="new-password">
+                    <button type="button" class="toggle-btn" onclick="togglePasswordVisibility('confirmPassword', this)">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                <div id="matchBadge" class="match-badge"></div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fa-solid fa-key"></i>
+                Reset Password
+            </button>
+
+        </form>
+
+        <div class="security-footer">
+            <i class="fa-solid fa-lock"></i>
+            <span>Authorized Administrator Password Recovery Portal</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function togglePasswordVisibility(fieldId, btn) {
+        const field = document.getElementById(fieldId);
+        const icon = btn.querySelector('i');
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    const passInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirmPassword');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const matchBadge = document.getElementById('matchBadge');
+
+    if (passInput) {
+        function calculateStrength(pwd) {
+            if (!pwd || pwd.length === 0) return { score: 0, text: 'None', color: '#e2e8f0', width: '0%' };
+            let score = 0;
+            if (pwd.length >= 6) score++;
+            if (pwd.length >= 10) score++;
+            if (/[A-Z]/.test(pwd)) score++;
+            if (/[0-9]/.test(pwd)) score++;
+            if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+            if (score <= 1) return { score: 1, text: 'Weak', color: '#ef4444', width: '25%' };
+            if (score === 2 || score === 3) return { score: 2, text: 'Medium', color: '#f59e0b', width: '60%' };
+            return { score: 3, text: 'Strong', color: '#10b981', width: '100%' };
+        }
+
+        passInput.addEventListener('input', () => {
+            const result = calculateStrength(passInput.value);
+            strengthBar.style.width = result.width;
+            strengthBar.style.backgroundColor = result.color;
+            strengthText.textContent = result.text;
+            strengthText.style.color = result.color;
+            checkMatch();
+        });
+
+        confirmInput.addEventListener('input', checkMatch);
+
+        function checkMatch() {
+            const p1 = passInput.value;
+            const p2 = confirmInput.value;
+            if (!p2) {
+                matchBadge.style.display = 'none';
+                return;
+            }
+            matchBadge.style.display = 'block';
+            if (p1 === p2) {
+                matchBadge.textContent = '✓ Passwords match';
+                matchBadge.style.color = '#10b981';
+            } else {
+                matchBadge.textContent = '✕ Passwords do not match';
+                matchBadge.style.color = '#ef4444';
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
