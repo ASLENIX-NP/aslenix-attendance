@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,12 +48,10 @@ public class FileUploadService {
     }
 
     /**
-     * Stores an uploaded employee photo and returns its web-accessible URL.
-     * When ImageKit is configured via environment variables, the photo is stored in ImageKit.
-     * Otherwise, falls back to local disk storage.
+     * Stores an uploaded employee photo to ImageKit and returns its web-accessible URL.
      *
      * @param file the multipart file uploaded by the client
-     * @return the photo URL (ImageKit CDN URL or local /uploads/photos/... path) or null if empty
+     * @return the photo URL (ImageKit CDN URL) or null if empty
      * @throws IOException if saving fails
      */
     public String storeEmployeePhoto(MultipartFile file) throws IOException {
@@ -76,12 +73,7 @@ public class FileUploadService {
         String uniqueFileName = "emp_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + extension;
         byte[] fileBytes = file.getBytes();
 
-        if (isImageKitActive()) {
-            return uploadToImageKit(fileBytes, uniqueFileName);
-        }
-
-        // Default / fallback local disk storage ONLY when ImageKit is not configured/active
-        return storeLocally(fileBytes, uniqueFileName);
+        return uploadToImageKit(fileBytes, uniqueFileName);
     }
 
     /**
@@ -139,15 +131,6 @@ public class FileUploadService {
         return uploadToImageKit(bytes, fileName);
     }
 
-    private String storeLocally(byte[] fileBytes, String uniqueFileName) throws IOException {
-        if (!Files.exists(uploadRoot)) {
-            Files.createDirectories(uploadRoot);
-        }
-        Path targetLocation = uploadRoot.resolve(uniqueFileName);
-        Files.copy(new ByteArrayInputStream(fileBytes), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-        log.info("Stored employee photo locally: {} at {}", uniqueFileName, targetLocation);
-        return "/uploads/photos/" + uniqueFileName;
-    }
 
     /**
      * Deletes an employee photo from ImageKit or disk based on URL format.

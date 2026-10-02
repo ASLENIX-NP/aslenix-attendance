@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FileUploadServiceTest {
 
     @Test
-    void testLocalFallbackWhenImageKitNotConfigured() throws IOException {
+    void testWhenImageKitNotActiveThrowsException() {
         ImageKitConfig config = new ImageKitConfig();
         FileUploadService service = new FileUploadService(config, null);
 
@@ -24,13 +24,7 @@ public class FileUploadServiceTest {
                 new byte[]{1, 2, 3, 4}
         );
 
-        String photoUrl = service.storeEmployeePhoto(file);
-        assertNotNull(photoUrl);
-        assertTrue(photoUrl.startsWith("/uploads/photos/"));
-        assertTrue(photoUrl.endsWith(".jpg"));
-
-        // Clean up
-        service.deleteEmployeePhoto(photoUrl);
+        assertThrows(IllegalStateException.class, () -> service.storeEmployeePhoto(file));
     }
 
     @Test
