@@ -125,7 +125,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // 2. If environment/properties explicitly configure auto-provisioning
-        if (!hasAdmin && (autoCreateAdmin || (initialAdminPassword != null && !initialAdminPassword.isBlank()))) {
+        if (!hasAdmin && autoCreateAdmin) {
             String passwordToUse = (initialAdminPassword != null && !initialAdminPassword.isBlank())
                     ? initialAdminPassword
                     : "123";
